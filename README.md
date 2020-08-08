@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/atmughrabi/OpenGraph-Sim.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=master)](https://travis-ci.com/atmughrabi/OpenGraphSim)
+[![Build Status](https://travis-ci.com/atmughrabi/OpenGraphSim.svg?branch=master)](https://travis-ci.com/atmughrabi/OpenGraphSim)
 [<p align="center"><img src="./02_slides/fig/logo.png" width="650" ></p>](#opengraph-Sim-benchmark-suite)
 
 # OpenGraph-Sim Benchmark Suite
@@ -9,7 +9,7 @@
 
 ![End-to-End Evaluation](./02_slides/fig/theme.png "OpenGraph-Sim")
 
-OpenGraph-Sim build upon OpenGraph by integrating it with simulators like SNIPER/GEM5. It is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraph-Sim has been developed on Ubuntu 20.04, with PowerPC/Intel architecture taken into account.
+OpenGraph-Sim builds upon OpenGraph by integrating it with simulators like SNIPER/GEM5. It is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraph-Sim has been developed on Ubuntu 20.04, with PowerPC/Intel architecture taken into account.
 OpenGraph-Sim is coded using C giving the researcher full flexibility with modifying data structures and other algorithmic optimizations.
 
 * Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
