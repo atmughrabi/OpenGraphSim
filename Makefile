@@ -2,22 +2,22 @@
 #       		 GENERAL DIRECTOIRES   	    			#
 #########################################################
 # globals binaary /bin/accel-graph name doesn't need to match main/accel-graph.c
-APP                        ?= open-graph
+APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-export APP_TEST          ?=  test_open-graph
-# export APP_TEST          ?=  pagerRank-accuracy-report
-# export APP_TEST          ?=  pagerRank-capi-report
-# export APP_TEST          ?=  test_cache
+export APP_TEST             ?=  test_open-graph
+# export APP_TEST             ?=  pagerRank-accuracy-report
+# export APP_TEST             ?=  test_grasp-cache
 
 # dirs Root app
 export APP_DIR              ?= .
 
 
-export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-
-export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
-# export BENCHMARKS_DIR    	= ../../$(BENCHMARKS_DIR_LOCAL)
+# export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
+export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+# export BENCHMARKS_DIR    	?= ../01_test_graphs
+# export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
+# export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
 
 #dir root/managed_folders
 export SRC_DIR           	= src
@@ -55,7 +55,7 @@ export MAIN_DIR		  	= main
 
 # # small test graphs
 # export GRAPH_NAME ?= test
-export GRAPH_NAME ?= v51_e1021
+# export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= amazon
 
@@ -66,6 +66,7 @@ export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
+export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
@@ -92,12 +93,6 @@ export GRAPH_NAME ?= v51_e1021
 # export MIX = Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en
 export LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001 Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en gplus USA-Road enwiki-2013 KONECT-wikipedia_link_en twitter
 
-# export GAP = GAP-kron GAP-road GAP-twitter GAP-urand GAP-web
-# export CU_CONFIG_MODES ?= 0x00000000 0x00041000 0x00841000 0x10041000 0x10841000
-# export CU_CONFIG_MODES ?= 0x10000000 0x00800000 0x00040000 0x00001000
-export CU_CONFIG_MODES  ?= 0x00041000 0x00841000
-# export PUSHPULL_MODES = 0 2 4 9 10 11 12 13
-
 # TEXT formant
 # export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph
 
@@ -112,31 +107,31 @@ export FILE_BIN_TYPE ?= graph.wbin
 export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 
 #Direction
-export PULL_PUSH 		?=0
+export PULL_PUSH 		?= 0
 
 #GRAPH RUN
-export SORT_TYPE		?=0
-export REORDER 		    ?=0
-export DATA_STRUCTURES  ?=0
-export ALGORITHMS 		?=2
+export SORT_TYPE		?= 0
+export REORDER 		    ?= 4
+export DATA_STRUCTURES  ?= 0
+export ALGORITHMS 		?= 1
 
-export ROOT 			?=164
-export TOLERANCE 		?=1e-8
+export ROOT 			?= 164
+export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 
 export START_THREADS	?= 1
-export INC_THREADS      ?=1
-export NUM_THREADS  	?=25
+export INC_THREADS      ?= 1
+export NUM_THREADS  	?= 1
 # NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1
-export NUM_TRIALS 		?=1
+export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1
-export CONVERT_FORMAT 	?=1
+export CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
-export BIN_SIZE 		?=1000
-export INOUT_STATS 		?=0
+export BIN_SIZE 		?= 1000
+export INOUT_STATS 		?= 0
 
 ##################################################
 
@@ -149,7 +144,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
+export ARGS ?= -w -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
 ##################################################
 ##################################################
 

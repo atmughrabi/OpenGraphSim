@@ -37,24 +37,24 @@
 // GRASP EXPRESS (GRASP-XP)
 // CHOOSE global Policys
 // #define POLICY LRU_POLICY
-// #define POLICY SRRIP_POLICY
+#define POLICY SRRIP_POLICY
 // #define POLICY LFU_POLICY
 // #define POLICY GRASP_POLICY
 // #define POLICY PIN_POLICY
-#define POLICY PLRU_POLICY
+// #define POLICY PLRU_POLICY
 // #define POLICY GRASPXP_POLICY
 
 #ifndef POLICY
 #define POLICY GRASP_POLICY
 #endif
 
-#define BLOCKSIZE   64
-#define L1_SIZE     1048576 + 262144 + 262144 + 262144 + 262144
-#define L1_ASSOC    16
+// #define BLOCKSIZE   64
+// #define L1_SIZE     1048576 + 262144 + 262144 + 262144 + 262144
+// #define L1_ASSOC    16
 
-// #define BLOCKSIZE   128
-// #define L1_SIZE     786432
-// #define L1_ASSOC    8
+#define BLOCKSIZE   128
+#define L1_SIZE     786432
+#define L1_ASSOC    8
 
 // #define BLOCKSIZE   128
 // #define L1_SIZE     (262144 + 262144 + (262144/2))

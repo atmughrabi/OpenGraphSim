@@ -99,7 +99,6 @@ GRAPH_NAME ?= test
 
 LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
 MIX ?= GAP-kron GAP-road GAP-twitter GAP-urand GAP-web
-CU_CONFIG_MODES ?= 0x00000000 0x00041000 0x00841000 0x10041000 0x10841000
 
 # TEXT formant
 # export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph
@@ -138,10 +137,10 @@ FILE_FORMAT 	?= 1
 CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
-BIN_SIZE ?= 512
-INOUT_STATS ?= 0
+BIN_SIZE        ?= 512
+INOUT_STATS     ?= 0
 
-ARGS ?= z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
+ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
 
 
 ##############################################
@@ -151,8 +150,6 @@ ARGS ?= z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(
 
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
 SRC_FILES_ALGO_OPENMP		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/*.c)
-SRC_FILES_ALGO_CACHE		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/cachesim/*.c)
-
 SRC_FILES_UTIL		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
 SRC_FILES_PREPRO	=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
 SRC_FILES_STRUCT	=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
@@ -160,10 +157,17 @@ SRC_FILES_MAIN		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
 SRC_FILES_TEST		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
 SRC_FILES_CACHE		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/*.c)
 
+INC_FILES_ALGO_OPENMP		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/openmp/*.h)
+INC_FILES_UTIL		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
+INC_FILES_PREPRO	=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
+INC_FILES_STRUCT	=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
+INC_FILES_CACHE		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)/*.h)
+
+ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CACHE)
+
 #create object file rules for the final binary target
 OBJ_FILES_ALGO_OPENMP 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
-OBJ_FILES_ALGO_CACHE 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/cachesim/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o,$(SRC_FILES_ALGO_CACHE))
-
+OBJ_FILES_ALGO_CACHE		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o,$(SRC_FILES_ALGO_OPENMP))
 
 OBJ_FILES_UTIL 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
 OBJ_FILES_PREPRO 	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
@@ -173,6 +177,7 @@ OBJ_FILES_TEST  	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$
 OBJ_FILES_CACHE  	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o,$(SRC_FILES_CACHE))
 
 
+
 CC				  = gcc
 
 OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
@@ -180,7 +185,6 @@ OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
 				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)
-
 
 # flags
 CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
@@ -241,10 +245,10 @@ directories-openmp :
 directories-cache :
 	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim
 
-$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
+$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
-$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_CACHE) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
+$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_CACHE) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE) 
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
@@ -256,22 +260,22 @@ $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$
 $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c
+$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(INC_FILES_ALGO_OPENMP) $(ALL_HEADER_FILES)
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(INC_FILES_ALGO_OPENMP) $(ALL_HEADER_FILES)
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c $(INC_FILES_CACHE)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/cachesim/%.c
-	$(CC) $(CFLAGS) $(MODE) $(OPENMP_INC) -c -o $@ $<
-
-$(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c
+$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
-
-$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c
+$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 .PHONY: clean
@@ -350,14 +354,14 @@ help: app-openmp
 run: run-openmp
 
 .PHONY: debug-cache
-debug-cache: MODE 		= -DCACHE_HARNESS
-debug-cache: INTEGRATION 	= cachesim
+debug-cache: MODE 		  = -DCACHE_HARNESS
+debug-cache: INTEGRATION  = openmp
 debug-cache: app-cache
 	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim  -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-cache
 run-cache: MODE 		= -DCACHE_HARNESS
-run-cache: INTEGRATION 	= cachesim
+run-cache: INTEGRATION 	= openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
 

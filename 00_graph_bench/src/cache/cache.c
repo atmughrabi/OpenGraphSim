@@ -1676,9 +1676,11 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node)
 void AccessDoubleTaggedCacheFloat(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, float value)
 {
     // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
-
-    AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
-    Access(cache->ref_cache, addr, op, node);
+    #pragma omp critical
+    {
+        AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
+        Access(cache->ref_cache, addr, op, node);
+    }
 }
 
 void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node)
