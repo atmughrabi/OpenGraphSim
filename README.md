@@ -1,16 +1,16 @@
-[![Build Status](https://travis-ci.com/atmughrabi/OpenGraph.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=master)](https://travis-ci.com/atmughrabi/OpenGraphSim)
-[<p align="center"><img src="./02_slides/fig/logo.png" width="650" ></p>](#opengraph-benchmark-suite)
+[![Build Status](https://travis-ci.com/atmughrabi/OpenGraph-Sim.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=master)](https://travis-ci.com/atmughrabi/OpenGraphSim)
+[<p align="center"><img src="./02_slides/fig/logo.png" width="650" ></p>](#opengraph-Sim-benchmark-suite)
 
-# OpenGraph Benchmark Suite
+# OpenGraph-Sim Benchmark Suite
 
 ## Graph Processing Framework with OpenMP
 
 ## Overview
 
-![End-to-End Evaluation](./02_slides/fig/theme.png "OpenGraph")
+![End-to-End Evaluation](./02_slides/fig/theme.png "OpenGraph-Sim")
 
-OpenGraph is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraph has been developed on Ubuntu 16.04.6, with PowerPC/Intel architecture taken into account.
-OpenGraph is coded using C giving the researcher full flexibility with modifying data structures and other algorithmic optimizations.
+OpenGraph-Sim build upon OpenGraph by integrating it with simulators like SNIPER/GEM5. It is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraph-Sim has been developed on Ubuntu 20.04, with PowerPC/Intel architecture taken into account.
+OpenGraph-Sim is coded using C giving the researcher full flexibility with modifying data structures and other algorithmic optimizations.
 
 * Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
   * Preprocessing two steps (third one is optional) :
@@ -28,11 +28,17 @@ OpenGraph is coded using C giving the researcher full flexibility with modifying
        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
 
 <!-- ## Details -->
-<!-- ### OpenGraph Supported Algorithms -->
+<!-- ### OpenGraph-Sim Supported Algorithms -->
 
 # Installation
 
 ## Dependencies
+
+### Sniper simulator
+1. Coming soon
+
+### GEM5 simulator
+1. Coming soon
 
 ### OpenMP
 1. Judy Arrays
@@ -45,20 +51,20 @@ open@graph:~$ sudo apt-get install libomp-dev
 ```
 ## Setting up the source code
 
-1. Clone OpenGraph.
+1. Clone OpenGraph-Sim.
 ```console
-open@graph:~$ git clone https://github.com/atmughrabi/OpenGraph.git
+open@graph:~$ git clone https://github.com/atmughrabi/OpenGraph-Sim.git
 ```
-2. From the home directory go to the OpenGraph directory:
+2. From the home directory go to the OpenGraph-Sim directory:
 ```console
-open@graph:~$ cd OpenGraph/
+open@graph:~$ cd OpenGraph-Sim/
 ```
 3. Make the source code
 ```console
-open@graph:~OpenGraph$ make
+open@graph:~OpenGraph-Sim$ make
 ```
 
-# Running OpenGraph
+# Running OpenGraph-Sim 
 
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
@@ -66,22 +72,33 @@ open@graph:~OpenGraph$ make
 
 1. (Optional) From the root directory go to the graph benchmark directory:
 ```console
-open@graph:~OpenGraph$ cd 00_graph_bench/
+open@graph:~OpenGraph-Sim$ cd 00_graph_bench/
 ```
 2. The default compilation is `openmp` mode:
 ```console
-open@graph:~OpenGraph/00_graph_bench$ make
+open@graph:~OpenGraph-Sim/00_graph_bench$ make
 ```
-3. From the root directory you can modify the Makefile with the [(parameters)](#opengraph-options) you need for OpenMP:
+3. From the root directory you can modify the Makefile with the [(parameters)](#opengraph-Sim-options) you need for OpenMP:
 ```console
-open@graph:~OpenGraph/00_graph_bench$ make run
+open@graph:~OpenGraph-Sim/00_graph_bench$ make run
 ```
 * OR
 ```console
-open@graph:~OpenGraph/00_graph_bench$ make run-openmp
+open@graph:~OpenGraph-Sim/00_graph_bench$ make run-openmp
 ```
 
-## Graph structure Input (Edge list)
+# Running OpenGraph-Sim Simulation mode
+
+## Initial compilation for the Graph framework with a simple trace Cache 
+1. Coming soon
+
+## Initial compilation for the Graph framework with Sniper 
+1. Coming soon
+
+## Initial compilation for the Graph framework with GEM5 
+1. Coming soon
+
+# Graph structure Input (Edge list)
 
 * If you open the Makefile you will see the convention for graph directories : `BENCHMARKS_DIR/GRAPH_NAME/graph.wbin`.
 * `.bin` stands to unweighted edge list, `.wbin` stands for wighted, `In binary format`. (This is only a convention you don't have to use it)
@@ -114,11 +131,11 @@ open@graph:~OpenGraph/00_graph_bench$ make run-openmp
 * NOTE: you can read the file from text format without the convert step. By adding `--graph-file-format 0` to the argument list. The default is `1` assuming it is binary. please check `--help` for better explanation.
 * `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
 ```console
-open@graph:~OpenGraph/00_graph_bench$ make convert
+open@graph:~OpenGraph-Sim/00_graph_bench$ make convert
 ```
 * OR
 ```console
-open@graph:~OpenGraph/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+open@graph:~OpenGraph-Sim/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
 * OUTPUT: (weighted binary edge-list)
@@ -136,7 +153,7 @@ open@graph:~OpenGraph/00_graph_bench$ ./bin/open-graph-openmp  --generate-weight
 ```
 
 # Graph Structure Preprocessing:
-OpenGraph can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
+OpenGraph-Sim can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
 
 ## Regular unsorted Edge-list as input.
 
@@ -155,14 +172,14 @@ OpenGraph can handle multiple representations of the graph structure in memory, 
 <p align="center"><img src="./02_slides/fig/datastructures/linkedlist.png" width="600" ></p>
 
 
-# OpenGraph Options
+# OpenGraph-Sim Options
 
 ```
 Usage: open-graph-openmp [OPTION...]
             -f <graph file> -d [data structure] -a [algorithm] -r [root] -n
             [num threads] [-h -c -s -w]
 
-OpenGraph is an open source graph processing framework, it is designed to be a
+OpenGraph-Sim is an open source graph processing framework, it is designed to be a
 benchmarking suite for various graph processing algorithms using pure C.
 
   -a, --algorithm=[DEFAULT:0]
@@ -364,30 +381,42 @@ benchmarking suite for various graph processing algorithms using pure C.
 
 # Tasks TODO:
 
-- [x] Finish preprocessing sort
-  - [x] Radix sort
-  - [x] Count sort
-  - [ ] Bitonic sort
-- [x] Finish preprocessing Graph Data-structures
-  - [x] CSR   (Compressed Sparse Row)
-  - [x] Grid
-  - [x] Adjacency Linked List
-  - [x] Adjacency Array List
-- [x] Add Light weight reordering
-- [x] Finish graph algorithms suite OpenMP
-  - [x] BFS   (Breadth First Search)
-  - [x] PR    (Page-Rank)
-  - [x] DFS   (Depth First Search)
-  - [x] IA    (Incremental Aggregation) BUGGY*
-  - [x] SSSP  (BellmanFord)
-  - [x] SSSP  (Delta Stepping)
-  - [x] SPMV  (Sparse Matrix Vector Multiplication)
-  - [x] CC    (Connected Components)
-  - [x] TC    (Triangle Counting)
-  - [x] BC    (Betweenness Centrality)
-- [x] Support testing
+- [ ] Finish graph algorithms suite Simple Trace Cache
+  - [ ] BFS   (Breadth First Search)
+  - [ ] PR    (Page-Rank)
+  - [ ] DFS   (Depth First Search)
+  - [ ] IA    (Incremental Aggregation) BUGGY*
+  - [ ] SSSP  (BellmanFord)
+  - [ ] SSSP  (Delta Stepping)
+  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
+  - [ ] CC    (Connected Components)
+  - [ ] TC    (Triangle Counting)
+  - [ ] BC    (Betweenness Centrality)
+- [ ] Finish graph algorithms suite Sniper
+  - [ ] BFS   (Breadth First Search)
+  - [ ] PR    (Page-Rank)
+  - [ ] DFS   (Depth First Search)
+  - [ ] IA    (Incremental Aggregation) BUGGY*
+  - [ ] SSSP  (BellmanFord)
+  - [ ] SSSP  (Delta Stepping)
+  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
+  - [ ] CC    (Connected Components)
+  - [ ] TC    (Triangle Counting)
+  - [ ] BC    (Betweenness Centrality)
+- [ ] Finish graph algorithms suite GEM5
+  - [ ] BFS   (Breadth First Search)
+  - [ ] PR    (Page-Rank)
+  - [ ] DFS   (Depth First Search)
+  - [ ] IA    (Incremental Aggregation) BUGGY*
+  - [ ] SSSP  (BellmanFord)
+  - [ ] SSSP  (Delta Stepping)
+  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
+  - [ ] CC    (Connected Components)
+  - [ ] TC    (Triangle Counting)
+  - [ ] BC    (Betweenness Centrality)
+
 
 Report bugs to:
 - <atmughrabi@gmail.com>
 - <atmughra@ncsu.edu>
-[<p align="right"> <img src="./02_slides/fig/logo1.png" width="200" ></p>](#opengraph-benchmark-suite)
+[<p align="right"> <img src="./02_slides/fig/logo1.png" width="200" ></p>](#opengraph-Sim-benchmark-suite)
