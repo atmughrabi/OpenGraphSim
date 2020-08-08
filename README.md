@@ -37,7 +37,7 @@ OpenGraph-Sim is coded using C giving the researcher full flexibility with modif
 ### Sniper simulator
 1. Coming soon
 
-### GEM5 simulator
+### gem5 simulator
 1. Coming soon
 
 ### OpenMP
@@ -89,13 +89,13 @@ open@graph:~OpenGraph-Sim/00_graph_bench$ make run-openmp
 
 # Running OpenGraph-Sim Simulation mode
 
-## Initial compilation for the Graph framework with a simple trace Cache 
+## Simple trace-driven Cache 
 1. Coming soon
 
-## Initial compilation for the Graph framework with Sniper 
+## Sniper Multi-Core Simulator
 1. Coming soon
 
-## Initial compilation for the Graph framework with GEM5 
+## gem5 Simulator
 1. Coming soon
 
 # Graph structure Input (Edge list)
