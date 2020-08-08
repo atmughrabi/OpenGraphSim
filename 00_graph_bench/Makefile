@@ -54,48 +54,6 @@ GRAPH_NAME ?= test
 # GRAPH_NAME ?= v51_e1021
 # GRAPH_NAME  ?= v300_e2730
 
-#gem5-Aladdin small dynamic traces
-# GRAPH_NAME ?= Gnutella
-# GRAPH_NAME ?= dblp
-# GRAPH_NAME ?= amazon
-# GRAPH_NAME ?= euall
-
-# generates large dynamic traces for gem5-Aladdin
-# GRAPH_NAME ?= com-youtube
-# GRAPH_NAME ?= web-BerkStan
-# GRAPH_NAME ?= web-Google
-# GRAPH_NAME ?= wiki-Talk
-
-# synthetic graphs
-# GRAPH_NAME ?= RMAT20
-# GRAPH_NAME ?= RMAT22
-
-# real world large graphs binary format
-# GRAPH_NAME ?= orkut
-# GRAPH_NAME ?= gplus
-# GRAPH_NAME ?= sk-2005
-# GRAPH_NAME ?= twitter
-# GRAPH_NAME ?= livejournal
-# GRAPH_NAME ?= USA-Road
-# GRAPH_NAME ?= enwiki-2013
-# GRAPH_NAME ?= arabic-2005
-
-# real world large graphs binary LAW
-# GRAPH_NAME ?= amazon-2008
-# GRAPH_NAME ?= arabic-2005
-# GRAPH_NAME ?= cnr-2000
-# GRAPH_NAME ?= dblp-2010
-# GRAPH_NAME ?= enron
-# GRAPH_NAME ?= eu-2005
-# GRAPH_NAME ?= hollywood-2009
-# GRAPH_NAME ?= in-2004
-# GRAPH_NAME ?= indochina-2004
-# GRAPH_NAME ?= it-2004
-# GRAPH_NAME ?= ljournal-2008
-# GRAPH_NAME ?= sk-2005
-# GRAPH_NAME ?= uk-2002
-# GRAPH_NAME ?= uk-2005
-# GRAPH_NAME ?= webbase-2001
 
 LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
 MIX ?= GAP-kron GAP-road GAP-twitter GAP-urand GAP-web
@@ -254,19 +212,19 @@ $(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP)
 $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
-$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c
+$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c
+$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(INC_FILES_ALGO_OPENMP) $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
-$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(INC_FILES_ALGO_OPENMP) $(ALL_HEADER_FILES)
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c $(INC_FILES_CACHE)

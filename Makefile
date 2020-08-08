@@ -1,13 +1,13 @@
 #########################################################
 #       		 GENERAL DIRECTOIRES   	    			#
 #########################################################
-# globals binaary /bin/accel-graph name doesn't need to match main/accel-graph.c
+# globals binaary /bin/open-graph name doesn't need to match main/open-graph.c
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-export APP_TEST             ?=  test_open-graph
+# export APP_TEST             ?=  test_open-graph
 # export APP_TEST             ?=  pagerRank-accuracy-report
-# export APP_TEST             ?=  test_grasp-cache
+export APP_TEST             ?=  test_grasp-cache
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -63,10 +63,10 @@ export MAIN_DIR		  	= main
 # GAP https://sparse.tamu.edu/MM/GAP/
 # https://gonglab.pratt.duke.edu/google-dataset
 
-# export GRAPH_NAME ?= Gong-gplus
+export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-export GRAPH_NAME ?= SNAP-web-Google
+# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
@@ -121,7 +121,7 @@ export DELTA			?= 800
 
 export START_THREADS	?= 1
 export INC_THREADS      ?= 1
-export NUM_THREADS  	?= 1
+export NUM_THREADS  	?= 8
 # NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
