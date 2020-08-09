@@ -131,14 +131,6 @@ static struct argp_option options[] =
         "remove-duplicate",      'k', 0,      0,
         "\nRemovers duplicate edges and self loops from the graph.\n"
     },
-    {
-        "afu-config",            'm', "[DEFAULT:0x1]\n",      0,
-        "\nCAPI FPGA integration: AFU-Control buffers(read/write/prefetcher) arbitration 0x01 round robin 0x10 fixed priority.\n"
-    },
-    {
-        "cu-config",             'q', "[DEFAULT:0x01]\n",      0,
-        "\nCAPI FPGA integration: CU configurations for requests cached/non cached/prefetcher active or not check README for more explanation.\n"
-    },
     { 0 }
 };
 
@@ -257,10 +249,6 @@ main (int argc, char **argv)
     arguments.fnameb = NULL;
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
-    arguments.afu_config = 0x01;
-    arguments.cu_config  = 0x01;
-    arguments.afu_config_2 = 0x01;
-    arguments.cu_config_2  = 0x01;
 
     void *graph = NULL;
 

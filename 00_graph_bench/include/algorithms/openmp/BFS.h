@@ -12,6 +12,10 @@
 #include "graphAdjArrayList.h"
 #include "graphAdjLinkedList.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
 // ********************************************************************************************
 // ***************					Stats DataStructure							 **************
 // ********************************************************************************************
@@ -24,6 +28,11 @@ struct BFSStats
     uint32_t  num_vertices;
     uint32_t iteration;
     double time_total;
+
+#ifdef CACHE_HARNESS
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
 };
 
 struct BFSStats *newBFSStatsGraphCSR(struct GraphCSR *graph);
@@ -37,7 +46,7 @@ void freeBFSStats(struct BFSStats *stats);
 // ***************					CSR DataStructure							 **************
 // ********************************************************************************************
 
-struct BFSStats *breadthFirstSearchGraphCSR(uint32_t source,uint32_t pushpull, struct GraphCSR *graph);
+struct BFSStats *breadthFirstSearchGraphCSR(uint32_t source, uint32_t pushpull, struct GraphCSR *graph);
 
 struct BFSStats *breadthFirstSearchPullGraphCSR(uint32_t source, struct GraphCSR *graph);
 struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR *graph);

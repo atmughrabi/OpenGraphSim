@@ -370,4 +370,5 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
 struct Cache *newCache( uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, uint32_t num_vertices, uint32_t policy, uint32_t numPropertyRegions);
 void freeCache(struct Cache *cache);
 
+
 #endif

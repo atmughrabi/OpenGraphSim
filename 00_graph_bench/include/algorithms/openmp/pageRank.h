@@ -10,6 +10,10 @@
 #include "graphAdjArrayList.h"
 #include "graphAdjLinkedList.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
 #define Damp 0.85f
 
 // ********************************************************************************************
@@ -27,6 +31,12 @@ struct PageRankStats
     float *pageRanks;
     double time_total;
     double error_total;
+
+#ifdef CACHE_HARNESS
+    uint32_t numPropertyRegions;
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
 };
 
 struct PageRankStats *newPageRankStatsGraphCSR(struct GraphCSR *graph);
