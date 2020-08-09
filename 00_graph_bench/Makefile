@@ -216,7 +216,7 @@ directories-cache :
 .PHONY: directories-sniper
 directories-sniper :
 	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper
-	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper-results
+	@mkdir -p $(APP_DIR)/sniper-results
 
 $(APP_DIR)/$(BIN_DIR)/$(APP)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
@@ -268,6 +268,7 @@ clean-stats:
 	@rm -f $(BENCHMARKS_DIR)/*.perf
 	@rm -f $(BENCHMARKS_DIR)/*/*.perf
 	@rm -f $(BENCHMARKS_DIR)/*/*.stats
+	@rm -fr $(APP_DIR)/sniper-results
 
 
 .PHONY: results-law
@@ -348,7 +349,7 @@ run-cache: app-cache
 run-sniper: MODE 		= -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown --roi -d $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown --roi -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp
