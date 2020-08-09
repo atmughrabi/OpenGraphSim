@@ -14,8 +14,8 @@ export APP_DIR              ?= .
 
 
 # export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-# export BENCHMARKS_DIR    	?= ../01_test_graphs
+# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+export BENCHMARKS_DIR    	?= ../01_test_graphs
 # export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
 # export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
 
@@ -25,6 +25,7 @@ export OBJ_DIR			  	= obj
 export INC_DIR			  	= include
 export BIN_DIR			  	= bin
 export RES_DIR			  	= results
+export SNI_DIR			    = sniper
 
 
 #if you want to compile from cmake you need this directory
@@ -56,7 +57,7 @@ export MAIN_DIR		  	= main
 # # small test graphs
 # export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
-# export GRAPH_NAME ?= v300_e2730
+export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= amazon
 
 
@@ -66,7 +67,7 @@ export MAIN_DIR		  	= main
 # export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-export GRAPH_NAME ?= SNAP-web-Google
+# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
@@ -121,7 +122,7 @@ export DELTA			?= 800
 
 export START_THREADS	?= 1
 export INC_THREADS      ?= 1
-export NUM_THREADS  	?= 8
+export NUM_THREADS  	?= 1
 # NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
@@ -163,6 +164,10 @@ run:
 .PHONY: run-cache
 run-cache:
 	$(MAKE) run-cache $(MAKE_ARGS)
+
+.PHONY: run-sniper
+run-sniper:
+	$(MAKE) run-sniper $(MAKE_ARGS)
 
 .PHONY: debug-cache
 debug-cache:

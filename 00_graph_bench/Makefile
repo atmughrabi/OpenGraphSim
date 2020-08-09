@@ -20,6 +20,7 @@ OBJ_DIR			  	?= obj
 INC_DIR			  	?= include
 BIN_DIR			  	?= bin
 RES_DIR			  	?= results
+SNI_DIR	            ?= sniper
 
 #if you want to compile from cmake you need this directory
 #cd build
@@ -126,6 +127,7 @@ ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_P
 #create object file rules for the final binary target
 OBJ_FILES_ALGO_OPENMP 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
 OBJ_FILES_ALGO_CACHE		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o,$(SRC_FILES_ALGO_OPENMP))
+OBJ_FILES_ALGO_SNIPER		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o,$(SRC_FILES_ALGO_OPENMP))
 
 OBJ_FILES_UTIL 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
 OBJ_FILES_PREPRO 	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
@@ -143,6 +145,8 @@ OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
 				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)
+
+SNIPER_INC =    -I$(APP_DIR)/$(SNI_DIR)/$(INC_DIR)
 
 # flags
 CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
@@ -163,7 +167,7 @@ FAIL = \033[91mFAIL\033[0m
 .PHONY: app-openmp
 app-openmp : directories directories-openmp $(APP_DIR)/$(BIN_DIR)/$(APP)-openmp
 	@echo "\n ******************************************************************************  "
-	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> AccelGraph: ./$(word 3,$^)"
+	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> OpenGraph-openmp: ./$(word 3,$^)"
 	@echo " ******************************************************************************  \n"
 
 .PHONY: test-openmp
@@ -175,7 +179,7 @@ test-openmp : directories directories-openmp $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-o
 .PHONY: app-cache
 app-cache : directories directories-cache $(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim
 	@echo "\n ******************************************************************************  "
-	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> AccelGraph: ./$(word 3,$^)"
+	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> OpenGraph-cache: ./$(word 3,$^)"
 	@echo " ******************************************************************************  \n"
 
 .PHONY: test-cache
@@ -183,6 +187,12 @@ test-cache : directories directories-cache $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cac
 	@echo "\n ******************************************************************************  "
 	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> TEST: ./$(word 3,$^)"
 	@echo " ****************************************************************************** \n"
+
+.PHONY: app-sniper
+app-sniper : directories directories-sniper $(APP_DIR)/$(BIN_DIR)/$(APP)-sniper
+	@echo "\n ******************************************************************************  "
+	@echo " * DONE!! NOTHING ELSE TO COMPILE ---> OpenGraph-sniper: ./$(word 3,$^)"
+	@echo " ******************************************************************************  \n"
 
 .PHONY: directories
 directories :
@@ -203,10 +213,18 @@ directories-openmp :
 directories-cache :
 	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim
 
+.PHONY: directories-sniper
+directories-sniper :
+	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper
+	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper-results
+
 $(APP_DIR)/$(BIN_DIR)/$(APP)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_CACHE) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE) 
+	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
+
+$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_SNIPER) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE) 
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
@@ -226,6 +244,9 @@ $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)
 
 $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
+
+$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(SNIPER_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c $(INC_FILES_CACHE)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
@@ -322,6 +343,12 @@ run-cache: MODE 		= -DCACHE_HARNESS
 run-cache: INTEGRATION 	= openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
+
+.PHONY: run-sniper
+run-sniper: MODE 		= -DSNIPER_HARNESS
+run-sniper: INTEGRATION = openmp
+run-sniper: app-sniper
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown --roi -d $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp

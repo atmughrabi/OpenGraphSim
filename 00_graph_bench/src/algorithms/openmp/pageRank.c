@@ -42,6 +42,10 @@
 #include "cache.h"
 #endif
 
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -1024,6 +1028,10 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
                 riDividedOnDiClause[v] = 0.0f;
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1043,6 +1051,12 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
             AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
 #endif
         }
+
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
+
 
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
