@@ -334,13 +334,13 @@ help: app-openmp
 run: run-openmp
 
 .PHONY: debug-cache
-debug-cache: MODE 		  = -DCACHE_HARNESS
+debug-cache: MODE 		  = -DCACHE_HARNESS -DCACHE_HARNESS_META
 debug-cache: INTEGRATION  = openmp
 debug-cache: app-cache
 	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim  -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-cache
-run-cache: MODE 		= -DCACHE_HARNESS
+run-cache: MODE 		= -DCACHE_HARNESS -DCACHE_HARNESS_META
 run-cache: INTEGRATION 	= openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
@@ -349,7 +349,7 @@ run-cache: app-cache
 run-sniper: MODE 		= -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown --roi -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 1 -c mybase --roi -s markers:stats -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp

@@ -180,7 +180,7 @@ void freePageRankStats(struct PageRankStats *stats)
         if(stats->pageRanks)
             free(stats->pageRanks);
 
-#ifdef CACHE_HARNESS
+#ifdef CACHE_HARNESS_META
         freeDoubleTaggedCache(stats->cache);
         if(stats->propertyMetaData)
             free(stats->propertyMetaData);
@@ -970,7 +970,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     float *pageRanksNext = (float *) my_malloc(graph->num_vertices * sizeof(float));
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
 
-#ifdef CACHE_HARNESS
+#ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
     stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
@@ -995,9 +995,6 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #endif
 
-
-
-
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
@@ -1014,6 +1011,10 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -1029,7 +1030,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        SimMarker(1, stats->iterations);
 #endif
 
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
@@ -1038,6 +1039,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
             float nodeIncomingPR = 0.0f;
             degree = vertices->out_degree[v];
             edge_idx = vertices->edges_idx[v];
+
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
                 u = sorted_edges_array[j];
@@ -1054,10 +1056,8 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
 
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, stats->iterations);
 #endif
-
-
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1074,6 +1074,10 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
             }
         }
 
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));
@@ -1118,7 +1122,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
 
     double error_total = 0.0;
-    uint32_t i;
+    // uint32_t i;
     uint32_t v;
 
     // double error = 0;
@@ -1130,22 +1134,25 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
 
 
-    omp_lock_t *vertex_lock  = (omp_lock_t *) my_malloc( graph->num_vertices * sizeof(omp_lock_t));
-
-
-
-
-    #pragma omp parallel for default(none) private(i) shared(graph,vertex_lock)
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_init_lock(&(vertex_lock[i]));
-    }
-
-
-
     float *pageRanksNext = (float *) my_malloc(graph->num_vertices * sizeof(float));
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[0].data_type_size = sizeof(float);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push (tolerance/epsilon)");
@@ -1180,6 +1187,9 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         #pragma omp parallel for default(none) private(v) shared(graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1193,19 +1203,13 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
             {
                 uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
 
-                // omp_set_lock(&(vertex_lock[u]));
-                //   pageRanksNext[u] += riDividedOnDiClause[v];
-                // omp_unset_lock((&vertex_lock[u]));
-
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
-
-                // __atomic_fetch_add(&pageRanksNext[u], riDividedOnDiClause[v], __ATOMIC_RELAXED);
-                // printf("tid %u degree %u edge_idx %u v %u u %u \n",tid,degree,edge_idx,v,u );
-
-                // addAtomicFloat(&pageRanksNext[u] , riDividedOnDiClause[v]);
             }
         }
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1251,15 +1255,8 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     printf(" -----------------------------------------------------\n");
     // pageRankPrint(pageRanks, graph->num_vertices);
 
-    #pragma omp parallel for
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_destroy_lock(&(vertex_lock[i]));
-    }
-
     free(timer);
     free(timer_inner);
-    free(vertex_lock);
     free(pageRanksNext);
     free(riDividedOnDiClause);
 
@@ -1307,6 +1304,23 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
     // uint64_t* outDegreesFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
     // uint64_t* pageRanksFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint64_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint64_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_64 (tolerance/epsilon)");
@@ -1343,6 +1357,9 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
         // Stop(timer_inner);
         // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         //  Start(timer_inner);
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1356,6 +1373,10 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
             }
 
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // Stop(timer_inner);
         // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
@@ -1454,6 +1475,22 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
     // uint64_t* outDegreesFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
     // uint64_t* pageRanksFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint32_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_32 (tolerance/epsilon)");
@@ -1490,6 +1527,9 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
         // Stop(timer_inner);
         // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         //  Start(timer_inner);
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1503,6 +1543,10 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             }
 
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // Stop(timer_inner);
         // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
@@ -1594,13 +1638,27 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #endif
 
-
-
     uint64_t *pageRanksNext = (uint64_t *) my_malloc(graph->num_vertices * sizeof(uint64_t));
     uint16_t *riDividedOnDiClause = (uint16_t *) my_malloc(graph->num_vertices * sizeof(uint16_t));
     // uint64_t* outDegreesFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
     // uint64_t* pageRanksFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint16_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint16_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_16 (tolerance/epsilon)");
@@ -1636,7 +1694,9 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
 
         // Stop(timer_inner);
         // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         //  Start(timer_inner);
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1650,6 +1710,10 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
             }
 
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // Stop(timer_inner);
         // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
@@ -1748,6 +1812,22 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
     // uint64_t* outDegreesFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
     // uint64_t* pageRanksFP = (uint64_t*) my_malloc(graph->num_vertices*sizeof(uint64_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint8_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint8_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_8 (tolerance/epsilon)");
@@ -1783,7 +1863,9 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
 
         // Stop(timer_inner);
         // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         //  Start(timer_inner);
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1797,6 +1879,10 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
             }
 
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // Stop(timer_inner);
         // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
@@ -1861,7 +1947,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
 {
 
     double error_total = 0.0;
-    uint32_t i;
+    // uint32_t i;
     uint32_t v;
 
     // double error = 0;
@@ -1875,22 +1961,26 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
 
 
-    omp_lock_t *vertex_lock  = (omp_lock_t *) my_malloc( graph->num_vertices * sizeof(omp_lock_t));
-
-
-
-    #pragma omp parallel for default(none) private(i) shared(graph,vertex_lock)
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_init_lock(&(vertex_lock[i]));
-    }
-
-
-
     // uint32_t* pageRanksFP = (uint32_t*) my_malloc(graph->num_vertices*sizeof(uint32_t));
     uint64_t *pageRanksNext = (uint64_t *) my_malloc(graph->num_vertices * sizeof(uint64_t));
     uint64_t *riDividedOnDiClause = (uint64_t *) my_malloc(graph->num_vertices * sizeof(uint64_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint64_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint64_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push FP (tolerance/epsilon)");
@@ -1931,6 +2021,10 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
         // Stop(timer_inner);
         // printf("|A%-10u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
         // Start(timer_inner);
+
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         #pragma omp parallel for default(none) schedule(dynamic, 1024) private(v) shared(graph,pageRanksNext,riDividedOnDiClause)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1945,17 +2039,14 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
                 uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
-
-                // omp_set_lock(&(vertex_lock[u]));
-                //   pageRanksNext[u] += riDividedOnDiClause[v];
-                // omp_unset_lock((&vertex_lock[u]));
-
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
-
-                // addAtomicFixedPoint(&pageRanksNext[u] , riDividedOnDiClause[v]);
             }
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // Stop(timer_inner);
         // printf("|B%-10u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
         // Start(timer_inner);
@@ -2001,17 +2092,9 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-    // pageRankPrint(pageRanks, graph->num_vertices);
-
-    #pragma omp parallel for
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_destroy_lock(&(vertex_lock[i]));
-    }
 
     free(timer);
     free(timer_inner);
-    free(vertex_lock);
     free(pageRanksNext);
     free(riDividedOnDiClause);
 
@@ -2049,6 +2132,23 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     uint32_t *riDividedOnDiClause_quant = (uint32_t *)my_malloc(graph->num_vertices * sizeof(uint32_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint32_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_32", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
@@ -2063,6 +2163,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     {
         pageRanksNext[v] = 0;
     }
+
 
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
@@ -2094,6 +2195,10 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
             riDividedOnDiClause_quant[v] = quantize_32(riDividedOnDiClause[v], rDivD_params.scale, rDivD_params.zero);
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -2109,6 +2214,9 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         //uint64_t temp_degree = 0;
         #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
@@ -2189,6 +2297,23 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     uint16_t *riDividedOnDiClause_quant = (uint16_t *)my_malloc(graph->num_vertices * sizeof(uint16_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint16_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint16_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_16", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
@@ -2233,6 +2358,9 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
         {
             riDividedOnDiClause_quant[v] = quantize_16(riDividedOnDiClause[v], rDivD_params.scale, rDivD_params.zero);
         }
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
 
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -2249,6 +2377,9 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         //uint64_t temp_degree = 0;
         #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
@@ -2329,6 +2460,23 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     uint8_t *riDividedOnDiClause_quant = (uint8_t *)my_malloc(graph->num_vertices * sizeof(uint8_t));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint8_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint8_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_8", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
@@ -2374,6 +2522,10 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
             riDividedOnDiClause_quant[v] = quantize_8(riDividedOnDiClause[v], rDivD_params.scale, rDivD_params.zero);
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -2388,6 +2540,10 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
             //nodeIncomingPR -= (degree * rDivD_params.zero);
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         //uint64_t temp_degree = 0;
         #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
@@ -2445,7 +2601,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
 struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
 {
     //QUANT_SCALE = 16;
-    uint32_t i;
+    // uint32_t i;
     uint32_t v;
     uint32_t activeVertices = 0;
     double error_total = 0.0;
@@ -2453,18 +2609,28 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
-    omp_lock_t *vertex_lock  = (omp_lock_t *) my_malloc( graph->num_vertices * sizeof(omp_lock_t));
-
-    #pragma omp parallel for default(none) private(i) shared(graph,vertex_lock)
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_init_lock(&(vertex_lock[i]));
-    }
 
     float *pageRanksNext = (float *) my_malloc(graph->num_vertices * sizeof(float));
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     uint32_t *riDividedOnDiClause_quant = (uint32_t *)my_malloc(graph->num_vertices * sizeof(uint32_t));
 
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint32_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Push Quant_32", "(tolerance/epsilon)");
@@ -2511,6 +2677,10 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
             riDividedOnDiClause_quant[v] = quantize(riDividedOnDiClause[v], rDivD_params.scale, rDivD_params.zero);
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
         #pragma omp parallel for default(none) private(v) shared(rDivD_params,riDividedOnDiClause_quant,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -2527,6 +2697,10 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
                 pageRanksNext[u] += rDivD_params.scale * (riDividedOnDiClause_quant[v] - rDivD_params.zero);
             }
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         #pragma omp parallel for private(v) shared(epsilon, stats,pageRanksNext) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
@@ -2570,15 +2744,8 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
     printf(" -----------------------------------------------------\n");
     // pageRankPrint(pageRanks, graph->num_vertices);
 
-    #pragma omp parallel for
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        omp_destroy_lock(&(vertex_lock[i]));
-    }
-
     free(timer);
     free(timer_inner);
-    free(vertex_lock);
     free(pageRanksNext);
     free(riDividedOnDiClause);
 
@@ -2630,6 +2797,24 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
 
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 2;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[0].data_type_size = sizeof(float);
+
+    stats->propertyMetaData[1].base_address = (uint64_t)&workListNext[0];
+    stats->propertyMetaData[1].size = graph->num_vertices * sizeof(uint8_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint8_t);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
+
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull DD (tolerance/epsilon)");
@@ -2668,6 +2853,10 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
             else
                 riDividedOnDiClause[v] = 0.0f;
         }
+
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
 
         #pragma omp parallel for default(none) shared(epsilon,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -2712,6 +2901,9 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // activeVertices = getNumOfSetBits(workListNext);
         swapWorkLists(&workListNext, &workListCurr);
         resetWorkList(workListNext, graph->num_vertices);
@@ -2762,8 +2954,6 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     uint32_t j;
     uint32_t u;
 
-
-
     // float init_pr = 1.0f / (float)graph->num_vertices;
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Vertex *vertices = NULL;
@@ -2774,10 +2964,8 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     uint8_t *workListNext = NULL;
     int activeVertices = 0;
 
-
     workListCurr  = (uint8_t *) my_malloc(graph->num_vertices * sizeof(uint8_t));
     workListNext  = (uint8_t *) my_malloc(graph->num_vertices * sizeof(uint8_t));
-
 
     resetWorkList(workListNext, graph->num_vertices);
     resetWorkList(workListCurr, graph->num_vertices);
@@ -2790,11 +2978,27 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #endif
 
-
-
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     float *aResiduals = (float *) my_malloc(graph->num_vertices * sizeof(float));
 
+
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 2;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[0].data_type_size = sizeof(float);
+
+    stats->propertyMetaData[1].base_address = (uint64_t)&workListNext[0];
+    stats->propertyMetaData[1].size = graph->num_vertices * sizeof(uint8_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint8_t);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
 
     printf(" -----------------------------------------------------\n");
@@ -2838,6 +3042,10 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
         error_total = 0;
         activeVertices = 0;
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
+
         #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -2880,6 +3088,9 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
         // activeVertices = getNumOfSetBits(workListNext);
         swapWorkLists(&workListNext, &workListCurr);
         resetWorkList(workListNext, graph->num_vertices);
@@ -2966,7 +3177,26 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     float *riDividedOnDiClause = (float *) my_malloc(graph->num_vertices * sizeof(float));
     float *aResiduals = (float *) my_malloc(graph->num_vertices * sizeof(float));
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 3;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
 
+    stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[0].data_type_size = sizeof(float);
+
+    stats->propertyMetaData[1].base_address = (uint64_t)&workListNext[0];
+    stats->propertyMetaData[1].size = graph->num_vertices * sizeof(uint8_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint8_t);
+
+    stats->propertyMetaData[2].base_address = (uint64_t)&aResiduals[0];
+    stats->propertyMetaData[2].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[2].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull-Push DD (tolerance/epsilon)");
@@ -3009,6 +3239,9 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
         error_total = 0;
         activeVertices = 0;
 
+#ifdef SNIPER_HARNESS
+        SimRoiStart();
+#endif
         #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -3057,6 +3290,9 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
                 aResiduals[v] = 0.0f;
             }
         }
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         // activeVertices = getNumOfSetBits(workListNext);
         swapWorkLists(&workListNext, &workListCurr);
