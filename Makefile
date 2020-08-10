@@ -124,7 +124,7 @@ export START_THREADS	?= 1
 export INC_THREADS      ?= 1
 export NUM_THREADS  	?= 1
 # NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_ITERATIONS	?= 2
+export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1
