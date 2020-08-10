@@ -24,6 +24,13 @@ struct SPMVStats
     float *vector_output;
     float *vector_input;
     double time_total;
+
+#ifdef CACHE_HARNESS_META
+    uint32_t numPropertyRegions;
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
+
 };
 
 struct SPMVStats *newSPMVStatsGraphCSR(struct GraphCSR *graph);

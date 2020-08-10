@@ -33,6 +33,10 @@
 
 #include "BFS.h"
 
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -272,6 +276,11 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(uint32_t source, struct GraphCSR
     printf("| BU %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     while (sharedFrontierQueue->q_bitmap->numSetBits)
     {
 
@@ -288,6 +297,11 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(uint32_t source, struct GraphCSR
         printf("| BU %-12u | %-15u | %-15f | \n", stats->iteration++, nf, Seconds(timer_inner));
 
     } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
     stats->time_total =  Seconds(timer);
 
@@ -497,6 +511,11 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(uint32_t source, s
     printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     while(!isEmptyArrayQueue(sharedFrontierQueue))  // start while
     {
 
@@ -554,6 +573,11 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(uint32_t source, s
 
 
     } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
     stats->time_total =  Seconds(timer);
 

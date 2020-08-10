@@ -15,11 +15,11 @@
 
 #ifndef HASHSIZE
 #define HASHSIZE (1 << 16) // hash table size 256
-#endif 
-#define JUDYERROR_SAMPLE 1 
+#endif
+#define JUDYERROR_SAMPLE 1
 
 struct CCStats
-{	
+{
     uint32_t neighbor_rounds;
     uint32_t iterations;
     uint32_t num_vertices;
@@ -27,6 +27,13 @@ struct CCStats
     uint32_t *counts;
     uint32_t *labels;
     double time_total;
+
+
+#ifdef CACHE_HARNESS_META
+    uint32_t numPropertyRegions;
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
 };
 
 struct CCStats *newCCStatsGraphCSR(struct GraphCSR *graph);

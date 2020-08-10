@@ -37,6 +37,13 @@
 
 #include "connectedComponents.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
 
 Pvoid_t JArray = (PWord_t) NULL; // Declare static hash table
 
@@ -159,6 +166,12 @@ void freeCCStats(struct CCStats *stats)
         if(stats->labels)
             free(stats->labels);
         free(stats);
+
+#ifdef CACHE_HARNESS_META
+        freeDoubleTaggedCache(stats->cache);
+        if(stats->propertyMetaData)
+            free(stats->propertyMetaData);
+#endif
     }
 }
 
@@ -292,7 +305,7 @@ uint32_t sampleFrequentNode(uint32_t num_vertices, uint32_t num_samples, uint32_
     Word_t *PValue;
     Word_t   Index;
     uint32_t i;
-    initializeMersenneState (mt19937var, 27491095); 
+    initializeMersenneState (mt19937var, 27491095);
     for (i = 0; i < num_samples; i++)
     {
         uint32_t n = generateRandInt(mt19937var) % num_vertices;
@@ -376,10 +389,31 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
     printf("| %-21s | %-27s | \n", "Iteration", "Time (S)");
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->components[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint32_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
 
     Start(timer);
     stats->iterations = 0;
     change = 1;
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
 
     while(change)
     {
@@ -402,7 +436,10 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
                 dest = graph->sorted_edges_array->edges_array_dest[j];
                 uint32_t comp_src = stats->components[src];
                 uint32_t comp_dest = stats->components[dest];
-
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[src]), 'r', src, stats->components[src]);
+                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[dest]), 'r', dest, stats->components[dest]);
+#endif
                 if(comp_src == comp_dest)
                     continue;
 
@@ -413,16 +450,22 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
                 {
                     change = 1;
                     stats->components[comp_high] = comp_low;
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[comp_high]), 'w', comp_high, stats->components[comp_high]);
+#endif
                 }
             }
         }
-
 
         compressNodes( stats->num_vertices, stats->components);
 
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total = Seconds(timer);
@@ -433,11 +476,14 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
     printf("| %-15u | %-15u | %-15f | \n", stats->iterations, componentsCount, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-
     free(timer);
     free(timer_inner);
 
     printCCStats(stats);
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
     return stats;
 
 }
@@ -1637,7 +1683,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphAdjLinkedList(uint32_t it
 
             for(j = 0 ; j < (degree) ; j++)
             {
-                
+
                 dest = Nodes->dest;
                 Nodes = Nodes->next;
 

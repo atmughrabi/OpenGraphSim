@@ -1012,7 +1012,6 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     }
 
 #ifdef SNIPER_HARNESS
-    // SimNamedMarker(1, "Start_pageRankPullGraphCSR");
     SimRoiStart();
 #endif
 
@@ -1069,9 +1068,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
 
 #ifdef SNIPER_HARNESS
         SimRoiEnd();
-        // SimNamedMarker(2, "End_pageRankPullGraphCSR");
 #endif
-
 
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));

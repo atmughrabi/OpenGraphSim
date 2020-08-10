@@ -37,6 +37,14 @@
 
 #include "SSSP.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -973,6 +981,9 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
     printf("| %-15s | %-15u | %-15f | \n", "Init", stats->buckets_total,  Seconds(timer_inner));
     printf(" -----------------------------------------------------\n");
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
 
     while (stats->buckets_total)
     {
@@ -1039,7 +1050,9 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
             printf("| H%-14u | %-15u | %-15f |\n", iter, stats->buckets_total, Seconds(timer_inner));
     }
 
-
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total += Seconds(timer);

@@ -37,7 +37,13 @@
 
 #include "SPMV.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
 
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -144,6 +150,13 @@ void freeSPMVStats(struct SPMVStats *stats)
     {
         if(stats->vector_output)
             free(stats->vector_output);
+
+#ifdef CACHE_HARNESS_META
+        freeDoubleTaggedCache(stats->cache);
+        if(stats->propertyMetaData)
+            free(stats->propertyMetaData);
+#endif
+
         free(stats);
     }
 
@@ -624,7 +637,7 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
 
     struct Vertex *vertices = NULL;
-     uint32_t *sorted_edges_array = NULL;
+    uint32_t *sorted_edges_array = NULL;
 #if WEIGHTED
     float *edges_array_weight = NULL;
 #endif
@@ -641,6 +654,23 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 #if WEIGHTED
     edges_array_weight = graph->sorted_edges_array->edges_array_weight;
 #endif
+#endif
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->vector_input[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
+    stats->propertyMetaData[0].data_type_size = sizeof(float);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
 #endif
 
     printf(" -----------------------------------------------------\n");
@@ -660,6 +690,11 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
     }
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -680,12 +715,20 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 #if WEIGHTED
                 weight = edges_array_weight[j];
 #endif
+
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, stats->vector_input[src]);
+#endif
                 stats->vector_output[dest] +=  (weight * stats->vector_input[src]); // stats->pageRanks[v]/graph->vertices[v].out_degree;
             }
-
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, stats->vector_output[dest]);
+#endif
         }
 
+#ifdef SNIPER_HARNESS
+        SimRoiEnd();
+#endif
 
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
@@ -707,6 +750,9 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
     printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);

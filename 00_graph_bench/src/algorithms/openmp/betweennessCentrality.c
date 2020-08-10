@@ -35,6 +35,9 @@
 
 #include "betweennessCentrality.h"
 
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
 
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
@@ -158,6 +161,12 @@ void freeBetweennessCentralityStats(struct BetweennessCentralityStats *stats)
             }
             free(stats->predecessors);
         }
+
+#ifdef CACHE_HARNESS_META
+        freeDoubleTaggedCache(stats->cache);
+        if(stats->propertyMetaData)
+            free(stats->propertyMetaData);
+#endif
         free(stats);
     }
 }
@@ -382,7 +391,30 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
     uint32_t u;
     uint32_t t;
 
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 2;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->sigma[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
+    stats->propertyMetaData[0].data_type_size = sizeof(int);
+
+    stats->propertyMetaData[1].base_address = (uint64_t) & (stats->distances[0]);
+    stats->propertyMetaData[1].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint32_t);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+    
     for(iter = 0 ; iter < iterations ; iter++)
     {
         s = generateRandomRootBetweennessCentrality(graph);
@@ -416,11 +448,20 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
 
         printf("| %-15s | %-15f | %-15u | \n", "Iter.Time", Seconds(timer_inner), stats->processed_nodes);
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-33f | \n", "Avg.Time", Seconds(timer));
     printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
