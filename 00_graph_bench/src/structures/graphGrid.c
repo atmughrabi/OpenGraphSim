@@ -155,7 +155,6 @@ struct GraphGrid *graphGridPreProcessingStep (struct Arguments *arguments)
 
     if(arguments->lmode)
         edgeList = reorderGraphProcess(edgeList, arguments);
-
     // Start(timer);
     edgeList = sortRunAlgorithms(edgeList, arguments->sort);
 
@@ -166,6 +165,9 @@ struct GraphGrid *graphGridPreProcessingStep (struct Arguments *arguments)
         Stop(timer);
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
+
+    if(arguments->mmode)
+        edgeList = maskGraphProcess(edgeList, arguments);
     // Stop(timer);
     // graphGridPrintMessageWithtime("Radix Sort Edges By Source (Seconds)",Seconds(timer));
 

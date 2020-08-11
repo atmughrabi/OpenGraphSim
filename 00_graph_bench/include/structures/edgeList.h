@@ -17,6 +17,7 @@ struct  EdgeList
 #endif
     uint32_t *edges_array_src;
     uint32_t *edges_array_dest;
+    uint32_t *mask_array;
 };
 
 

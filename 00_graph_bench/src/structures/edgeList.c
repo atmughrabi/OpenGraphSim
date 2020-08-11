@@ -117,6 +117,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
 #endif
     }
 
+    newEdgeList->mask_array = NULL;
     newEdgeList->num_edges = num_edges;
     newEdgeList->num_vertices = 0;
     newEdgeList->avg_degree = 0;
@@ -204,6 +205,8 @@ void freeEdgeList( struct EdgeList *edgeList)
             free(edgeList->edges_array_src);
         if(edgeList->edges_array_dest)
             free(edgeList->edges_array_dest);
+        if(edgeList->mask_array)
+            free(edgeList->mask_array);
 
 #if WEIGHTED
         if(edgeList->edges_array_weight)
@@ -350,7 +353,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
 #endif
 
 #if WEIGHTED
-    if(weighted) 
+    if(weighted)
     {
         offset = 3;
         offset_size = (2 * sizeof(uint32_t)) + sizeof(float);

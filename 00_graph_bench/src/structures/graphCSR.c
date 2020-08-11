@@ -160,7 +160,7 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
 {
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
-   
+
     Start(timer);
     struct EdgeList *edgeList = readEdgeListsbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted); // read edglist from binary file
     Stop(timer);
@@ -180,6 +180,9 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
         Stop(timer);
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
+
+    if(arguments->mmode)
+        edgeList = maskGraphProcess(edgeList, arguments);
 
 #if DIRECTED
     struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 1);

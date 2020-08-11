@@ -845,6 +845,151 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
     return edgeList;
 }
 
+// ********************************************************************************************
+// ***************                  AccelGraph label-Masking                     **************
+// ********************************************************************************************
+
+struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *arguments)
+{
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+
+    printf(" *****************************************************\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Mask Process");
+    printf(" -----------------------------------------------------\n");
+    Start(timer);
+
+    switch(arguments->lmode)
+    {
+    case 1  :
+    case 2  :
+    case 3  :
+    case 4 :
+        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode);// degree
+        break;
+    default :
+        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode);// out-degree
+    }
+
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Total Mask Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+    printf(" *****************************************************\n");
+
+    free(timer);
+
+    return edgeList;
+}
+
+struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmode)
+{
+
+    // UINT32_MAX
+    uint32_t  i;
+    uint32_t *degrees;
+    uint32_t *thresholds;
+    uint32_t  num_buckets = 11;
+
+    degrees = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    thresholds = (uint32_t *) my_malloc(num_buckets * sizeof(uint32_t));
+
+    for (i = 0; i < edgeList->num_vertices; ++i)
+    {
+        degrees[i] = 0;
+    }
+
+    // START initialize thresholds
+    if(edgeList->avg_degree <= 1)
+        thresholds[0] = 1;
+    else
+        thresholds[0] = (edgeList->avg_degree / 2);
+    for ( i = 1; i < (num_buckets - 1); ++i)
+    {
+        thresholds[i] = thresholds[i - 1] * 2;
+    }
+    thresholds[num_buckets - 1] = UINT32_MAX;
+    // END initialize thresholds
+
+    switch(mmode)
+    {
+    case 1  :
+        printf("| %-51s | \n", "Vertex Property OUT-DEGREE");
+        break;
+    case 2  :
+        printf("| %-51s | \n", "Vertex Structure IN-DEGREE");
+        break;
+    case 3  :
+        printf("| %-51s | \n", "Vertex Property OUT-DEGREE");
+        break;
+    case 4  :
+        printf("| %-51s | \n", "Vertex Structure IN-DEGREE");
+        break;
+    default :
+        printf("| %-51s | \n", "Vertex Property OUT-DEGREE");
+    }
+
+    degrees = maskGraphProcessGenerateInOutDegrees(degrees, edgeList, mmode);
+
+    // edgeList = reorderGraphListDBG(edgeList, degrees, thresholds, num_buckets, lmode);
+
+    free(thresholds);
+    free(degrees);
+    return edgeList;
+
+}
+
+uint32_t *maskGraphProcessGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *edgeList, uint32_t mmode)
+{
+
+    uint32_t i;
+    uint32_t src;
+    uint32_t dest;
+
+    #pragma omp parallel for default(none) private(i,src,dest) shared(edgeList,degrees,mmode)
+    for(i = 0; i < edgeList->num_edges; i++)
+    {
+        src  = edgeList->edges_array_src[i];
+        dest = edgeList->edges_array_dest[i];
+
+        switch(mmode)
+        {
+        case 1 :
+        case 3 :
+        {
+            #pragma omp atomic update
+            degrees[src]++;
+        }
+        break;
+        case 2 :
+        case 4 :
+        {
+            #pragma omp atomic update
+            degrees[dest]++;
+        }
+        break;
+        case 5 :
+        case 6 :
+        {
+            #pragma omp atomic update
+            degrees[dest]++;
+            #pragma omp atomic update
+            degrees[src]++;
+        }
+        break;
+        default :
+        {
+            #pragma omp atomic update
+            degrees[src]++;
+        }// out-degree
+        }
+    }
+    return degrees;
+}
 
 // ********************************************************************************************
 // ***************                  generic functions                            **************

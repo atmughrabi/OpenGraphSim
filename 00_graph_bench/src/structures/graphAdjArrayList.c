@@ -544,6 +544,9 @@ struct GraphAdjArrayList *graphAdjArrayListPreProcessingStep (struct Arguments *
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
 
+    if(arguments->mmode)
+        edgeList = maskGraphProcess(edgeList, arguments);
+
 #if DIRECTED
     Start(timer);
     // struct EdgeList* inverse_edgeList = readEdgeListsbin(fnameb,1);

@@ -28,9 +28,9 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
 #define VERTEX_CACHE_COLD_U32      0x0000
 
 
-
-
-
+struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *arguments);
+struct EdgeList *maskGraphProcessDegree(struct EdgeList *edgeList, uint32_t mmode);
+uint32_t *maskGraphProcessGenerateInOutDegrees( uint32_t *degrees, struct EdgeList *edgeList, uint32_t mmode);
 
 // ********************************************************************************************
 // ***************                  Degree relabel                               **************
