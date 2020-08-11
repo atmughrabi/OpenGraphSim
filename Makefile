@@ -64,10 +64,10 @@ export MAIN_DIR		  	= main
 # GAP https://sparse.tamu.edu/MM/GAP/
 # https://gonglab.pratt.duke.edu/google-dataset
 
-export GRAPH_NAME ?= Gong-gplus
+# export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-# export GRAPH_NAME ?= SNAP-web-Google
+export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1

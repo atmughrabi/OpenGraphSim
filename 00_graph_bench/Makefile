@@ -149,7 +149,7 @@ OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 SNIPER_INC =    -I$(APP_DIR)/$(SNI_DIR)/$(INC_DIR)
 
 # flags
-CFLAGS   =  -O3 -Wall -m64 -fopenmp -g -fPIE
+CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
 LFLAGS = -lm -lJudy
 
 
@@ -349,7 +349,7 @@ run-cache: app-cache
 run-sniper: MODE 		= -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 1 -c mybase --roi -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 1 -c gainestown --roi -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp

@@ -896,6 +896,22 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
 #endif
 #endif
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->vector_input[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
+    stats->propertyMetaData[0].data_type_size = sizeof(uint32_t);
+
+    // stats->propertyMetaData[1].base_address = (uint64_t)&pageRanksNext[0];
+    // stats->propertyMetaData[1].size = graph->num_vertices * sizeof(float);
+    // stats->propertyMetaData[1].data_type_size = sizeof(float);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     #pragma omp parallel for
     for (w = 0; w < graph->num_edges ; ++w)
@@ -954,9 +970,15 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
 #if WEIGHTED
                 weight = edges_array_weight_fixedPoint[j];
 #endif
+                
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, stats->vector_input[src]);
+#endif
                 vector_output[dest] +=   MULFixed32V1(weight, vector_input[src]); // stats->pageRanks[v]/graph->vertices[v].out_degree;
             }
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, stats->vector_output[dest]);
+#endif
         }
 
 
@@ -988,6 +1010,9 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
     printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
