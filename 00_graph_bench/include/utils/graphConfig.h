@@ -8,11 +8,6 @@
 #define WEIGHTED 0
 #define DIRECTED 1
 
-extern  uint64_t afu_config;
-extern  uint64_t cu_config;
-extern  uint64_t afu_config_2;
-extern  uint64_t cu_config_2;
-
 extern int numThreads;
 extern mt19937state *mt19937var;
 
@@ -34,7 +29,8 @@ struct Arguments
     uint32_t datastructure;
     uint32_t pushpull;
     uint32_t sort;
-    uint32_t lmode;
+    uint32_t lmode; // reorder mode
+    uint32_t mmode; // mask mode
     uint32_t symmetric;
     uint32_t weighted;
     uint32_t delta;
@@ -42,12 +38,6 @@ struct Arguments
     char *fnameb;
     uint32_t fnameb_format;
     uint32_t convert_format;
-
-    //ACCEL GRAPH variables
-    uint64_t afu_config; // parameters to pass for CAPI integration
-    uint64_t cu_config;  // parameters to pass for CAPI integration
-    uint64_t afu_config_2; // parameters to pass for CAPI integration
-    uint64_t cu_config_2;  // parameters to pass for CAPI integration
 };
 
 #endif

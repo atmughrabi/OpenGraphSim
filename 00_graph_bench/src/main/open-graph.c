@@ -34,12 +34,12 @@ int numThreads;
 mt19937state *mt19937var;
 
 const char *argp_program_version =
-    "OpenGraph v2.0";
+    "OpenGraphSim v3.0";
 const char *argp_program_bug_address =
     "<atmughra@ncsu.edu>|<atmughrabi@gmail.com>";
 /* Program documentation. */
 static char doc[] =
-    "\nOpenGraph is an open source graph processing framework, it is designed to be a benchmarking suite for various graph processing algorithms using pure C.\n";
+    "\nOpenGraphSim is an open source graph processing framework, it is designed to be a benchmarking suite for various graph processing algorithms using pure C.\n";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "-f <graph file> -d [data structure] -a [algorithm] -r [root] -n [num threads] [-h -c -s -w]";
@@ -128,8 +128,12 @@ static struct argp_option options[] =
         "\nFor now it controls the output of .perf file and PageRank .stats (needs --stats enabled) files\nPageRank .stat [1:top-k results] [2:top-k results and top-k ranked vertices listed.\n"
     },
     {
-        "remove-duplicate",      'k', 0,      0,
+        "remove-duplicate", 'k', 0,      0,
         "\nRemovers duplicate edges and self loops from the graph.\n"
+    },
+    {
+        "mask-mode",        'M', "[DEFAULT:0]\n",      0,
+        "\nEncodes [0:disabled] the last two bits of [1:out-degree]-Edgelist-labels [2:in-degree]-Edgelist-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-datawith hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work.\n"
     },
     { 0 }
 };
@@ -209,6 +213,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'k':
         arguments->dflag = 1;
         break;
+    case 'M':
+        arguments->mmode = atoi(arg);
+        break;
 
     default:
         return ARGP_ERR_UNKNOWN;
@@ -241,6 +248,7 @@ main (int argc, char **argv)
     arguments.datastructure = 0;
     arguments.pushpull = 0;
     arguments.sort = 0;
+    arguments.mmode = 0;
     arguments.lmode = 0;
     arguments.symmetric = 0;
     arguments.weighted = 0;

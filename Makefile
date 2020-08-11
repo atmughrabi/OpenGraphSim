@@ -5,8 +5,8 @@
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-# export APP_TEST             ?=  test_open-graph
-# export APP_TEST             ?=  pagerRank-accuracy-report
+# export APP_TEST           ?=  test_open-graph
+# export APP_TEST           ?=  pagerRank-accuracy-report
 export APP_TEST             ?=  test_grasp-cache
 
 # dirs Root app
@@ -14,8 +14,8 @@ export APP_DIR              ?= .
 
 
 # export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-# export BENCHMARKS_DIR    	?= ../01_test_graphs
+# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+export BENCHMARKS_DIR    	?= ../01_test_graphs
 # export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
 # export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
 
@@ -57,7 +57,7 @@ export MAIN_DIR		  	= main
 # # small test graphs
 # export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
-# export GRAPH_NAME ?= v300_e2730
+export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= amazon
 
 
@@ -67,7 +67,7 @@ export MAIN_DIR		  	= main
 # export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-export GRAPH_NAME ?= SNAP-web-Google
+# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
@@ -133,6 +133,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
+export MASK_MODE 		?= 1
 
 ##################################################
 
@@ -145,7 +146,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -w -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
+export ARGS ?= -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
 ##################################################
 ##################################################
 

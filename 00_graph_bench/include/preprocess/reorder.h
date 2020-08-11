@@ -5,11 +5,31 @@
 #include "edgeList.h"
 #include "graphCSR.h"
 
+#include "cache.h"
+
 struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *fnameb, uint32_t size);
 void writeLabelsToFile(const char *fnameb, uint32_t *labels, uint32_t size);
 struct EdgeList *relabelEdgeList(struct EdgeList *edgeList, uint32_t *labels);
 struct EdgeList *reorderGraphProcess(struct EdgeList *edgeList, struct Arguments *arguments);
 uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *edgeList, uint32_t lmode);
+
+// ********************************************************************************************
+// ***************                  AccelGraph label-Masking                     **************
+// ********************************************************************************************
+
+#define ACCELGRAPH_CACHE PSL_L1_SIZE + WARM_L1_SIZE + HOT_L1_SIZE
+
+#define VERTEX_VALUE_MASK_U32 0xC000
+#define VERTEX_CACHE_MASK_U32 0x3FFF
+
+#define VERTEX_VALUE_HOT_U32       0xC000
+#define VERTEX_CACHE_WARM_U32      0x4000
+#define VERTEX_VALUE_LUKEWARM_U32  0x1000
+#define VERTEX_CACHE_COLD_U32      0x0000
+
+
+
+
 
 
 // ********************************************************************************************
