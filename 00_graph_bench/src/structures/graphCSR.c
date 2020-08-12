@@ -190,8 +190,6 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
     struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 0);
 #endif
 
-
-
     // edgeListPrint(edgeList);
     Start(timer);
     graphCSR = graphCSRAssignEdgeList (graphCSR, edgeList, 0);

@@ -34,6 +34,33 @@
 #include "reorder.h"
 
 
+uint32_t RegionAtomicDecrement(uint32_t *region)
+{
+
+    uint32_t oldValue;
+    uint32_t flag = 0;
+
+    do
+    {
+
+        oldValue = *region;
+        if(oldValue > 0)
+        {
+            if(__sync_bool_compare_and_swap(region, oldValue, (oldValue - 1)))
+            {
+                flag = 1;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    while(!flag);
+
+    return 1;
+}
+
 void radixSortCountSortEdgesByRanks (uint32_t **pageRanksFP, uint32_t **pageRanksFPTemp, uint32_t **labels, uint32_t **labelsTemp, uint32_t radix, uint32_t buckets, uint32_t *buckets_count, uint32_t num_vertices)
 {
 
@@ -211,7 +238,7 @@ uint32_t *radixSortEdgesByDegree (uint32_t *degrees, uint32_t *labels, uint32_t 
     degreesTemp = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
     labelsTemp = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
 
-
+    #pragma omp parallel
     for (j = 0; j < num_vertices; ++j)
     {
         labelsTemp[j] = 0;
@@ -244,6 +271,7 @@ struct EdgeList *reorderGraphProcessDegree( uint32_t sort, struct EdgeList *edge
 
     degrees = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
 
+    #pragma omp parallel
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         degrees[i] = 0;
@@ -346,6 +374,7 @@ struct EdgeList *reorderGraphProcessDBG( uint32_t sort, struct EdgeList *edgeLis
     degrees = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
     thresholds = (uint32_t *) my_malloc(num_buckets * sizeof(uint32_t));
 
+    #pragma omp parallel
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         degrees[i] = 0;
@@ -897,7 +926,7 @@ struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmo
 
     degrees = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
     thresholds = (uint32_t *) my_malloc(num_buckets * sizeof(uint32_t));
-
+    #pragma omp parallel
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         degrees[i] = 0;
@@ -935,7 +964,7 @@ struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmo
 
     degrees = maskGraphProcessGenerateInOutDegrees(degrees, edgeList, mmode);
 
-    // edgeList = reorderGraphListDBG(edgeList, degrees, thresholds, num_buckets, lmode);
+    edgeList = maskGraphProcessGenerateMaskArray(edgeList, degrees, thresholds, num_buckets, mmode);
 
     free(thresholds);
     free(degrees);
@@ -989,6 +1018,140 @@ uint32_t *maskGraphProcessGenerateInOutDegrees(uint32_t *degrees, struct EdgeLis
         }
     }
     return degrees;
+}
+
+struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, uint32_t *degrees, uint32_t *thresholds, uint32_t num_buckets, uint32_t mmode)
+{
+
+    uint32_t i = 0;
+    int32_t  j = 0;
+    void  *iter = 0;
+    uint32_t  v = 0;
+    uint32_t  t = 0;
+    uint32_t  temp_idx = 0;
+    uint32_t P = numThreads;
+    uint32_t t_id = 0;
+    uint32_t offset_start = 0;
+    uint32_t offset_end = 0;
+    uint32_t  num_masks = 4;
+    uint32_t *start_idx      = (uint32_t *) my_malloc(P * num_buckets * sizeof(uint32_t));
+    uint32_t *labels         = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    uint32_t *mask_array     = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    vc_vector **buckets      = (vc_vector **) malloc(P * num_buckets * sizeof(vc_vector *));
+    struct Timer *timer      = (struct Timer *) malloc(sizeof(struct Timer));
+    uint32_t *cache_regions  = (uint32_t *) my_malloc(num_masks * sizeof(uint32_t));
+
+    cache_regions[0] = ACCELGRAPH_CACHE_UINT; // VERTEX_VALUE_HOT_U32
+    cache_regions[1] = ACCELGRAPH_CACHE_UINT; // VERTEX_CACHE_WARM_U32
+    cache_regions[2] = ACCELGRAPH_CACHE_UINT; // VERTEX_VALUE_LUKEWARM_U32
+    cache_regions[3] = UINT32_MAX;            // VERTEX_CACHE_COLD_U32
+
+    #pragma omp parallel
+    for (i = 0; i < edgeList->num_vertices; ++i)
+    {
+        mask_array[i] = VERTEX_CACHE_COLD_U32;
+    }
+
+    Start(timer);
+    for (i = 0; i < (P * num_buckets); ++i)
+    {
+        buckets[i] = vc_vector_create(0, sizeof(uint32_t), NULL);
+    }
+
+    #pragma omp parallel default(none) shared(mask_array,mmode,cache_regions,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,offset_start,offset_end,t_id,i,j,v,P,t)
+    {
+        P = omp_get_num_threads();
+        t_id = omp_get_thread_num();
+        offset_start = t_id * (edgeList->num_vertices / P);
+
+        if(t_id == (P - 1))
+        {
+            offset_end = offset_start + (edgeList->num_vertices / P) + (edgeList->num_vertices % P) ;
+        }
+        else
+        {
+            offset_end = offset_start + (edgeList->num_vertices / P);
+        }
+
+        for (v = offset_start; v < offset_end; ++v)
+        {
+            for ( i = 0; i < num_buckets; ++i)
+            {
+                if(degrees[v] <= thresholds[i])
+                {
+                    vc_vector_push_back(buckets[(t_id * num_buckets) + i], &v);
+                    break;
+                }
+            }
+        }
+
+        #pragma omp barrier
+
+        if(t_id == 0)
+        {
+            for ( j = num_buckets - 1; j >= 0; --j)
+            {
+                for (t = 0; t < P; ++t)
+                {
+                    start_idx[(t * num_buckets) + j] = temp_idx;
+                    temp_idx += vc_vector_count(buckets[(t * num_buckets) + j]);
+                }
+            }
+        }
+
+        #pragma omp barrier
+
+        for ( j = num_buckets - 1 ; j >= 0 ; --j)
+        {
+            for (   iter = vc_vector_begin(buckets[(t_id * num_buckets) + j]);
+                    iter != vc_vector_end(buckets[(t_id * num_buckets) + j]);
+                    iter = vc_vector_next(buckets[(t_id * num_buckets) + j], iter))
+            {
+                if(RegionAtomicDecrement(&(cache_regions[0])))
+                {
+                    mask_array[(*(uint32_t *)iter)] = VERTEX_VALUE_HOT_U32;
+                }
+                else if(RegionAtomicDecrement(&(cache_regions[1])))
+                {
+                    mask_array[(*(uint32_t *)iter)] = VERTEX_CACHE_WARM_U32;
+                }
+                else if(RegionAtomicDecrement(&(cache_regions[2])))
+                {
+                    mask_array[(*(uint32_t *)iter)] = VERTEX_VALUE_LUKEWARM_U32;
+                }
+                else
+                {
+                    mask_array[(*(uint32_t *)iter)] = VERTEX_CACHE_COLD_U32;
+                }
+            }
+        }
+
+    }
+
+    if(mmode == 1 || mmode == 2)
+        edgeList = maskEdgeList(edgeList, mask_array);
+
+    edgeList->mask_array = mask_array;
+
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Mask Array Generation/Relabeling Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    for (i = 0; i < (P * num_buckets); ++i)
+    {
+        vc_vector_release(buckets[i]);
+    }
+
+    free(timer);
+    free(buckets);
+    free(start_idx);
+    free(labels);
+    free(cache_regions);
+    return edgeList;
 }
 
 // ********************************************************************************************
@@ -1136,6 +1299,24 @@ struct EdgeList *relabelEdgeList(struct EdgeList *edgeList, uint32_t *labels)
 
 }
 
+struct EdgeList *maskEdgeList(struct EdgeList *edgeList, uint32_t *mask_array)
+{
+    uint32_t i;
+
+    #pragma omp parallel for
+    for(i = 0; i < edgeList->num_edges; i++)
+    {
+        uint32_t src;
+        uint32_t dest;
+        src = edgeList->edges_array_src[i];
+        dest = edgeList->edges_array_dest[i];
+
+        edgeList->edges_array_src[i] = src | mask_array[src];
+        edgeList->edges_array_dest[i] = dest | mask_array[dest];
+    }
+
+    return edgeList;
+}
 
 // ********************************************************************************************
 // ***************                  File relabel                                 **************

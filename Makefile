@@ -64,10 +64,10 @@ export MAIN_DIR		  	= main
 # GAP https://sparse.tamu.edu/MM/GAP/
 # https://gonglab.pratt.duke.edu/google-dataset
 
-export GRAPH_NAME ?= Gong-gplus
+# export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-# export GRAPH_NAME ?= SNAP-web-Google
+export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
@@ -112,9 +112,9 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 0
-export REORDER 		    ?= 4
+export REORDER 		    ?= 0
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 6
+export ALGORITHMS 		?= 1
 
 export ROOT 			?= 164
 export TOLERANCE 		?= 1e-8
@@ -122,9 +122,9 @@ export DELTA			?= 800
 
 export START_THREADS	?= 1
 export INC_THREADS      ?= 1
-export NUM_THREADS  	?= 4
+export NUM_THREADS  	?= 1
 # NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_ITERATIONS	?= 1
+export NUM_ITERATIONS	?= 10
 export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1

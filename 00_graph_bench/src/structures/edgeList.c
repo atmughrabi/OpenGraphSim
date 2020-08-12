@@ -26,6 +26,7 @@
 #include <omp.h>
 #include <math.h>
 
+#include "reorder.h"
 #include "mt19937.h"
 #include "myMalloc.h"
 #include "graphConfig.h"
@@ -558,23 +559,33 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
 
 
     uint32_t num_edges = edgeListmem->num_edges;
+    uint32_t num_vertices = edgeListmem->num_vertices;
+    uint32_t i;
     uint32_t  src = 0, dest = 0;
-#if WEIGHTED
-    float weight = 1;
-#endif
+    
     struct EdgeList *edgeList;
 
     edgeList = newEdgeList((num_edges));
 
-    uint32_t i;
+    if(edgeListmem->mask_array)
+    {
+        edgeList->mask_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
 
-    // #pragma omp parallel for
+        #pragma omp parallel for
+        for ( i = 0; i < num_vertices; ++i)
+        {
+            edgeList->mask_array[i] = edgeListmem->mask_array[i];
+        }
+
+    }
+
+    #pragma omp parallel for private(src,dest)
     for(i = 0; i < num_edges; i++)
     {
         src = edgeListmem->edges_array_src[i];
         dest = edgeListmem->edges_array_dest[i];
 #if WEIGHTED
-        weight = edgeListmem->edges_array_weight[i];
+        float weight = edgeListmem->edges_array_weight[i];
 #endif
         // printf(" %u %lu -> %lu \n",src,dest);
 #if DIRECTED
