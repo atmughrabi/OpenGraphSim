@@ -25,7 +25,7 @@
 #include "bitmap.h"
 
 #include "graphConfig.h"
-
+#include "reorder.h"
 #include "graphCSR.h"
 #include "graphGrid.h"
 #include "graphAdjArrayList.h"
@@ -197,12 +197,12 @@ struct DFSStats  *depthFirstSearchGraphCSRBase(uint32_t source, struct GraphCSR 
         for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
         {
 
-            uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+            uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
             int u_parent = stats->parents[u];
             if(u_parent < 0 )
             {
                 stats->parents[u] = v;
-                stats->distances[u] = stats->distances[v]+1;
+                stats->distances[u] = stats->distances[v] + 1;
                 pushArrayStack(sharedFrontierStack, u);
             }
         }
@@ -270,12 +270,12 @@ struct DFSStats  *depthFirstSearchGraphCSR(uint32_t source, struct GraphCSR *gra
         for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
         {
 
-            uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+            uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
             int u_parent = stats->parents[u];
             if(u_parent < 0 )
             {
                 stats->parents[u] = v;
-                stats->distances[u] = stats->distances[v]+1;
+                stats->distances[u] = stats->distances[v] + 1;
                 pushArrayStack(sharedFrontierStack, u);
             }
         }
@@ -359,15 +359,15 @@ void parallelDepthFirstSearchGraphCSRTask(uint32_t source, struct GraphCSR *grap
     for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
     {
 
-        uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+        uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
         int u_parent = stats->parents[u];
         if(u_parent < 0 )
         {
             if(__sync_bool_compare_and_swap(&(stats->parents[u]), u_parent, v))
             {
 
-                
-                stats->distances[u] = stats->distances[v]+1;
+
+                stats->distances[u] = stats->distances[v] + 1;
 
                 // #pragma omp task
                 parallelDepthFirstSearchGraphCSRTask( u, graph, stats);

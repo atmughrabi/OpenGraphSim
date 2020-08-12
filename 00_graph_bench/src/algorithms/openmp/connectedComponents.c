@@ -26,7 +26,7 @@
 #include "boolean.h"
 #include "arrayQueue.h"
 #include "bitmap.h"
-
+#include "reorder.h"
 #include "graphConfig.h"
 
 #include "graphCSR.h"
@@ -430,13 +430,13 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
 
             degree = graph->vertices->out_degree[src];
             edge_idx = graph->vertices->edges_idx[src];
-// #ifdef CACHE_HARNESS
-//                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (graph->vertices->out_degree[src]), 'r', src, graph->vertices->out_degree[src]);
-//                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (graph->vertices->edges_idx[src]), 'r', src, graph->vertices->edges_idx[src]);
-// #endif
+            // #ifdef CACHE_HARNESS
+            //                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (graph->vertices->out_degree[src]), 'r', src, graph->vertices->out_degree[src]);
+            //                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (graph->vertices->edges_idx[src]), 'r', src, graph->vertices->edges_idx[src]);
+            // #endif
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                dest = graph->sorted_edges_array->edges_array_dest[j];
+                dest = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 uint32_t comp_src = stats->components[src];
                 uint32_t comp_dest = stats->components[dest];
 #ifdef CACHE_HARNESS
@@ -449,7 +449,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
                 uint32_t comp_high = comp_src > comp_dest ? comp_src : comp_dest;
                 uint32_t comp_low = comp_src + (comp_dest - comp_high);
 #ifdef CACHE_HARNESS
-                    AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[comp_high]), 'r', comp_high, stats->components[comp_high]);
+                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[comp_high]), 'r', comp_high, stats->components[comp_high]);
 #endif
                 if(comp_high == stats->components[comp_high])
                 {
@@ -534,7 +534,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct
 
             for(j = (edge_idx_out + r) ; j < (edge_idx_out + degree_out) ; j++)
             {
-                v =  graph->sorted_edges_array->edges_array_dest[j];
+                v =  EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 linkNodes(u, v, stats->components);
                 break;
             }
@@ -585,7 +585,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct
 
         for(j = (edge_idx_out + stats->neighbor_rounds) ; j < (edge_idx_out + degree_out) ; j++)
         {
-            v =  graph->sorted_edges_array->edges_array_dest[j];
+            v =  EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
             linkNodes(u, v, stats->components);
         }
 
@@ -594,7 +594,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct
 
         for(j = (edge_idx_in) ; j < (edge_idx_in + degree_in) ; j++)
         {
-            v =  graph->inverse_sorted_edges_array->edges_array_dest[j];
+            v =  EXTRACT_VALUE(graph->inverse_sorted_edges_array->edges_array_dest[j]);
             linkNodes(u, v, stats->components);
         }
 
@@ -616,7 +616,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct
 
         for(j = (edge_idx_out + stats->neighbor_rounds) ; j < (edge_idx_out + degree_out) ; j++)
         {
-            v =  graph->sorted_edges_array->edges_array_dest[j];
+            v =  EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
             linkNodes(u, v, stats->components);
         }
     }
@@ -696,7 +696,7 @@ struct CCStats *connectedComponentsWeaklyGraphCSR( uint32_t iterations, struct G
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                dest = graph->sorted_edges_array->edges_array_dest[j];
+                dest = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                 if(atomicMin(&(stats->components[dest]), stats->components[src]))
                 {
@@ -787,7 +787,7 @@ uint32_t connectedComponentsVerifyGraphCSR(struct CCStats *stats, struct GraphCS
 
             for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
             {
-                uint32_t v = graph->sorted_edges_array->edges_array_dest[j];
+                uint32_t v = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                 if(stats->components[v] != comp)
                 {
@@ -804,7 +804,7 @@ uint32_t connectedComponentsVerifyGraphCSR(struct CCStats *stats, struct GraphCS
 
             for(j = in_edge_idx ; j < (in_edge_idx + in_degree) ; j++)
             {
-                uint32_t v = graph->inverse_sorted_edges_array->edges_array_dest[j];
+                uint32_t v = EXTRACT_VALUE(graph->inverse_sorted_edges_array->edges_array_dest[j]);
 
                 if(stats->components[v] != comp)
                 {

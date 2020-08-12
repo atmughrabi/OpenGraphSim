@@ -30,6 +30,7 @@
 
 #include "graphConfig.h"
 #include "sortRun.h"
+#include "reorder.h"
 
 #include "graphCSR.h"
 #include "graphGrid.h"
@@ -846,7 +847,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
     for(v = edge_idx ; v < (edge_idx + degree) ; v++)
     {
 
-        uint32_t t = graph->sorted_edges_array->edges_array_dest[v];
+        uint32_t t = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[v]);
         stats->parents[t] = source;
         bitmapNext->numSetBits++;
         setBit(bitmapNext, t);
@@ -888,7 +889,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
                 // printf("degree %u source %u \n",degree,v );
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    u = sorted_edges_array->edges_array_dest[j];
+                    u = EXTRACT_VALUE(sorted_edges_array->edges_array_dest[j]);
                     w = 1;
 #if WEIGHTED
                     w = sorted_edges_array->edges_array_weight[j];
@@ -910,7 +911,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
 
                     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                     {
-                        u = graph->sorted_edges_array->edges_array_dest[j];
+                        u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                         if(!getBit(bitmapNext, u))
                         {
@@ -1033,8 +1034,8 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uin
                 uint32_t j;
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    uint32_t src = graph->sorted_edges_array->edges_array_src[j];
-                    uint32_t dest = graph->sorted_edges_array->edges_array_dest[j];
+                    uint32_t src = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_src[j]);
+                    uint32_t dest = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                     float weight  = 1;
 #if WEIGHTED
                     weight = graph->sorted_edges_array->edges_array_weight[j];
@@ -1206,8 +1207,8 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
 
-                    uint32_t src = graphPlus->sorted_edges_array->edges_array_src[j];
-                    uint32_t dest = graphPlus->sorted_edges_array->edges_array_dest[j];
+                    uint32_t src = EXTRACT_VALUE(graphPlus->sorted_edges_array->edges_array_src[j]);
+                    uint32_t dest = EXTRACT_VALUE(graphPlus->sorted_edges_array->edges_array_dest[j]);
                     float weight  = 1;
 #if WEIGHTED
                     weight = graphPlus->sorted_edges_array->edges_array_weight[j];
@@ -1236,8 +1237,8 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
 
-                    uint32_t src = graphMinus->sorted_edges_array->edges_array_src[j];
-                    uint32_t dest = graphMinus->sorted_edges_array->edges_array_dest[j];
+                    uint32_t src = EXTRACT_VALUE(graphMinus->sorted_edges_array->edges_array_src[j]);
+                    uint32_t dest = EXTRACT_VALUE(graphMinus->sorted_edges_array->edges_array_dest[j]);
                     float weight  = 1;
 #if WEIGHTED
                     weight = graphMinus->sorted_edges_array->edges_array_weight[j];

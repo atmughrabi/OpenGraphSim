@@ -27,6 +27,7 @@
 #include "arrayQueue.h"
 #include "bitmap.h"
 #include "graphConfig.h"
+#include "reorder.h"
 
 #include "graphCSR.h"
 #include "graphGrid.h"
@@ -325,7 +326,7 @@ uint32_t betweennessCentralityBottomUpStepGraphCSR(struct GraphCSR *graph, struc
 
             for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 if(getBit(bitmapCurr, u))
                 {
                     // stats->parents[v] = u;
@@ -414,7 +415,7 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
 #ifdef SNIPER_HARNESS
     SimRoiStart();
 #endif
-    
+
     for(iter = 0 ; iter < iterations ; iter++)
     {
         s = generateRandomRootBetweennessCentrality(graph);

@@ -27,7 +27,7 @@
 #include "arrayQueue.h"
 #include "bitmap.h"
 #include "sortRun.h"
-
+#include "reorder.h"
 #include "graphConfig.h"
 
 #include "graphCSR.h"
@@ -1021,8 +1021,8 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
                     uint32_t j;
                     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                     {
-                        uint32_t src = graph->sorted_edges_array->edges_array_src[j];
-                        uint32_t dest = graph->sorted_edges_array->edges_array_dest[j];
+                        uint32_t src = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_src[j]);
+                        uint32_t dest = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                         float weight = 1;
 #if WEIGHTED
                         weight = graph->sorted_edges_array->edges_array_weight[j];
@@ -1192,8 +1192,8 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
                     uint32_t j;
                     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                     {
-                        uint32_t src = graphLight->sorted_edges_array->edges_array_src[j];
-                        uint32_t dest = graphLight->sorted_edges_array->edges_array_dest[j];
+                        uint32_t src = EXTRACT_VALUE(graphLight->sorted_edges_array->edges_array_src[j]);
+                        uint32_t dest = EXTRACT_VALUE(graphLight->sorted_edges_array->edges_array_dest[j]);
                         float weight = 1;
 #if WEIGHTED
                         weight = graphLight->sorted_edges_array->edges_array_weight[j];
@@ -1229,8 +1229,8 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
 
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    uint32_t src = graphHeavy->sorted_edges_array->edges_array_src[j];
-                    uint32_t dest = graphHeavy->sorted_edges_array->edges_array_dest[j];
+                    uint32_t src = EXTRACT_VALUE(graphHeavy->sorted_edges_array->edges_array_src[j]);
+                    uint32_t dest = EXTRACT_VALUE(graphHeavy->sorted_edges_array->edges_array_dest[j]);
                     float weight = 1;
 #if WEIGHTED
                     weight = graphHeavy->sorted_edges_array->edges_array_weight[j];

@@ -25,6 +25,7 @@
 #include "arrayQueue.h"
 #include "bitmap.h"
 #include "graphConfig.h"
+#include "reorder.h"
 
 #include "graphCSR.h"
 #include "graphGrid.h"
@@ -645,7 +646,7 @@ uint32_t topDownStepGraphCSR(struct GraphCSR *graph, struct ArrayQueue *sharedFr
             for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
             {
 
-                u = graph->sorted_edges_array->edges_array_dest[j];
+                u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 int u_parent = stats->parents[u];
                 if(u_parent < 0 )
                 {
@@ -714,7 +715,7 @@ uint32_t bottomUpStepGraphCSR(struct GraphCSR *graph, struct Bitmap *bitmapCurr,
 
             for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
 #ifdef CACHE_HARNESS
                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, (bitmapCurr->bitarray[word_offset(u)]));
 #endif
@@ -997,7 +998,7 @@ uint32_t topDownStepUsingBitmapsGraphCSR(struct GraphCSR *graph, struct ArrayQue
                 {
 
 
-                    u = graph->sorted_edges_array->edges_array_dest[j];
+                    u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                     int u_parent = stats->parents[u];
 
                     if(u_parent < 0 )
@@ -1007,21 +1008,12 @@ uint32_t topDownStepUsingBitmapsGraphCSR(struct GraphCSR *graph, struct ArrayQue
                             mf +=  -(u_parent);
                             stats->distances[u] = stats->distances[v] + 1;
                             setBitAtomic(sharedFrontierQueue->q_bitmap_next, u);
-
-
                         }
-
                     }
                 }
-
             }
-
         }
-
     }
-
-
-
     return mf;
 }
 

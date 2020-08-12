@@ -24,7 +24,7 @@
 #include "boolean.h"
 #include "arrayQueue.h"
 #include "bitmap.h"
-
+#include "reorder.h"
 #include "graphConfig.h"
 
 #include "fixedPoint.h"
@@ -711,7 +711,7 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                src = sorted_edges_array[j];
+                src = EXTRACT_VALUE(sorted_edges_array[j]);
 #if WEIGHTED
                 weight = edges_array_weight[j];
 #endif
@@ -817,7 +817,7 @@ struct SPMVStats *SPMVPushGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                dest = sorted_edges_array[j];
+                dest = EXTRACT_VALUE(sorted_edges_array[j]);
 #if WEIGHTED
                 weight = edges_array_weight[j];
 #endif
@@ -966,11 +966,11 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                src = sorted_edges_array[j];
+                src = EXTRACT_VALUE(sorted_edges_array[j]);
 #if WEIGHTED
                 weight = edges_array_weight_fixedPoint[j];
 #endif
-                
+
 #ifdef CACHE_HARNESS
                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, stats->vector_input[src]);
 #endif
@@ -1092,7 +1092,7 @@ struct SPMVStats *SPMVPushFixedPointGraphCSR( uint32_t iterations, struct GraphC
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                dest = sorted_edges_array[j];
+                dest = EXTRACT_VALUE(sorted_edges_array[j]);
 #if WEIGHTED
                 weight = DoubleToFixed64(edges_array_weight[j]);
 #endif

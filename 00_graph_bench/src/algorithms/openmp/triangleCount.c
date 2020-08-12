@@ -24,7 +24,7 @@
 #include "boolean.h"
 #include "arrayQueue.h"
 #include "bitmap.h"
-
+#include "reorder.h"
 #include "graphConfig.h"
 
 #include "graphCSR.h"
@@ -160,14 +160,14 @@ uint32_t countIntersectionsBinarySearch(uint32_t u, uint32_t v, struct GraphCSR 
     for(iter = edge_idx_iter ; iter < (edge_idx_iter + degree_iter); iter++ )
     {
 
-        uint32_t u_iter = graph->sorted_edges_array->edges_array_dest[iter];
+        uint32_t u_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
         if(u_iter > v)
             break;
 
         uint32_t bottom = 0;
         uint32_t top = degree_comp;
         uint32_t mid = (top + bottom) >> 1;
-        uint32_t v_comp = graph->sorted_edges_array->edges_array_dest[edge_idx_comp + mid];
+        uint32_t v_comp = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[edge_idx_comp + mid]);
 
         while( bottom < (top - 1))
         {
@@ -190,8 +190,8 @@ uint32_t countIntersectionsBinarySearch(uint32_t u, uint32_t v, struct GraphCSR 
 
 
             mid = (top + bottom) >> 1;
-            v_comp = graph->sorted_edges_array->edges_array_dest[edge_idx_comp + mid];
-            u_iter = graph->sorted_edges_array->edges_array_dest[iter];
+            v_comp = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[edge_idx_comp + mid]);
+            u_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
 
         }
 
@@ -258,7 +258,7 @@ struct TCStats *triangleCountBasicGraphCSR(struct GraphCSR *graph)
 
         for(v = edge_idx_u; v < (edge_idx_u + degree_u) ; v++)
         {
-            uint32_t node_v = graph->sorted_edges_array->edges_array_dest[v];
+            uint32_t node_v = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[v]);
             uint32_t degree_v = graph->vertices->out_degree[node_v];
             uint32_t edge_idx_v = graph->vertices->edges_idx[node_v];
             uint32_t w;
@@ -269,12 +269,12 @@ struct TCStats *triangleCountBasicGraphCSR(struct GraphCSR *graph)
 
             for(w = edge_idx_v; w < (edge_idx_v + degree_v) ; w++)
             {
-                uint32_t node_w = graph->sorted_edges_array->edges_array_dest[w];
-                uint32_t node_iter = graph->sorted_edges_array->edges_array_dest[edge_idx_iter];
+                uint32_t node_w = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[w]);
+                uint32_t node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[edge_idx_iter]);
 
                 for(iter = edge_idx_iter; iter < (edge_idx_iter + degree_iter) ; iter++)
                 {
-                    node_iter = graph->sorted_edges_array->edges_array_dest[iter];
+                    node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
 
                     if(node_iter == node_w)
                         stats->counts[u]++;
@@ -328,7 +328,7 @@ struct TCStats *triangleCountPullGraphCSR(struct GraphCSR *graph)
         steps++;
         for(v = edge_idx_u; v < (edge_idx_u + degree_u) ; v++)
         {
-            uint32_t node_v = graph->sorted_edges_array->edges_array_dest[v];
+            uint32_t node_v = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[v]);
             uint32_t degree_v = graph->vertices->out_degree[node_v];
 
             if(node_v > u)
@@ -345,17 +345,17 @@ struct TCStats *triangleCountPullGraphCSR(struct GraphCSR *graph)
             for(w = edge_idx_v; w < (edge_idx_v + degree_v) ; w++)
             {
 
-                uint32_t node_w = graph->sorted_edges_array->edges_array_dest[w];
+                uint32_t node_w = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[w]);
                 if(node_w > node_v)
                     break;
 
-                uint32_t node_iter = graph->sorted_edges_array->edges_array_dest[edge_idx_iter];
+                uint32_t node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[edge_idx_iter]);
 
 
 
                 for(iter = edge_idx_iter; iter < (edge_idx_iter + degree_iter) ; iter++)
                 {
-                    node_iter = graph->sorted_edges_array->edges_array_dest[iter];
+                    node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
 
                     if(node_iter >= node_w)
                         break;
@@ -405,7 +405,7 @@ struct TCStats *triangleCountPushGraphCSR(struct GraphCSR *graph)
 
         for(v = edge_idx_u; v < (edge_idx_u + degree_u) ; v++)
         {
-            uint32_t node_v = graph->sorted_edges_array->edges_array_dest[v];
+            uint32_t node_v = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[v]);
 
             if(node_v > u)
                 break;
@@ -421,16 +421,16 @@ struct TCStats *triangleCountPushGraphCSR(struct GraphCSR *graph)
             for(w = edge_idx_v; w < (edge_idx_v + degree_v) ; w++)
             {
 
-                uint32_t node_w = graph->sorted_edges_array->edges_array_dest[w];
+                uint32_t node_w = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[w]);
 
                 if(node_w > node_v)
                     break;
 
-                uint32_t node_iter = graph->sorted_edges_array->edges_array_dest[edge_idx_iter];
+                uint32_t node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[edge_idx_iter]);
 
                 for(iter = edge_idx_iter; iter < (edge_idx_iter + degree_iter) ; iter++)
                 {
-                    node_iter = graph->sorted_edges_array->edges_array_dest[iter];
+                    node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
 
                     if(node_iter >= node_w)
                         break;
@@ -491,7 +491,7 @@ struct TCStats *triangleCountBinaryIntersectionGraphCSR(struct GraphCSR *graph)
         steps++;
         for(v = edge_idx_u; v < (edge_idx_u + degree_u) ; v++)
         {
-            uint32_t node_v = graph->sorted_edges_array->edges_array_dest[v];
+            uint32_t node_v = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[v]);
 
             if(node_v > u)
                 break;
@@ -539,7 +539,7 @@ struct TCStats *triangleCountGraphGrid(uint32_t pushpull, struct GraphGrid *grap
 struct TCStats *triangleCountRowGraphGrid(struct GraphGrid *graph)
 {
 
-    
+
     uint64_t counts = 0;
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Triangle Count To Be Implemented");
