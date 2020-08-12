@@ -335,7 +335,7 @@ void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, u
 void AccessAccelGraphExpressUInt64(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint64_t value);
 void AccessAccelGraphExpressUInt32(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t value);
 void AccessAccelGraphExpressFloat(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, float value);
-
+void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask);
 // ********************************************************************************************
 // ***************               GRASP-XP Policy                                 **************
 // ********************************************************************************************

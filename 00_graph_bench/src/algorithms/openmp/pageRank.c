@@ -1042,12 +1042,12 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause[u]; // stats->pageRanks[v]/graph->vertices[v].out_degree;
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, riDividedOnDiClause[u]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
 #endif
             }
             pageRanksNext[v] = nodeIncomingPR;
 #ifdef CACHE_HARNESS
-            AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
 #endif
         }
 

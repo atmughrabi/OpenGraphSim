@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <omp.h>
 
+#include "reorder.h"
 #include "quantization.h"
 #include "myMalloc.h"
 #include "cache.h"
@@ -1675,11 +1676,66 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node)
 
 void AccessDoubleTaggedCacheFloat(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, float value)
 {
-    // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
+
     #pragma omp critical
     {
+        // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
         AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
+        // AccessAccelGraphExpress(cache->accel_graph, addr, op, node,);
         Access(cache->ref_cache, addr, op, node);
+    }
+}
+
+void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
+{
+
+    #pragma omp critical
+    {
+        // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
+        // AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
+        AccessAccelGraphExpress(cache->accel_graph, addr, op, node, value);
+        Access(cache->ref_cache, addr, op, node);
+    }
+}
+
+void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
+{
+    // struct CacheLine *victim = NULL;
+
+    if(checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
+    {
+        if(mask == VERTEX_VALUE_HOT_U32)
+        {
+            Access(accel_graph->cold_cache, addr, op, node);
+            Access(accel_graph->hot_cache, addr, op, node);
+            // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
+            // if(isValid(victim))
+            // {
+            //     // Prefetch(accel_graph->warm_cache, victim->addr, 'r', victim_node);
+            //     Access(accel_graph->warm_cache, victim->addr, 'd', victim->idx);
+            // }
+        }
+        else if(mask == VERTEX_CACHE_WARM_U32)
+        {
+            Access(accel_graph->cold_cache, addr, op, node);
+            Access(accel_graph->warm_cache, addr, op, node);
+        }
+        else
+        {
+            Access(accel_graph->cold_cache, addr, op, node);
+        }
+    }
+    else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
+    {
+        Access(accel_graph->warm_cache, addr, op, node);
+    }
+    else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
+    {
+        Access(accel_graph->hot_cache, addr, op, node);
+    }
+    else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
+    {
+        Access(accel_graph->hot_cache, addr, op, node);
     }
 }
 
