@@ -252,27 +252,19 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
         {
 
             vertex_id = VERTEX_CACHE_MASK_U32 & sorted_edges_array->edges_array_src[offset_start];
-              printf("0 %u %u %u\n", offset_start, vertex_id, sorted_edges_array->edges_array_src[offset_start]);
             vertices->edges_idx[vertex_id] = offset_start;
             vertices->out_degree[vertex_id]++;
 
             for(i = offset_start + 1; i < offset_end; i++)
             {
-
                 vertex_id = VERTEX_CACHE_MASK_U32 & sorted_edges_array->edges_array_src[i];
-                // printf("0 %u %u \n", i, vertex_id);
-                // printf("0 %u %u %u %u %u\n", i, vertex_id, sorted_edges_array->edges_array_src[i], sorted_edges_array->mask_array[vertex_id], inverse);
                 vertices->out_degree[vertex_id]++;
-                 // printf("1 %u %u \n", i, vertex_id);
                 if(sorted_edges_array->edges_array_src[i] != sorted_edges_array->edges_array_src[i - 1])
                 {
                     vertices->edges_idx[vertex_id] = i;
                 }
-                 // printf("2 %u %u \n", i, vertex_id);
             }
-             // printf("3 %u %u \n", i, vertex_id);
         }
-
     }
 
 #if DIRECTED

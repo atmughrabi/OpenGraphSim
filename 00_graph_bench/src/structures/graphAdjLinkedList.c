@@ -287,8 +287,8 @@ struct GraphAdjLinkedList *graphAdjLinkedListPreProcessingStep (struct Arguments
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
 
-    if(arguments->mmode)
-        edgeList = maskGraphProcess(edgeList, arguments);
+    // if(arguments->mmode)
+    //     edgeList = maskGraphProcess(edgeList, arguments);
 
     graphAdjLinkedListPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
 

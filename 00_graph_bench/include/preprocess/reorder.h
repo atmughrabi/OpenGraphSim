@@ -28,6 +28,9 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
 #define VERTEX_VALUE_LUKEWARM_U32  0x40000000
 #define VERTEX_CACHE_COLD_U32      0x00000000
 
+#define EXTRACT_VALUE(num)	((uint32_t) (num) & VERTEX_CACHE_MASK_U32)
+#define EXTRACT_MASK(num)	((uint32_t) (num) & VERTEX_VALUE_MASK_U32)
+
 struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *arguments);
 struct EdgeList *maskGraphProcessDegree(struct EdgeList *edgeList, uint32_t mmode);
 uint32_t *maskGraphProcessGenerateInOutDegrees( uint32_t *degrees, struct EdgeList *edgeList, uint32_t mmode);

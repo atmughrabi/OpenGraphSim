@@ -112,7 +112,7 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 0
-export REORDER 		    ?= 0
+export REORDER 		    ?= 4
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 1
 
@@ -133,7 +133,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 2
 
 ##################################################
 

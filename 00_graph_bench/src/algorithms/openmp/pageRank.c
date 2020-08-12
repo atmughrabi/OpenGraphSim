@@ -30,6 +30,7 @@
 
 #include "fixedPoint.h"
 #include "quantization.h"
+#include "reorder.h"
 
 #include "graphCSR.h"
 #include "graphGrid.h"
@@ -1038,7 +1039,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause[u]; // stats->pageRanks[v]/graph->vertices[v].out_degree;
 #ifdef CACHE_HARNESS
                 AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, riDividedOnDiClause[u]);
@@ -1192,7 +1193,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+                uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
@@ -1359,7 +1360,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
             }
 
@@ -1529,7 +1530,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
             }
 
@@ -1696,7 +1697,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
             }
 
@@ -1865,7 +1866,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
             }
 
@@ -2029,7 +2030,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+                uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
             }
@@ -2198,7 +2199,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
             }
             //nodeIncomingPR -= (degree * rDivD_params.zero);
@@ -2361,7 +2362,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
             }
             //nodeIncomingPR -= (degree * rDivD_params.zero);
@@ -2525,7 +2526,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
             edge_idx = vertices->edges_idx[v];
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                u = sorted_edges_array[j];
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
             }
             //nodeIncomingPR -= (degree * rDivD_params.zero);
@@ -2682,7 +2683,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
 
             for(j = edge_idx ; j < (edge_idx + degree) ; j++)
             {
-                uint32_t u = graph->sorted_edges_array->edges_array_dest[j];
+                uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                 #pragma omp atomic update
                 pageRanksNext[u] += rDivD_params.scale * (riDividedOnDiClause_quant[v] - rDivD_params.zero);
@@ -2864,7 +2865,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
                 edge_idx = vertices->edges_idx[v];
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    u = sorted_edges_array[j];
+                    u = EXTRACT_VALUE(sorted_edges_array[j]);
                     nodeIncomingPR += riDividedOnDiClause[u]; // sum (PRi/outDegree(i))
                 }
                 float oldPageRank =  stats->pageRanks[v];
@@ -2878,7 +2879,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
                     edge_idx = graph->vertices->edges_idx[v];
                     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                     {
-                        u = graph->sorted_edges_array->edges_array_dest[j];
+                        u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
 
                         #pragma omp atomic write
                         workListNext[u] = 1;
@@ -3017,7 +3018,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
         edge_idx = vertices->edges_idx[v];
         for(j = edge_idx ; j < (edge_idx + degree) ; j++)
         {
-            u = sorted_edges_array[j];
+            u = EXTRACT_VALUE(sorted_edges_array[j]);
             if(graph->vertices->out_degree[u])
                 aResiduals[v] += 1.0f / graph->vertices->out_degree[u]; // sum (PRi/outDegree(i))
         }
@@ -3055,7 +3056,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
 
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    u = graph->sorted_edges_array->edges_array_dest[j];
+                    u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                     float prevResidual = 0.0f;
 
                     prevResidual = aResiduals[u];
@@ -3214,7 +3215,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
         edge_idx = vertices->edges_idx[v];
         for(j = edge_idx ; j < (edge_idx + degree) ; j++)
         {
-            u = sorted_edges_array[j];
+            u = EXTRACT_VALUE(sorted_edges_array[j]);
             if(graph->vertices->out_degree[u])
                 aResiduals[v] += 1.0f / graph->vertices->out_degree[u]; // sum (PRi/outDegree(i))
         }
@@ -3244,7 +3245,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
                 edge_idx = vertices->edges_idx[v];
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    u = sorted_edges_array[j];
+                    u = EXTRACT_VALUE(sorted_edges_array[j]);
                     nodeIncomingPR += stats->pageRanks[u] / graph->vertices->out_degree[u];
                 }
 
@@ -3261,7 +3262,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
                 edge_idx = graph->vertices->edges_idx[v];
                 for(j = edge_idx ; j < (edge_idx + degree) ; j++)
                 {
-                    u = graph->sorted_edges_array->edges_array_dest[j];
+                    u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                     float prevResidual = 0.0f;
 
                     prevResidual = aResiduals[u];
