@@ -147,7 +147,9 @@ OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
 				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)
 
-SNIPER_INC =    -I$(APP_DIR)/$(SNI_DIR)/$(INC_DIR)
+SNIPER_INC     = -I$(APP_DIR)/$(SNI_DIR)/$(INC_DIR)
+SNIPER_CFLAGS  = -mno-sse4 -mno-sse4.1 -mno-sse4.2 -mno-sse4a -mno-avx -mno-avx2 -I$(APP_DIR)/$(SNI_DIR)/include 
+SNIPER_LDFLAGS = -static -L$(APP_DIR)/$(SNI_DIR)/lib -pthread 
 
 # flags
 CFLAGS   =  -O3 -Wall -m64 -fopenmp -g
@@ -226,7 +228,7 @@ $(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(APP)-sniper : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_SNIPER) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE) 
-	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
+	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS) $(SNIPER_LDFLAGS)
 
 $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
@@ -247,7 +249,7 @@ $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DI
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
-	$(CC) $(CFLAGS) $(OPENMP_INC) $(SNIPER_INC) $(MODE) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(SNIPER_INC) $(SNIPER_CFLAGS) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c $(INC_FILES_CACHE)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
@@ -346,11 +348,12 @@ run-cache: INTEGRATION 	= openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
 
+# http://snipersim.org/w/Multiple_regions_of_interest
 .PHONY: run-sniper
 run-sniper: MODE 		= -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 1 -c gainestown --roi -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp
@@ -370,7 +373,7 @@ convert-w: app-openmp
 .PHONY: stats-openmp
 stats-openmp: INTEGRATION = openmp
 stats-openmp: app-openmp
-	./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp -x -f $(FILE_BIN) -n $(NUM_THREADS) -i $(BIN_SIZE) -o $(SORT_TYPE) -l $(REORDER) -p $(INOUT_STATS)
+	./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp -x -f $(FILE_BIN) -n 4 $(NUM_THREADS) -i $(BIN_SIZE) -o $(SORT_TYPE) -l $(REORDER) -p $(INOUT_STATS)
 
 .PHONY: debug-openmp
 debug-openmp: INTEGRATION = openmp
