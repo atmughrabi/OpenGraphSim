@@ -1338,7 +1338,6 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
     char *fname_txt = (char *) malloc((strlen(fnameb) + 10) * sizeof(char));
 
     fname_txt = strcpy (fname_txt, fnameb);
-    fname_txt = strcat (fname_txt, ".labels");
 
     printf("%s\n", fname_txt );
     pText = fopen(fname_txt, "r");
