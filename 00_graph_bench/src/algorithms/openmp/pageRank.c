@@ -1020,7 +1020,6 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     {
         error_total = 0;
         activeVertices = 0;
-        int iter = stats->iterations;
         Start(timer_inner);
         #pragma omp parallel for
         for(v = 0; v < graph->num_vertices; v++)
@@ -1032,6 +1031,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
         }
 
 #ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
         SimMarker(1, iter);
 #endif
 

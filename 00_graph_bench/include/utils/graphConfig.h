@@ -36,6 +36,7 @@ struct Arguments
     uint32_t delta;
     uint32_t numThreads;
     char *fnameb;
+    char *fnamel;
     uint32_t fnameb_format;
     uint32_t convert_format;
 };

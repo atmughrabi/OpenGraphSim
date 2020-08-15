@@ -135,6 +135,10 @@ static struct argp_option options[] =
         "mask-mode",        'M', "[DEFAULT:0]\n",      0,
         "\nEncodes [0:disabled] the last two bits of [1:out-degree]-Edgelist-labels [2:in-degree]-Edgelist-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work.\n"
     },
+    {
+        "labels-file",      'L', "<FILE>\n",      0,
+        "\nRead and reorder vertex labels from a text file, Specify the file name for the new graph reorder, generated from Gorder, Rabbit-order, etc.\n"
+    },
     { 0 }
 };
 
@@ -152,6 +156,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
     {
     case 'f':
         arguments->fnameb = arg;
+        break;
+    case 'L':
+        arguments->fnamel = arg;
         break;
     case 'z':
         arguments->fnameb_format = atoi(arg);
@@ -255,6 +262,7 @@ main (int argc, char **argv)
     arguments.delta = 1;
     arguments.numThreads = omp_get_max_threads();
     arguments.fnameb = NULL;
+    arguments.fnamel = NULL;
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
 

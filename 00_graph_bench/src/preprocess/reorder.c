@@ -1251,7 +1251,7 @@ struct EdgeList *reorderGraphProcess(struct EdgeList *edgeList, struct Arguments
         edgeList = reorderGraphProcessHUBCluster( arguments->sort, edgeList, arguments->lmode);// HUBCluster
         break;
     case 11 :
-        edgeList = relabelEdgeListFromFile(edgeList, arguments->fnameb, edgeList->num_vertices);// load from file
+        edgeList = relabelEdgeListFromFile(edgeList, arguments->fnamel, edgeList->num_vertices);// load from file
         break;
 
     default :

@@ -64,17 +64,19 @@ export MAIN_DIR		  	= main
 # GAP https://sparse.tamu.edu/MM/GAP/
 # https://gonglab.pratt.duke.edu/google-dataset
 
+# export GRAPH_SUIT ?= GAP
 # export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
-export GRAPH_NAME ?= SNAP-web-Google
+# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
+export GRAPH_SUIT ?= LAW
 # LAW https://sparse.tamu.edu/MM/LAW/
-# export GRAPH_NAME ?= amazon-2008
+export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
 # export GRAPH_NAME ?= cnr-2000
 # export GRAPH_NAME ?= dblp-2010
@@ -94,18 +96,16 @@ export GRAPH_NAME ?= SNAP-web-Google
 # export MIX = Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en
 export LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001 Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en gplus USA-Road enwiki-2013 KONECT-wikipedia_link_en twitter
 
-# TEXT formant
-# export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph
-
-#UNWEIGHTED
-# export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph.bin
-
-# export FILE_BIN_TYPE = graph
+export FILE_BIN_TYPE ?= graph
 # export FILE_BIN_TYPE = graph.bin
-export FILE_BIN_TYPE ?= graph.wbin
+# export FILE_BIN_TYPE ?= graph.wbin
 
-#WEIGHTED
-export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
+export FILE_LABEL_TYPE ?= graph_Gorder.labels
+# export FILE_LABEL_TYPE ?= graph_Rabbit.labels
+
+#GRAPH file
+export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(GRAPH_SUIT)/$(FILE_BIN_TYPE)
+export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(GRAPH_SUIT)/$(FILE_LABEL_TYPE)
 
 #Direction
 export PULL_PUSH 		?= 0
@@ -127,7 +127,7 @@ export NUM_THREADS  	?= 4
 export NUM_ITERATIONS	?= 4
 export NUM_TRIALS 		?= 1
 
-export FILE_FORMAT		?= 1
+export FILE_FORMAT		?= 0
 export CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
@@ -146,7 +146,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA)
+export ARGS ?= -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -L $(FILE_LABEL) -l $(REORDER) -b $(DELTA)
 ##################################################
 ##################################################
 
