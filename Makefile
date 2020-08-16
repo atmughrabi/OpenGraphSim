@@ -54,6 +54,10 @@ export MAIN_DIR		  	= main
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
 
+export GRAPH_SUIT ?= LAW
+# export GRAPH_SUIT ?= GAP
+# export GRAPH_SUIT ?= SNAP
+
 # # small test graphs
 # export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
@@ -64,8 +68,8 @@ export MAIN_DIR		  	= main
 # GAP https://sparse.tamu.edu/MM/GAP/
 # https://gonglab.pratt.duke.edu/google-dataset
 
-# export GRAPH_SUIT ?= GAP
-export GRAPH_NAME ?= Gong-gplus
+
+# export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
 # export GRAPH_NAME ?= SNAP-web-Google
@@ -74,9 +78,9 @@ export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
-# export GRAPH_SUIT ?= LAW
+
 # LAW https://sparse.tamu.edu/MM/LAW/
-# export GRAPH_NAME ?= amazon-2008
+export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
 # export GRAPH_NAME ?= cnr-2000
 # export GRAPH_NAME ?= dblp-2010
@@ -96,9 +100,9 @@ export GRAPH_NAME ?= Gong-gplus
 # export MIX = Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en
 export LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001 Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en gplus USA-Road enwiki-2013 KONECT-wikipedia_link_en twitter
 
-export FILE_BIN_TYPE ?= graph
+# export FILE_BIN_TYPE ?= graph
 # export FILE_BIN_TYPE = graph.bin
-# export FILE_BIN_TYPE ?= graph.wbin
+export FILE_BIN_TYPE ?= graph.wbin
 
 export FILE_LABEL_TYPE ?= graph_Gorder.labels
 # export FILE_LABEL_TYPE ?= graph_Rabbit.labels
@@ -108,7 +112,7 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 0
+export PULL_PUSH 		?= 8
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
@@ -127,13 +131,13 @@ export NUM_THREADS  	?= 4
 export NUM_ITERATIONS	?= 4
 export NUM_TRIALS 		?= 1
 
-export FILE_FORMAT		?= 0
+export FILE_FORMAT		?= 1
 export CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 0
+export MASK_MODE 		?= 1
 
 ##################################################
 

@@ -25,12 +25,12 @@
 #define WARM_L1_SIZE   262144
 #define WARM_L1_ASSOC  8
 #define WARM_POLICY    PLRU_POLICY
-#define WARM_BLOCKSIZE 4
+#define WARM_BLOCKSIZE 8
 
 #define HOT_L1_SIZE   262144
 #define HOT_L1_ASSOC  8
 #define HOT_POLICY    PLRU_POLICY
-#define HOT_BLOCKSIZE 4
+#define HOT_BLOCKSIZE 8
 
 
 //GRASP/Ref_cache default configs

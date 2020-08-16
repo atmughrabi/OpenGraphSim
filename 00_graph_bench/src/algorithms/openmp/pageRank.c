@@ -1173,6 +1173,10 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -1189,9 +1193,11 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) private(v) shared(graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
+
+        #pragma omp parallel for default(none) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -1206,10 +1212,17 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
+
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
+
             }
         }
+
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
 
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
@@ -1237,6 +1250,9 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -1255,6 +1271,10 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
     // pageRankPrint(pageRanks, graph->num_vertices);
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -1341,6 +1361,10 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -1355,13 +1379,11 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        // Stop(timer_inner);
-        // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        //  Start(timer_inner);
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1371,17 +1393,19 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
-        // Stop(timer_inner);
-        // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
-        // Start(timer_inner);
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1399,16 +1423,17 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
             }
         }
 
-        // Stop(timer_inner);
-        // printf("|C %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
-
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));
         if(activeVertices == 0)
             break;
 
     }// end iteration loop
+
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -1426,6 +1451,10 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     // pageRankPrint(pageRanks, graph->num_vertices);
     free(timer);
@@ -1511,6 +1540,10 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -1525,13 +1558,11 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        // Stop(timer_inner);
-        // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        //  Start(timer_inner);
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1541,17 +1572,19 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
-        // Stop(timer_inner);
-        // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
-        // Start(timer_inner);
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1569,9 +1602,6 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             }
         }
 
-        // Stop(timer_inner);
-        // printf("|C %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
 
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));
@@ -1579,6 +1609,10 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             break;
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -1597,7 +1631,10 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-    // pageRankPrint(pageRanks, graph->num_vertices);
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+
     free(timer);
     free(timer_inner);
     free(riDividedOnDiClause);
@@ -1679,6 +1716,10 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -1693,12 +1734,11 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        // Stop(timer_inner);
-        // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        //  Start(timer_inner);
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1708,17 +1748,19 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
-        // Stop(timer_inner);
-        // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
-        // Start(timer_inner);
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1736,16 +1778,16 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
             }
         }
 
-        // Stop(timer_inner);
-        // printf("|C %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
-
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));
         if(activeVertices == 0)
             break;
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -1764,6 +1806,9 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
     // pageRankPrint(pageRanks, graph->num_vertices);
     free(timer);
     free(timer_inner);
@@ -1848,6 +1893,10 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -1862,12 +1911,11 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        // Stop(timer_inner);
-        // printf("|A %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        //  Start(timer_inner);
+
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1877,17 +1925,19 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 pageRanksNext[v] += riDividedOnDiClause[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
-        // Stop(timer_inner);
-        // printf("|B %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
 
-        // Start(timer_inner);
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -1905,16 +1955,16 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
             }
         }
 
-        // Stop(timer_inner);
-        // printf("|C %-9u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-
-
         Stop(timer_inner);
         printf("| %-10u | %-8u | %-15.13lf | %-9f | \n", stats->iterations, activeVertices, error_total, Seconds(timer_inner));
         if(activeVertices == 0)
             break;
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -1933,7 +1983,10 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-    // pageRankPrint(pageRanks, graph->num_vertices);
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+
     free(timer);
     free(timer_inner);
     free(riDividedOnDiClause);
@@ -2002,6 +2055,10 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -2019,19 +2076,15 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
                 riDividedOnDiClause[v] = 0.0f;
 
         }
-        // Stop(timer_inner);
-        // printf("|A%-10u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-        // Start(timer_inner);
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) schedule(dynamic, 1024) private(v) shared(graph,pageRanksNext,riDividedOnDiClause)
+
+        #pragma omp parallel for default(none) schedule(dynamic, 1024) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause)
         for(v = 0; v < graph->num_vertices; v++)
         {
-
-
-
             uint32_t degree = graph->vertices->out_degree[v];
             uint32_t edge_idx = graph->vertices->edges_idx[v];
             // uint32_t tid = omp_get_thread_num();
@@ -2042,15 +2095,17 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
                 uint32_t u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 #pragma omp atomic update
                 pageRanksNext[u] += riDividedOnDiClause[v];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
             }
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
-        // Stop(timer_inner);
-        // printf("|B%-10u | %-8u | %-15.13lf | %-9f | \n",stats->iterations, activeVertices,error_total, Seconds(timer_inner));
-        // Start(timer_inner);
+
         #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -2075,6 +2130,9 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -2093,6 +2151,9 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -2165,6 +2226,9 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
 
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
@@ -2197,7 +2261,8 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
 
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
@@ -2210,13 +2275,18 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause_quant[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-            //nodeIncomingPR -= (degree * rDivD_params.zero);
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
         //uint64_t temp_degree = 0;
         #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
@@ -2243,6 +2313,10 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -2259,6 +2333,10 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -2330,6 +2408,11 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
         pageRanksNext[v] = 0;
     }
 
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -2359,8 +2442,10 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
         {
             riDividedOnDiClause_quant[v] = quantize_16(riDividedOnDiClause[v], rDivD_params.scale, rDivD_params.zero);
         }
+
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
 
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
@@ -2373,13 +2458,18 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause_quant[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
-            //nodeIncomingPR -= (degree * rDivD_params.zero);
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
         //uint64_t temp_degree = 0;
         #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
@@ -2406,6 +2496,10 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -2422,6 +2516,10 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -2493,6 +2591,10 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         error_total = 0;
@@ -2524,7 +2626,8 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
 
         #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
@@ -2537,13 +2640,19 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
                 nodeIncomingPR += riDividedOnDiClause_quant[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause_quant[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
             }
             //nodeIncomingPR -= (degree * rDivD_params.zero);
             pageRanksNext[v] = rDivD_params.scale * nodeIncomingPR;
+#ifdef CACHE_HARNESS
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[v]), 'w', v, pageRanksNext[v]);
+#endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
 
         //uint64_t temp_degree = 0;
@@ -2571,6 +2680,10 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -2587,6 +2700,10 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -2649,6 +2766,11 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
         pageRanksNext[v] = 0;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -2679,10 +2801,10 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
-
-        #pragma omp parallel for default(none) private(v) shared(rDivD_params,riDividedOnDiClause_quant,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) private(v) shared(stats,rDivD_params,riDividedOnDiClause_quant,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -2696,11 +2818,15 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
 
                 #pragma omp atomic update
                 pageRanksNext[u] += rDivD_params.scale * (riDividedOnDiClause_quant[v] - rDivD_params.zero);
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (pageRanksNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
             }
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
 
         #pragma omp parallel for private(v) shared(epsilon, stats,pageRanksNext) reduction(+ : error_total, activeVertices)
@@ -2727,6 +2853,10 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
             break;
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -2744,6 +2874,9 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, Seconds(timer));
     printf(" -----------------------------------------------------\n");
     // pageRankPrint(pageRanks, graph->num_vertices);
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
 
     free(timer);
     free(timer_inner);
@@ -2840,6 +2973,10 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -2856,7 +2993,8 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
 
         #pragma omp parallel for default(none) shared(epsilon,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
@@ -2876,6 +3014,9 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
                 {
                     u = EXTRACT_VALUE(sorted_edges_array[j]);
                     nodeIncomingPR += riDividedOnDiClause[u]; // sum (PRi/outDegree(i))
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (riDividedOnDiClause[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
                 }
                 float oldPageRank =  stats->pageRanks[v];
                 float newPageRank =  stats->base_pr + (stats->damp * nodeIncomingPR);
@@ -2884,6 +3025,9 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
                 if(error >= epsilon)
                 {
                     stats->pageRanks[v] = newPageRank;
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->pageRanks[v]), 'w', v, stats->pageRanks[v]);
+#endif
                     degree = graph->vertices->out_degree[v];
                     edge_idx = graph->vertices->edges_idx[v];
                     for(j = edge_idx ; j < (edge_idx + degree) ; j++)
@@ -2892,6 +3036,11 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
 
                         #pragma omp atomic write
                         workListNext[u] = 1;
+
+#ifdef CACHE_HARNESS
+                        AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (workListNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
+
                         // uint8_t old_val = workListNext[u];
                         // if(!old_val){
                         //    __sync_bool_compare_and_swap(&workListNext[u], 0, 1);
@@ -2903,7 +3052,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
         // activeVertices = getNumOfSetBits(workListNext);
         swapWorkLists(&workListNext, &workListCurr);
@@ -2915,6 +3064,10 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
             break;
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -2933,7 +3086,9 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
     // pageRankPrint(pageRanks, graph->num_vertices);
     free(workListCurr);
     free(workListNext);
@@ -3037,6 +3192,10 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -3044,7 +3203,8 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
         activeVertices = 0;
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
 
         #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
@@ -3069,19 +3229,25 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
                     float prevResidual = 0.0f;
 
                     prevResidual = aResiduals[u];
-
                     #pragma omp atomic update
                     aResiduals[u] += delta;
-
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                     if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
                     {
                         activeVertices++;
+#ifdef CACHE_HARNESS
+                        AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (workListNext[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                         if(!workListNext[u])
                         {
-
                             // #pragma omp atomic write
                             workListNext[u] = 1;
-
+#ifdef CACHE_HARNESS
+                            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (workListNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                         }
                     }
                 }
@@ -3090,8 +3256,9 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
+
         // activeVertices = getNumOfSetBits(workListNext);
         swapWorkLists(&workListNext, &workListCurr);
         resetWorkList(workListNext, graph->num_vertices);
@@ -3103,6 +3270,9 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -3121,7 +3291,9 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
-
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
     // pageRankPrint(pageRanks, graph->num_vertices);
     free(workListCurr);
     free(workListNext);
@@ -3234,6 +3406,10 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
@@ -3241,7 +3417,8 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
         activeVertices = 0;
 
 #ifdef SNIPER_HARNESS
-        SimRoiStart();
+        int iter = stats->iterations;
+        SimMarker(1, iter);
 #endif
         #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -3256,6 +3433,10 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
                 {
                     u = EXTRACT_VALUE(sorted_edges_array[j]);
                     nodeIncomingPR += stats->pageRanks[u] / graph->vertices->out_degree[u];
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->pageRanks[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (graph->vertices->out_degree[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
                 }
 
                 float newPageRank = stats->base_pr + (stats->damp * nodeIncomingPR);
@@ -3278,21 +3459,32 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
 
                     #pragma omp atomic update
                     aResiduals[u] += delta;
-
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                     if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
                     {
                         activeVertices++;
+                        aResiduals[u] += delta;
+#ifdef CACHE_HARNESS
+                        AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (workListNext[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                         if(!workListNext[u])
                         {
                             workListNext[u] = 1;
+#ifdef CACHE_HARNESS
+                            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (workListNext[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                         }
                     }
                 }
                 aResiduals[v] = 0.0f;
             }
         }
+
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
 
         // activeVertices = getNumOfSetBits(workListNext);
@@ -3306,6 +3498,9 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
 
     }// end iteration loop
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     double sum = 0.0f;
     #pragma omp parallel for reduction(+:sum)
@@ -3324,6 +3519,9 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
     // pageRankPrint(pageRanks, graph->num_vertices);
     free(workListCurr);
     free(workListNext);
