@@ -339,12 +339,20 @@ struct EdgeList *reorderGraphListDegree(struct EdgeList *edgeList, uint32_t *deg
         labels[labelsInverse[v]] = edgeList->num_vertices - 1 - v;
     }
 
-    edgeList = relabelEdgeList(edgeList, labels);
-
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Degree Reordering/Relabeling Complete");
+    printf("| %-51s | \n", "Reordering Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    Start(timer);
+    edgeList = relabelEdgeList(edgeList, labels);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Relabeling Complete");
     printf(" -----------------------------------------------------\n");
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -497,12 +505,20 @@ struct EdgeList *reorderGraphListDBG(struct EdgeList *edgeList, uint32_t *degree
 
     }
 
-    edgeList = relabelEdgeList(edgeList, labels);
-
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "DBG Reordering/Relabeling Complete");
+    printf("| %-51s | \n", "Reordering Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    Start(timer);
+    edgeList = relabelEdgeList(edgeList, labels);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Relabeling Complete");
     printf(" -----------------------------------------------------\n");
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -684,15 +700,24 @@ struct EdgeList *reorderGraphListHUBSort(struct EdgeList *edgeList, uint32_t *de
         labels[verticesHot[0][v]] = sizeHot[1] + (v);
     }
 
-    edgeList = relabelEdgeList(edgeList, labels);
-
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "HUBSort Reordering/Relabeling Complete");
+    printf("| %-51s | \n", "Reordering Complete");
     printf(" -----------------------------------------------------\n");
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
+
+    Start(timer);
+    edgeList = relabelEdgeList(edgeList, labels);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Relabeling Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
 
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -851,12 +876,20 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
 
     }
 
-    edgeList = relabelEdgeList(edgeList, labels);
-
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "HUBCluster Reordering/Relabeling Complete");
+    printf("| %-51s | \n", "Reordering Complete");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    Start(timer);
+    edgeList = relabelEdgeList(edgeList, labels);
+    Stop(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Relabeling Complete");
     printf(" -----------------------------------------------------\n");
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1128,18 +1161,27 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
 
     }
 
-    if(mmode == 1 || mmode == 2)
-        edgeList = maskEdgeList(edgeList, mask_array);
-
-    edgeList->mask_array = mask_array;
-
     Stop(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Mask Array Generation/Relabeling Complete");
+    printf("| %-51s | \n", "Mask Complete");
     printf(" -----------------------------------------------------\n");
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
+
+    if(mmode == 1 || mmode == 2)
+    {
+        Start(timer);
+        edgeList = maskEdgeList(edgeList, mask_array);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-51s | \n", "Relabeling Complete");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-51f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
+    }
+
+    edgeList->mask_array = mask_array;
 
     for (i = 0; i < (P * num_buckets); ++i)
     {

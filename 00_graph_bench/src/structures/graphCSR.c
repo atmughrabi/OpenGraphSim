@@ -167,10 +167,6 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
     // edgeListPrint(edgeList);
     graphCSRPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
 
-
-    if(arguments->lmode)
-        edgeList = reorderGraphProcess(edgeList, arguments);
-
     edgeList = sortRunAlgorithms(edgeList, arguments->sort);
 
     if(arguments->dflag)
@@ -180,6 +176,9 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
         Stop(timer);
         graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
     }
+
+    if(arguments->lmode)
+        edgeList = reorderGraphProcess(edgeList, arguments);
 
     if(arguments->mmode)
         edgeList = maskGraphProcess(edgeList, arguments);

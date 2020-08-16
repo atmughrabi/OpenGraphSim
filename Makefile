@@ -65,7 +65,7 @@ export MAIN_DIR		  	= main
 # https://gonglab.pratt.duke.edu/google-dataset
 
 # export GRAPH_SUIT ?= GAP
-# export GRAPH_NAME ?= Gong-gplus
+export GRAPH_NAME ?= Gong-gplus
 # export GRAPH_NAME ?= GAP-road
 # export GRAPH_NAME ?= SNAP-soc-pokec
 # export GRAPH_NAME ?= SNAP-web-Google
@@ -74,9 +74,9 @@ export MAIN_DIR		  	= main
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
-export GRAPH_SUIT ?= LAW
+# export GRAPH_SUIT ?= LAW
 # LAW https://sparse.tamu.edu/MM/LAW/
-export GRAPH_NAME ?= amazon-2008
+# export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
 # export GRAPH_NAME ?= cnr-2000
 # export GRAPH_NAME ?= dblp-2010
@@ -111,7 +111,7 @@ export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_T
 export PULL_PUSH 		?= 0
 
 #GRAPH RUN
-export SORT_TYPE		?= 0
+export SORT_TYPE		?= 1
 export REORDER 		    ?= 4
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 1
@@ -133,7 +133,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 0
 
 ##################################################
 
@@ -146,7 +146,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -L $(FILE_LABEL) -l $(REORDER) -b $(DELTA)
+export ARGS ?= -k -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -L $(FILE_LABEL) -l $(REORDER) -b $(DELTA)
 ##################################################
 ##################################################
 
