@@ -112,13 +112,13 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 8
+export PULL_PUSH 		?= 2
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER 		    ?= 4
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 1
+export ALGORITHMS 		?= 0
 
 export ROOT 			?= 164
 export TOLERANCE 		?= 1e-8

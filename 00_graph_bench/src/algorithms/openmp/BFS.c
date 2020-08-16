@@ -286,7 +286,14 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(uint32_t source, struct GraphCSR
     {
 
         Start(timer_inner);
+#ifdef SNIPER_HARNESS
+        int iter = nf;
+        SimMarker(1, iter);
+#endif
         nf = bottomUpStepGraphCSR(graph, sharedFrontierQueue->q_bitmap, sharedFrontierQueue->q_bitmap_next, stats);
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
         sharedFrontierQueue->q_bitmap_next->numSetBits = nf;
         swapBitmaps(&sharedFrontierQueue->q_bitmap, &sharedFrontierQueue->q_bitmap_next);
         clearBitmap(sharedFrontierQueue->q_bitmap_next);
@@ -356,6 +363,18 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR
         return stats;
     }
 
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->parents[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
+    stats->propertyMetaData[0].data_type_size = sizeof(int);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
@@ -385,12 +404,24 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR
 
     printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
 
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     Start(timer);
     while(!isEmptyArrayQueue(sharedFrontierQueue))  // start while
     {
 
         Start(timer_inner);
+#ifdef SNIPER_HARNESS
+        int iter_2 = sharedFrontierQueue->tail - sharedFrontierQueue->head;
+        SimMarker(3, iter_2);
+#endif
         topDownStepGraphCSR(graph, sharedFrontierQueue, localFrontierQueues, stats);
+#ifdef SNIPER_HARNESS
+        SimMarker(4, iter_2);
+#endif
         slideWindowArrayQueue(sharedFrontierQueue);
         Stop(timer_inner);
 
@@ -403,6 +434,10 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR
     Stop(timer);
     stats->time_total =  Seconds(timer);
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -410,6 +445,10 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+    
     for(i = 0 ; i < P ; i++)
     {
         freeArrayQueue(localFrontierQueues[i]);
@@ -533,7 +572,15 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(uint32_t source, s
             {
                 Start(timer_inner);
                 nf_prev = nf;
+
+#ifdef SNIPER_HARNESS
+                int iter = nf_prev;
+                SimMarker(1, iter);
+#endif
                 nf = bottomUpStepGraphCSR(graph, bitmapCurr, bitmapNext, stats);
+#ifdef SNIPER_HARNESS
+                SimMarker(2, iter);
+#endif
                 swapBitmaps(&bitmapCurr, &bitmapNext);
                 clearBitmap(bitmapNext);
                 Stop(timer_inner);
@@ -560,7 +607,14 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(uint32_t source, s
 
             Start(timer_inner);
             mu -= mf;
+#ifdef SNIPER_HARNESS
+            int iter_2 = mf;
+            SimMarker(3, iter_2);
+#endif
             mf = topDownStepGraphCSR(graph, sharedFrontierQueue, localFrontierQueues, stats);
+#ifdef SNIPER_HARNESS
+            SimMarker(4, iter_2);
+#endif
             slideWindowArrayQueue(sharedFrontierQueue);
             Stop(timer_inner);
 
@@ -648,8 +702,14 @@ uint32_t topDownStepGraphCSR(struct GraphCSR *graph, struct ArrayQueue *sharedFr
 
                 u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
                 int u_parent = stats->parents[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->parents[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                 if(u_parent < 0 )
                 {
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->parents[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
                     if(__sync_bool_compare_and_swap(&stats->parents[u], u_parent, v))
                     {
                         enArrayQueue(localFrontierQueue, u);
@@ -717,7 +777,7 @@ uint32_t bottomUpStepGraphCSR(struct GraphCSR *graph, struct Bitmap *bitmapCurr,
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, (bitmapCurr->bitarray[word_offset(u)]));
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
 #endif
                 if(getBit(bitmapCurr, u))
                 {
