@@ -353,7 +353,7 @@ run-cache: app-cache
 run-sniper: MODE 		= -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n 4 -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n $(NUM_THREADS) -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp

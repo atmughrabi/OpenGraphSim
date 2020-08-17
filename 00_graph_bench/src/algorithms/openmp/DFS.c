@@ -199,12 +199,6 @@ struct DFSStats  *depthFirstSearchGraphCSRBase(uint32_t source, struct GraphCSR 
 
     while(!isEmptyArrayStackCurr(sharedFrontierStack))  // start while
     {
-
-#ifdef SNIPER_HARNESS
-        int iter = sizeArrayStackCurr(sharedFrontierStack);
-        SimMarker(1, iter);
-#endif
-
         uint32_t v = popArrayStack(sharedFrontierStack);
 
         stats->processed_nodes++;
@@ -224,11 +218,6 @@ struct DFSStats  *depthFirstSearchGraphCSRBase(uint32_t source, struct GraphCSR 
                 pushArrayStack(sharedFrontierStack, u);
             }
         }
-
-#ifdef SNIPER_HARNESS
-        SimMarker(2, iter);
-#endif
-
     } // end while
 
 #ifdef SNIPER_HARNESS
@@ -289,11 +278,6 @@ struct DFSStats  *depthFirstSearchGraphCSR(uint32_t source, struct GraphCSR *gra
 
     while(!isEmptyArrayStackCurr(sharedFrontierStack))  // start while
     {
-
-#ifdef SNIPER_HARNESS
-        int iter = sizeArrayStackCurr(sharedFrontierStack);
-        SimMarker(1, iter);
-#endif
         uint32_t v = popArrayStack(sharedFrontierStack);
 
         stats->processed_nodes++;
@@ -312,10 +296,6 @@ struct DFSStats  *depthFirstSearchGraphCSR(uint32_t source, struct GraphCSR *gra
                 pushArrayStack(sharedFrontierStack, u);
             }
         }
-
-#ifdef SNIPER_HARNESS
-        SimMarker(2, iter);
-#endif
 
     } // end while
 
