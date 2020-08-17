@@ -1079,7 +1079,7 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
     cache_regions[2] = ACCELGRAPH_CACHE_UINT; // VERTEX_VALUE_LUKEWARM_U32
     cache_regions[3] = UINT32_MAX;            // VERTEX_CACHE_COLD_U32
 
-    #pragma omp parallel
+    #pragma omp parallel for
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         mask_array[i] = VERTEX_CACHE_COLD_U32;
@@ -1181,13 +1181,18 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
         printf(" -----------------------------------------------------\n");
     }
 
-    edgeList->mask_array = mask_array;
+    #pragma omp parallel for
+    for (i = 0; i < edgeList->num_vertices; ++i)
+    {
+        edgeList->mask_array[i] = mask_array[i];
+    }
 
     for (i = 0; i < (P * num_buckets); ++i)
     {
         vc_vector_release(buckets[i]);
     }
 
+    free(mask_array);
     free(timer);
     free(buckets);
     free(start_idx);

@@ -547,6 +547,14 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     // printf("DONE Reading EdgeList from file %s \n", fname);
     // edgeListPrint(edgeList);
 
+    edgeList->mask_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+
+    #pragma omp parallel for
+    for (i = 0; i < edgeList->num_vertices; ++i)
+    {
+        edgeList->mask_array[i] = 0;
+    }
+
     munmap(buf_addr, fs.st_size);
     close(fd);
 
@@ -562,7 +570,7 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
     uint32_t num_vertices = edgeListmem->num_vertices;
     uint32_t i;
     uint32_t  src = 0, dest = 0;
-    
+
     struct EdgeList *edgeList;
 
     edgeList = newEdgeList((num_edges));

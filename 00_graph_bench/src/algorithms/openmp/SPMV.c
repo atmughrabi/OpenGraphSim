@@ -699,6 +699,10 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
     {
         Start(timer_inner);
 
+#ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
+        SimMarker(1, iter);
+#endif
         #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -717,23 +721,28 @@ struct SPMVStats *SPMVPullGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 #endif
 
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, stats->vector_input[src]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, EXTRACT_MASK(sorted_edges_array[j]));
 #endif
-                stats->vector_output[dest] +=  (weight * stats->vector_input[src]); // stats->pageRanks[v]/graph->vertices[v].out_degree;
+                stats->vector_output[dest] +=  (weight * stats->vector_input[src]);
             }
 #ifdef CACHE_HARNESS
-            AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, stats->vector_output[dest]);
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'r', dest, graph->sorted_edges_array->mask_array[dest]);
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, graph->sorted_edges_array->mask_array[dest]);
 #endif
         }
 
 #ifdef SNIPER_HARNESS
-        SimRoiEnd();
+        SimMarker(2, iter);
 #endif
 
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -799,11 +808,19 @@ struct SPMVStats *SPMVPushGraphCSR( uint32_t iterations, struct GraphCSR *graph)
         else
             stats->vector_input[v] = 0.001f;
     }
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
 
     Start(timer);
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
+
+#ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
+        SimMarker(1, iter);
+#endif
 
         #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -828,11 +845,19 @@ struct SPMVStats *SPMVPushGraphCSR( uint32_t iterations, struct GraphCSR *graph)
 
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
 
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
+
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     #pragma omp parallel for reduction(+:sum)
     for(v = 0; v < graph->num_vertices; v++)
@@ -950,10 +975,19 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
     }
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
 
+#ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
+        SimMarker(1, iter);
+#endif
         #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -972,20 +1006,28 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( uint32_t iterations, struct GraphC
 #endif
 
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, stats->vector_input[src]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_input[src]), 'r', src, EXTRACT_MASK(sorted_edges_array[j]));
 #endif
-                vector_output[dest] +=   MULFixed32V1(weight, vector_input[src]); // stats->pageRanks[v]/graph->vertices[v].out_degree;
+                vector_output[dest] += MULFixed32V1(weight, vector_input[src]); // stats->pageRanks[v]/graph->vertices[v].out_degree;
             }
 #ifdef CACHE_HARNESS
-            AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, stats->vector_output[dest]);
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'r', dest, graph->sorted_edges_array->mask_array[dest]);
+            AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->vector_output[dest]), 'w', dest, graph->sorted_edges_array->mask_array[dest]);
 #endif
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
 
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     #pragma omp parallel for
     for(v = 0; v < graph->num_vertices; v++)
@@ -1075,10 +1117,19 @@ struct SPMVStats *SPMVPushFixedPointGraphCSR( uint32_t iterations, struct GraphC
         vector_input[v] = DoubleToFixed64(stats->vector_input[v]);
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     Start(timer);
     for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
     {
         Start(timer_inner);
+
+#ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
+        SimMarker(1, iter);
+#endif
 
         #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1103,11 +1154,17 @@ struct SPMVStats *SPMVPushFixedPointGraphCSR( uint32_t iterations, struct GraphC
 
         }
 
-
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
         Stop(timer_inner);
         printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     #pragma omp parallel for
     for(v = 0; v < graph->num_vertices; v++)

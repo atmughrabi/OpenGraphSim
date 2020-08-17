@@ -33,6 +33,14 @@
 
 #include "DFS.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -184,8 +192,18 @@ struct DFSStats  *depthFirstSearchGraphCSRBase(uint32_t source, struct GraphCSR 
     stats->parents[source] = source;
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     while(!isEmptyArrayStackCurr(sharedFrontierStack))  // start while
     {
+
+#ifdef SNIPER_HARNESS
+        int iter = sizeArrayStackCurr(sharedFrontierStack);
+        SimMarker(1, iter);
+#endif
 
         uint32_t v = popArrayStack(sharedFrontierStack);
 
@@ -207,8 +225,16 @@ struct DFSStats  *depthFirstSearchGraphCSRBase(uint32_t source, struct GraphCSR 
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
 
     } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
 
     stats->time_total = Seconds(timer);
@@ -255,12 +281,19 @@ struct DFSStats  *depthFirstSearchGraphCSR(uint32_t source, struct GraphCSR *gra
     pushArrayStack(sharedFrontierStack, source);
     stats->parents[source] = source;
 
-
-
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     while(!isEmptyArrayStackCurr(sharedFrontierStack))  // start while
     {
 
+#ifdef SNIPER_HARNESS
+        int iter = sizeArrayStackCurr(sharedFrontierStack);
+        SimMarker(1, iter);
+#endif
         uint32_t v = popArrayStack(sharedFrontierStack);
 
         stats->processed_nodes++;
@@ -280,8 +313,16 @@ struct DFSStats  *depthFirstSearchGraphCSR(uint32_t source, struct GraphCSR *gra
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
 
     } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
 
     stats->time_total = Seconds(timer);

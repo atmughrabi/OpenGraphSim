@@ -994,12 +994,19 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
         clearBitmap(bitmapSetCurr);
         Start(timer_inner);
 
+#ifdef SNIPER_HARNESS
+        int iteration = iter;
+        SimMarker(1, iteration);
+#endif
+
         while(stats->bucket_counter)
         {
             Start(timer_inner);
             stats->bucket_counter = 0;
             // uint32_t buckets_total_local =
             // process light edges
+
+
             #pragma omp parallel for private(v) shared(bitmapSetCurr, graph, stats) reduction(+ : activeVertices)
             for(v = 0; v < graph->num_vertices; v++)
             {
@@ -1042,6 +1049,10 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
             if(activeVertices)
                 printf("| L%-14u | %-15u | %-15f |\n", iter, stats->buckets_total, Seconds(timer_inner));
         }
+
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+#endif
 
         iter++;
         stats->bucket_current++;
@@ -1156,6 +1167,9 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
     printf("| %-15s | %-15u | %-15f | \n", "Init", stats->buckets_total,  Seconds(timer_inner));
     printf(" -----------------------------------------------------\n");
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
 
     while (stats->buckets_total)
     {
@@ -1165,6 +1179,10 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
         stats->bucket_counter = 1;
         clearBitmap(bitmapSetCurr);
 
+#ifdef SNIPER_HARNESS
+        int iteration = iter;
+        SimMarker(1, iteration);
+#endif
         while(stats->bucket_counter)
         {
             Start(timer_inner);
@@ -1214,6 +1232,11 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
                 printf("| L%-14u | %-15u | %-15f |\n", iter, stats->buckets_total, Seconds(timer_inner));
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+        SimMarker(3, iteration);
+#endif
+
         Start(timer_inner);
 
         #pragma omp parallel for private(v) shared(bitmapSetCurr, graphHeavy, stats) reduction(+ : activeVertices)
@@ -1244,6 +1267,10 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(4, iteration);
+#endif
+
         iter++;
         stats->bucket_current++;
         Stop(timer_inner);
@@ -1251,7 +1278,9 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
             printf("| H%-14u | %-15u | %-15f |\n", iter, stats->buckets_total, Seconds(timer_inner));
     }
 
-
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total += Seconds(timer);

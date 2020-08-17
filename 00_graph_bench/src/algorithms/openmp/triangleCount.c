@@ -34,6 +34,13 @@
 
 #include "triangleCount.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
 
 struct TCStats *newTCStatsGraphCSR(struct GraphCSR *graph)
 {
@@ -249,6 +256,11 @@ struct TCStats *triangleCountBasicGraphCSR(struct GraphCSR *graph)
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     #pragma omp parallel for shared(stats) schedule(dynamic, 128)
     for(u = 0; u < graph->num_vertices; u++)
     {
@@ -282,6 +294,10 @@ struct TCStats *triangleCountBasicGraphCSR(struct GraphCSR *graph)
             }
         }
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total = Seconds(timer);
@@ -318,6 +334,11 @@ struct TCStats *triangleCountPullGraphCSR(struct GraphCSR *graph)
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     #pragma omp parallel for shared(stats) reduction(+:counts) schedule(dynamic, 128)
     for(u = 0; u < graph->num_vertices; u++)
     {
@@ -369,6 +390,11 @@ struct TCStats *triangleCountPullGraphCSR(struct GraphCSR *graph)
             }
         }
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
     stats->time_total = Seconds(timer);
 
@@ -396,6 +422,11 @@ struct TCStats *triangleCountPushGraphCSR(struct GraphCSR *graph)
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     #pragma omp parallel for shared(stats) schedule(dynamic, 128)
     for(u = 0; u < graph->num_vertices; u++)
     {
@@ -445,6 +476,10 @@ struct TCStats *triangleCountPushGraphCSR(struct GraphCSR *graph)
         }
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
     Stop(timer);
     stats->time_total = Seconds(timer);
 
@@ -481,6 +516,11 @@ struct TCStats *triangleCountBinaryIntersectionGraphCSR(struct GraphCSR *graph)
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     #pragma omp parallel for shared(stats) reduction(+:counts) schedule(dynamic, 128)
     for(u = 0; u < graph->num_vertices; u++)
     {
@@ -498,6 +538,10 @@ struct TCStats *triangleCountBinaryIntersectionGraphCSR(struct GraphCSR *graph)
             counts += countIntersectionsBinarySearch(u, node_v, graph);
         }
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total = Seconds(timer);

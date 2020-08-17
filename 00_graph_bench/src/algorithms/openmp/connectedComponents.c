@@ -421,6 +421,11 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
         change = 0;
         stats->iterations++;
 
+#ifdef SNIPER_HARNESS
+        int iter = stats->iterations;
+        SimMarker(1, iter);
+#endif
+
         #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
@@ -440,8 +445,8 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
                 uint32_t comp_src = stats->components[src];
                 uint32_t comp_dest = stats->components[dest];
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[src]), 'r', src, stats->components[src]);
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[dest]), 'r', dest, stats->components[dest]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->components[src]), 'r', src, graph->sorted_edges_array->mask_array[src]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->components[dest]), 'r', dest, EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]));
 #endif
                 if(comp_src == comp_dest)
                     continue;
@@ -449,18 +454,22 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
                 uint32_t comp_high = comp_src > comp_dest ? comp_src : comp_dest;
                 uint32_t comp_low = comp_src + (comp_dest - comp_high);
 #ifdef CACHE_HARNESS
-                AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[comp_high]), 'r', comp_high, stats->components[comp_high]);
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->components[comp_high]), 'r', comp_high,  graph->sorted_edges_array->mask_array[comp_high]);
 #endif
                 if(comp_high == stats->components[comp_high])
                 {
                     change = 1;
                     stats->components[comp_high] = comp_low;
 #ifdef CACHE_HARNESS
-                    AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->components[comp_high]), 'w', comp_high, stats->components[comp_high]);
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->components[comp_high]), 'w', comp_high,  graph->sorted_edges_array->mask_array[comp_high]);
 #endif
                 }
             }
         }
+
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
 
         compressNodes( stats->num_vertices, stats->components);
 

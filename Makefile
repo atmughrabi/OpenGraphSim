@@ -112,13 +112,13 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 2
+export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER 		    ?= 4
+export REORDER 		    ?= 0
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 0
+export ALGORITHMS 		?= 4
 
 export ROOT 			?= 164
 export TOLERANCE 		?= 1e-8
@@ -150,7 +150,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -k -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -L $(FILE_LABEL) -l $(REORDER) -b $(DELTA)
+export ARGS ?= -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -L $(FILE_LABEL) -l $(REORDER) -b $(DELTA)
 ##################################################
 ##################################################
 

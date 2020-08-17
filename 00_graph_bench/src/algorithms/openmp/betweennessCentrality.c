@@ -40,6 +40,10 @@
 #include <sim_api.h>
 #endif
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -115,7 +119,6 @@ void clearBetweennessCentralityStats(struct BetweennessCentralityStats *stats)
 
     stats->stack->degree  = 0;
     stats->processed_nodes = 0;
-    stats->iteration = 0;
     stats->num_vertices = stats->num_vertices;
     // stats->time_total = 0.0f;
 
@@ -266,14 +269,19 @@ struct BetweennessCentralityStats *betweennessCentralityBFSPullGraphCSR(uint32_t
 
     while (sharedFrontierQueue->q_bitmap->numSetBits)
     {
+#ifdef SNIPER_HARNESS
+        int iteration = sharedFrontierQueue->q_bitmap->numSetBits;
+        SimMarker(5, iteration);
+#endif
         nf = betweennessCentralityBottomUpStepGraphCSR(graph, sharedFrontierQueue->q_bitmap, sharedFrontierQueue->q_bitmap_next, stats);
+#ifdef SNIPER_HARNESS
+        SimMarker(6, iteration);
+#endif
         sharedFrontierQueue->q_bitmap_next->numSetBits = nf;
         copyBitmapToStack(sharedFrontierQueue->q_bitmap_next, stats->stack, stats->num_vertices);
         swapBitmaps(&sharedFrontierQueue->q_bitmap, &sharedFrontierQueue->q_bitmap_next);
         clearBitmap(sharedFrontierQueue->q_bitmap_next);
         stats->processed_nodes += nf;
-
-
     } // end while
 
     freeArrayQueue(sharedFrontierQueue);
@@ -327,13 +335,23 @@ uint32_t betweennessCentralityBottomUpStepGraphCSR(struct GraphCSR *graph, struc
             for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
             {
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
                 if(getBit(bitmapCurr, u))
                 {
                     // stats->parents[v] = u;
                     stats->distances[v] = stats->distances[u] + 1;
-
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->distances[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
                     if(stats->distances[v] == stats->distances[u] + 1)
                     {
+
+#ifdef CACHE_HARNESS
+                        AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->sigma[u]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+                        AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->sigma[u]), 'w', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
                         stats->sigma[v] += stats->sigma[u];
                         stats->predecessors[v].nodes[stats->predecessors[v].degree] = u;
                         stats->predecessors[v].degree++;
@@ -344,10 +362,9 @@ uint32_t betweennessCentralityBottomUpStepGraphCSR(struct GraphCSR *graph, struc
                     // break;
                 }
             }
-
         }
-
     }
+
     return nf;
 }
 
@@ -385,13 +402,11 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
     printf("| %-51s | \n", "Starting Brandes Betweenness Centrality");
     printf(" -----------------------------------------------------\n");
 
-    uint32_t iter;
     uint32_t s;
     uint32_t v;
     uint32_t w;
     uint32_t u;
     uint32_t t;
-
 
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 2;
@@ -416,16 +431,21 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
     SimRoiStart();
 #endif
 
-    for(iter = 0 ; iter < iterations ; iter++)
+    for(stats->iteration = 0 ; stats->iteration  < iterations ; stats->iteration++)
     {
         s = generateRandomRootBetweennessCentrality(graph);
         Start(timer_inner);
         clearBetweennessCentralityStats(stats);
 
+#ifdef SNIPER_HARNESS
+        int iteration = stats->iteration ;
+        SimMarker(1, iteration);
+#endif
         stats = betweennessCentralityBFSPullGraphCSR(s, graph, stats);
-
-
-        // #pragma omp parallel for
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+        SimMarker(3, iteration);
+#endif
         for (t = stats->stack->degree - 1; t > 0; t--)
         {
             w = stats->stack->nodes[t];
@@ -444,6 +464,9 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
                 stats->betweennessCentrality[w] += stats->dependency[w] / 2;
             }
         }
+#ifdef SNIPER_HARNESS
+        SimMarker(4, iteration);
+#endif
         Stop(timer_inner);
         stats->time_total += Seconds(timer_inner);
 

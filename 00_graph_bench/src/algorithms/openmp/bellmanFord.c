@@ -39,6 +39,10 @@
 
 #include "bellmanFord.h"
 
+#ifdef SNIPER_HARNESS
+#include <sim_api.h>
+#endif
+
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
@@ -864,12 +868,20 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
     printf("| %-15s | %-15u | %-15f | \n", "Init", activeVertices,  Seconds(timer_inner));
     printf(" -----------------------------------------------------\n");
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(iter = 0; iter < iterations; iter++)
     {
         Start(timer_inner);
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
+#ifdef SNIPER_HARNESS
+        int iteration = iter;
+        SimMarker(1, iteration);
+#endif
 
         #pragma omp parallel for private(v) shared(vertices,sorted_edges_array,graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(v = 0; v < graph->num_vertices; v++)
@@ -923,19 +935,22 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+#endif
 
         swapBitmaps(&bitmapCurr, &bitmapNext);
         clearBitmap(bitmapNext);
 
         Stop(timer_inner);
-
-
-
         printf("| %-15u | %-15u | %-15f | \n", iter, activeVertices, Seconds(timer_inner));
         if(activeVertices == 0)
             break;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total = Seconds(timer);
@@ -949,12 +964,8 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
     freeBitmap(bitmapNext);
     freeBitmap(bitmapCurr);
 
-
-
     // bellmanFordPrintStats(stats);
     return stats;
-
-
 }
 
 
@@ -1015,12 +1026,20 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uin
     printf("| %-15s | %-15u | %-15f | \n", "Init", activeVertices,  Seconds(timer_inner));
     printf(" -----------------------------------------------------\n");
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(iter = 0; iter < iterations; iter++)
     {
         Start(timer_inner);
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
+#ifdef SNIPER_HARNESS
+        int iteration = iter;
+        SimMarker(1, iteration);
+#endif
 
         #pragma omp parallel for private(v) shared(graph,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(v = 0; v < graph->num_vertices; v++)
@@ -1049,6 +1068,9 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uin
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+#endif
 
         swapBitmaps(&bitmapCurr, &bitmapNext);
         clearBitmap(bitmapNext);
@@ -1059,6 +1081,10 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uin
         if(activeVertices == 0)
             break;
     }
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
 
     Stop(timer);
@@ -1185,12 +1211,20 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
     printf("| %-15s | %-15u | %-15f | \n", "Init", activeVertices,  Seconds(timer_inner));
     printf(" -----------------------------------------------------\n");
 
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
     for(iter = 0; iter < iterations; iter++)
     {
         Start(timer_inner);
         stats->processed_nodes += activeVertices;
         activeVertices = 0;
 
+#ifdef SNIPER_HARNESS
+        int iteration = iter;
+        SimMarker(1, iteration);
+#endif
 
         #pragma omp parallel for private(v,n) shared(vertices,graphPlus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(n = 0; n < graphPlus->num_vertices; n++)
@@ -1221,6 +1255,11 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
                 }
             }
         }
+
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iteration);
+        SimMarker(3, iteration);
+#endif
 
         #pragma omp parallel for private(v,n) shared(vertices,graphMinus,stats,bitmapNext,bitmapCurr) reduction(+ : activeVertices) schedule (dynamic,128)
         for(n = 0; n < graphMinus->num_vertices; n++)
@@ -1253,6 +1292,9 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
             }
         }
 
+#ifdef SNIPER_HARNESS
+        SimMarker(4, iteration);
+#endif
 
         swapBitmaps(&bitmapCurr, &bitmapNext);
         clearBitmap(bitmapNext);
@@ -1264,6 +1306,9 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
             break;
     }
 
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
 
     Stop(timer);
     stats->time_total = Seconds(timer);
