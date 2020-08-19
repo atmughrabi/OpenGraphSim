@@ -180,6 +180,11 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
     if(arguments->lmode)
         edgeList = reorderGraphProcess(edgeList, arguments);
 
+    // add another layer of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
+    arguments->lmode = arguments->lmode_l2;
+    if(arguments->lmode)
+        edgeList = reorderGraphProcess(edgeList, arguments);
+
     if(arguments->mmode)
         edgeList = maskGraphProcess(edgeList, arguments);
 

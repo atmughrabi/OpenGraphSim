@@ -96,8 +96,12 @@ static struct argp_option options[] =
         "\nSSSP Delta value [Default:1].\n"
     },
     {
-        "light-reorder",     'l', "[ORDER:0]\n",      0,
-        "\nRelabels the graph for better cache performance. [default:0]-no-reordering [1]-out-degree [2]-in-degree [3]-(in+out)-degree [4]-DBG-out [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in [8]-HUBCluster-out [9]-HUBCluster-in [10]-(random)-degree  [11]-LoadFromFile\n"
+        "light-reorder-l1",     'l', "[ORDER:0]\n",      0,
+        "\nRelabels the graph for better cache performance (first layer). [default:0]-no-reordering [1]-out-degree [2]-in-degree [3]-(in+out)-degree [4]-DBG-out [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in [8]-HUBCluster-out [9]-HUBCluster-in [10]-(random)-degree  [11]-LoadFromFile\n"
+    },
+    {
+        "light-reorder-l2",     'L', "[ORDER:0]\n",      0,
+        "\nRelabels the graph for better cache performance (second layer). [default:0]-no-reordering [1]-out-degree [2]-in-degree [3]-(in+out)-degree [4]-DBG-out [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in [8]-HUBCluster-out [9]-HUBCluster-in [10]-(random)-degree  [11]-LoadFromFile\n"
     },
     {
         "convert-format",    'c', "[TEXT|BIN|CSR:1]\n",      0,
@@ -136,7 +140,7 @@ static struct argp_option options[] =
         "\nEncodes [0:disabled] the last two bits of [1:out-degree]-Edgelist-labels [2:in-degree]-Edgelist-labels or [3:out-degree]-vertex-property-data  [4:in-degree]-vertex-property-data with hot/cold hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD] to specialize caching. The algorithm needs to support value unmask to work.\n"
     },
     {
-        "labels-file",      'L', "<FILE>\n",      0,
+        "labels-file",      'F', "<FILE>\n",      0,
         "\nRead and reorder vertex labels from a text file, Specify the file name for the new graph reorder, generated from Gorder, Rabbit-order, etc.\n"
     },
     { 0 }
@@ -157,7 +161,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'f':
         arguments->fnameb = arg;
         break;
-    case 'L':
+    case 'F':
         arguments->fnamel = arg;
         break;
     case 'z':
@@ -192,6 +196,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
         break;
     case 'l':
         arguments->lmode = atoi(arg);
+    case 'L':
+        arguments->lmode_l2 = atoi(arg);
         break;
     case 'b':
         arguments->delta = atoi(arg);
@@ -257,6 +263,7 @@ main (int argc, char **argv)
     arguments.sort = 0;
     arguments.mmode = 0;
     arguments.lmode = 0;
+    arguments.lmode_l2 = 0;
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
