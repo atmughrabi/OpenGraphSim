@@ -69,6 +69,7 @@ main (int argc, char **argv)
     arguments.wflag = 0;
     arguments.xflag = 0;
     arguments.sflag = 0;
+    arguments.dflag = 1;
 
     arguments.iterations = 200;
     arguments.trials = 100;
@@ -79,7 +80,8 @@ main (int argc, char **argv)
     arguments.pushpull = 0;
     arguments.sort = 0;
     arguments.lmode = 4;
-    arguments.mmode = 1;
+    arguments.lmode_l2 = 0;
+    arguments.mmode = 0;
     arguments.symmetric = 0;
     arguments.weighted = 1;
     arguments.delta = 1;
@@ -114,7 +116,7 @@ main (int argc, char **argv)
     void *cmp_data;
 
 
-    for(arguments.algorithm = 0 ; arguments.algorithm < 8; arguments.algorithm++)
+    for(arguments.algorithm = 0 ; arguments.algorithm < 9; arguments.algorithm++)
     {
         for(arguments.datastructure = 0 ; arguments.datastructure < 4; arguments.datastructure++)
         {

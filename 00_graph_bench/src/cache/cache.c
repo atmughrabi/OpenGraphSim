@@ -1603,7 +1603,7 @@ struct CacheLine *fillLine(struct Cache *cache, uint64_t addr)
     return victim;
 }
 
-void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node)
+void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
 {
 
     if(node < cache->numVertices)
@@ -1680,9 +1680,9 @@ void AccessDoubleTaggedCacheFloat(struct DoubleTaggedCache *cache, uint64_t addr
     #pragma omp critical
     {
         // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
-        AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
+        AccessAccelGraphGRASP(cache->accel_graph, addr, op, node, 0);
         // AccessAccelGraphExpress(cache->accel_graph, addr, op, node,);
-        Access(cache->ref_cache, addr, op, node);
+        Access(cache->ref_cache, addr, op, node, 0);
     }
 }
 
@@ -1692,9 +1692,9 @@ void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t add
     #pragma omp critical
     {
         // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
-        // AccessAccelGraphGRASP(cache->accel_graph, addr, op, node);
+        // AccessAccelGraphGRASP(cache->accel_graph, addr, op, node, value);
         AccessAccelGraphExpress(cache->accel_graph, addr, op, node, value);
-        Access(cache->ref_cache, addr, op, node);
+        Access(cache->ref_cache, addr, op, node, value);
     }
 }
 
@@ -1706,8 +1706,8 @@ void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr,
     {
         if(mask == VERTEX_VALUE_HOT_U32)
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->hot_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
+            Access(accel_graph->hot_cache, addr, op, node, mask);
             // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
             // if(isValid(victim))
             // {
@@ -1717,29 +1717,29 @@ void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr,
         }
         else if(mask == VERTEX_CACHE_WARM_U32)
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->warm_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
+            Access(accel_graph->warm_cache, addr, op, node, mask);
         }
         else
         {
-            Access(accel_graph->cold_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
         }
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->warm_cache, addr, op, node);
+        Access(accel_graph->warm_cache, addr, op, node, mask);
     }
     else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, mask);
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, mask);
     }
 }
 
-void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node)
+void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
 {
     // struct CacheLine *victim = NULL;
 
@@ -1747,8 +1747,8 @@ void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, u
     {
         if(inHotRegionAddrGRASP(accel_graph->hot_cache, addr))
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->hot_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
+            Access(accel_graph->hot_cache, addr, op, node, mask);
             // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
             // if(isValid(victim))
             // {
@@ -1758,25 +1758,25 @@ void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, u
         }
         else if(inWarmRegionAddrGRASP(accel_graph->warm_cache, addr))
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->warm_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
+            Access(accel_graph->warm_cache, addr, op, node, mask);
         }
         else
         {
-            Access(accel_graph->cold_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, mask);
         }
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->warm_cache, addr, op, node);
+        Access(accel_graph->warm_cache, addr, op, node, mask);
     }
     else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, mask);
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, mask);
     }
 }
 
@@ -1789,8 +1789,8 @@ void AccessAccelGraphExpressFloat(struct AccelGraphCache *accel_graph, uint64_t 
     {
         if(value <= 0.0015)
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->hot_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, 0);
+            Access(accel_graph->hot_cache, addr, op, node, 0);
             // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
             // if(isValid(victim))
             // {
@@ -1800,25 +1800,25 @@ void AccessAccelGraphExpressFloat(struct AccelGraphCache *accel_graph, uint64_t 
         }
         else if(value > 0.0015 && value <= 0.015)
         {
-            Access(accel_graph->cold_cache, addr, op, node);
-            Access(accel_graph->warm_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, 0);
+            Access(accel_graph->warm_cache, addr, op, node, 0);
         }
         else
         {
-            Access(accel_graph->cold_cache, addr, op, node);
+            Access(accel_graph->cold_cache, addr, op, node, 0);
         }
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->warm_cache, addr, op, node);
+        Access(accel_graph->warm_cache, addr, op, node, 0);
     }
     else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, 0);
     }
     else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
-        Access(accel_graph->hot_cache, addr, op, node);
+        Access(accel_graph->hot_cache, addr, op, node, 0);
     }
 }
 
