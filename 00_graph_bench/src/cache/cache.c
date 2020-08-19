@@ -482,7 +482,7 @@ uint32_t checkInCache(struct Cache *cache, uint64_t addr)
     return 0;
 }
 
-void Prefetch(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node)
+void Prefetch(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
 {
     cache->currentCycle++;/*per cache global counter to maintain LRU order
       among cache ways, updated on every cache access*/
@@ -492,12 +492,12 @@ void Prefetch(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t nod
     if(line == NULL)/*miss*/
     {
         cache->readMissesPrefetch++;
-        fillLine(cache, addr);
+        fillLine(cache, addr, mask);
     }
     else
     {
         /**since it's a hit, update LRU and update dirty flag**/
-        updatePromotionPolicy(cache, line);
+        updatePromotionPolicy(cache, line, mask);
     }
 }
 
@@ -581,7 +581,7 @@ void updateAgeGRASP(struct Cache *cache)
 // ***************         INSERTION POLICIES                                    **************
 // ********************************************************************************************
 
-void updateInsertionPolicy(struct Cache *cache, struct CacheLine *line)
+void updateInsertionPolicy(struct Cache *cache, struct CacheLine *line, uint32_t mask)
 {
     switch(cache->policy)
     {
@@ -605,6 +605,9 @@ void updateInsertionPolicy(struct Cache *cache, struct CacheLine *line)
         break;
     case GRASPXP_POLICY:
         updateInsertGRASPXP(cache, line);
+        break;
+    case MASK_POLICY:
+        updateInsertMASK(cache, line, mask);
         break;
     default :
         updateInsertLRU(cache, line);
@@ -630,6 +633,22 @@ void updateInsertGRASP(struct Cache *cache, struct CacheLine *line)
         setRRPV(line, HOT_INSERT_RRPV);
     }
     else if (inWarmRegion(cache, line))
+    {
+        setRRPV(line, WARM_INSERT_RRPV);
+    }
+    else
+    {
+        setRRPV(line, DEFAULT_INSERT_RRPV);
+    }
+}
+
+void updateInsertMASK(struct Cache *cache, struct CacheLine *line, uint32_t mask)
+{
+    if(mask == VERTEX_VALUE_HOT_U32)
+    {
+        setRRPV(line, HOT_INSERT_RRPV);
+    }
+    else if (mask == VERTEX_CACHE_WARM_U32)
     {
         setRRPV(line, WARM_INSERT_RRPV);
     }
@@ -760,7 +779,7 @@ uint32_t inWarmRegionAddrGRASP(struct Cache *cache, uint64_t addr)
 // ***************         PROMOTION POLICIES                                    **************
 // ********************************************************************************************
 
-void updatePromotionPolicy(struct Cache *cache, struct CacheLine *line)
+void updatePromotionPolicy(struct Cache *cache, struct CacheLine *line, uint32_t mask)
 {
     switch(cache->policy)
     {
@@ -785,6 +804,9 @@ void updatePromotionPolicy(struct Cache *cache, struct CacheLine *line)
     case GRASPXP_POLICY:
         updatePromoteGRASPXP(cache, line);
         break;
+    case MASK_POLICY:
+        updatePromoteMASK(cache, line, mask);
+        break;
     default :
         updatePromoteLRU(cache, line);
     }
@@ -807,6 +829,21 @@ void updatePromoteLFU(struct Cache *cache, struct CacheLine *line)
 void updatePromoteGRASP(struct Cache *cache, struct CacheLine *line)
 {
     if(inHotRegion(cache, line))
+    {
+        setRRPV(line, HOT_HIT_RRPV);
+    }
+    else
+    {
+        uint8_t RRPV = getRRPV(line);
+        if(RRPV > 0)
+            RRPV--;
+        setRRPV(line, RRPV);
+    }
+}
+
+void updatePromoteMASK(struct Cache *cache, struct CacheLine *line, uint32_t mask)
+{
+    if(mask == VERTEX_VALUE_HOT_U32)
     {
         setRRPV(line, HOT_HIT_RRPV);
     }
@@ -914,6 +951,9 @@ struct CacheLine *getVictimPolicy(struct Cache *cache, uint64_t addr)
         break;
     case GRASPXP_POLICY:
         victim = getVictimGRASPXP(cache, addr);
+        break;
+    case MASK_POLICY:
+        victim = getVictimMASK(cache, addr);
         break;
     default :
         victim = getVictimLRU(cache, addr);
@@ -1032,7 +1072,7 @@ struct CacheLine *getVictimGRASP(struct Cache *cache, uint64_t addr)
     return &(cache->cacheLines[i][victim]);
 }
 
-struct CacheLine *getVictimSRRIP(struct Cache *cache, uint64_t addr)
+struct CacheLine *getVictimMASK(struct Cache *cache, uint64_t addr)
 {
     uint64_t i, j, victim, min;
 
@@ -1049,30 +1089,53 @@ struct CacheLine *getVictimSRRIP(struct Cache *cache, uint64_t addr)
         }
     }
 
-    // do
-    // {
-    //     for(j = 0; j < cache->assoc; j++)
-    //     {
-    //         if(getSRRPV(&(cache->cacheLines[i][j])) == SRRPV_INIT)
-    //         {
-    //             victim = j;
-    //             min = getSRRPV(&(cache->cacheLines[i][j]));
-    //             break;
-    //         }
-    //     }
+    victim = 0;
+    min = getRRPV(&(cache->cacheLines[i][0]));
 
-    //     if(!min)
-    //     {
-    //         for(j = 0; j < cache->assoc; j++)
-    //         {
-    //             uint8_t SRRPV = getSRRPV(&(cache->cacheLines[i][j])) + 1;
-    //             if(SRRPV <= SRRPV_INIT)
-    //                 setSRRPV(&(cache->cacheLines[i][j]), SRRPV);
-    //         }
-    //     }
+    for(j = 1; j < cache->assoc; j++)
+    {
+        if(getRRPV(&(cache->cacheLines[i][j])) > min)
+        {
+            victim = j;
+            min = getRRPV(&(cache->cacheLines[i][j]));
+        }
+    }
+    assert(victim != cache->assoc);
 
-    // }
-    // while(!min);
+    // not in the GRASP paper optimizaiton
+    if (min < DEFAULT_INSERT_RRPV)
+    {
+        int diff = DEFAULT_INSERT_RRPV - min;
+        for(j = 0; j < cache->assoc; j++)
+        {
+            uint8_t RRPV = getRRPV(&(cache->cacheLines[i][j])) + diff;
+            setRRPV(&(cache->cacheLines[i][j]), RRPV);
+            assert(RRPV <= DEFAULT_INSERT_RRPV);
+        }
+    }
+
+    cache->evictions++;
+    cache->cacheLines[i][victim].addr = addr; // update victim with new address so we simulate hot/cold insertion
+    return &(cache->cacheLines[i][victim]);
+}
+
+
+struct CacheLine *getVictimSRRIP(struct Cache *cache, uint64_t addr)
+{
+    uint64_t i, j, victim, min;
+
+    victim = cache->assoc;
+    min    = 0;
+    i      = calcIndex(cache, addr);
+
+    for(j = 0; j < cache->assoc; j++)
+    {
+        if(isValid(&(cache->cacheLines[i][j])) == 0)
+        {
+            cache->cacheLines[i][j].addr = addr;
+            return &(cache->cacheLines[i][j]);
+        }
+    }
 
     victim = 0;
     min = getSRRPV(&(cache->cacheLines[i][0]));
@@ -1214,31 +1277,6 @@ struct CacheLine *getVictimGRASPXP(struct Cache *cache, uint64_t addr)
         }
     }
 
-    // do
-    // {
-    //     for(j = 0; j < cache->assoc; j++)
-    //     {
-    //         if(getXPRRPV(&(cache->cacheLines[i][j])) == 0)
-    //         {
-    //             victim = j;
-    //             min = getXPRRPV(&(cache->cacheLines[i][j]));
-    //             break;
-    //         }
-    //     }
-
-    //     if(min)
-    //     {
-    //         for(j = 0; j < cache->assoc; j++)
-    //         {
-    //             uint8_t XPRRPV = getXPRRPV(&(cache->cacheLines[i][j])) - 1;
-    //             if(XPRRPV > 0)
-    //                 setXPRRPV(&(cache->cacheLines[i][j]), XPRRPV);
-    //         }
-    //     }
-
-    // }
-    // while(min);
-
     victim = 0;
     min = getXPRRPV(&(cache->cacheLines[i][0]));
 
@@ -1265,33 +1303,6 @@ struct CacheLine *getVictimGRASPXP(struct Cache *cache, uint64_t addr)
 
     assert(min != XPRRPV_INIT || min != 0);
     assert(victim != cache->assoc);
-
-    // victim = 0;
-    // min = getXPRRPV(&(cache->cacheLines[i][0]));
-
-    // for(j = 1; j < cache->assoc; j++)
-    // {
-    //     if(getXPRRPV(&(cache->cacheLines[i][j])) < min)
-    //     {
-    //         victim = j;
-    //         min = getXPRRPV(&(cache->cacheLines[i][j]));
-    //     }
-    // }
-    // assert(victim != cache->assoc);
-
-    // if (min != XPRRPV_INIT)
-    // {
-    //     int diff = min;
-    //     for(j = 0; j < cache->assoc; j++)
-    //     {
-    //         uint8_t XPRRPV = getXPRRPV(&(cache->cacheLines[i][j])) - diff;
-    //         setXPRRPV(&(cache->cacheLines[i][j]), XPRRPV);
-    //     }
-    // }
-
-    // min = getXPRRPV(&(cache->cacheLines[i][victim]));
-    // assert(min == 0);
-    // assert(victim != cache->assoc);
 
     cache->evictions++;
     cache->cacheLines[i][victim].addr = addr;
@@ -1328,6 +1339,9 @@ struct CacheLine *peekVictimPolicy(struct Cache *cache, uint64_t addr)
         break;
     case GRASPXP_POLICY:
         victim = peekVictimGRASPXP(cache, addr);
+        break;
+    case MASK_POLICY:
+        victim = peekVictimMASK(cache, addr);
         break;
     default :
         victim = peekVictimLRU(cache, addr);
@@ -1393,6 +1407,37 @@ struct CacheLine *peekVictimLFU(struct Cache *cache, uint64_t addr)
 }
 
 struct CacheLine *peekVictimGRASP(struct Cache *cache, uint64_t addr)
+{
+    uint64_t i, j, victim, min;
+
+    victim = cache->assoc;
+    min    = 0;
+    i      = calcIndex(cache, addr);
+
+    for(j = 0; j < cache->assoc; j++)
+    {
+        if(isValid(&(cache->cacheLines[i][j])) == 0)
+        {
+            return &(cache->cacheLines[i][j]);
+        }
+    }
+
+    victim = 0;
+    min = getRRPV(&(cache->cacheLines[i][0]));
+
+    for(j = 1; j < cache->assoc; j++)
+    {
+        if(getRRPV(&(cache->cacheLines[i][j])) > min)
+        {
+            victim = j;
+            min = getRRPV(&(cache->cacheLines[i][j]));
+        }
+    }
+    assert(victim != cache->assoc);
+    return &(cache->cacheLines[i][victim]);
+}
+
+struct CacheLine *peekVictimMASK(struct Cache *cache, uint64_t addr)
 {
     uint64_t i, j, victim, min;
 
@@ -1572,20 +1617,20 @@ struct CacheLine *findLine(struct Cache *cache, uint64_t addr)
 
 
 /*find a victim*/
-struct CacheLine *findLineToReplace(struct Cache *cache, uint64_t addr)
+struct CacheLine *findLineToReplace(struct Cache *cache, uint64_t addr, uint32_t mask)
 {
     struct CacheLine  *victim = getVictimPolicy(cache, addr);
-    updateInsertionPolicy(cache, victim);
+    updateInsertionPolicy(cache, victim, mask);
 
     return (victim);
 }
 
 /*allocate a new line*/
-struct CacheLine *fillLine(struct Cache *cache, uint64_t addr)
+struct CacheLine *fillLine(struct Cache *cache, uint64_t addr, uint32_t mask)
 {
     uint64_t tag;
 
-    struct CacheLine *victim = findLineToReplace(cache, addr);
+    struct CacheLine *victim = findLineToReplace(cache, addr, mask);
     assert(victim != 0);
     if(getFlags(victim) == DIRTY)
     {
@@ -1641,7 +1686,7 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
         {
             if(!getVictimPINBypass(cache, addr))
             {
-                newline = fillLine(cache, addr);
+                newline = fillLine(cache, addr, mask);
                 newline->idx = node;
                 if(op == 'w')
                     setFlags(newline, DIRTY);
@@ -1649,7 +1694,7 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
         }
         else
         {
-            newline = fillLine(cache, addr);
+            newline = fillLine(cache, addr, mask);
             newline->idx = node;
             if(op == 'w')
                 setFlags(newline, DIRTY);
@@ -1661,7 +1706,7 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
     else
     {
         /**since it's a hit, update LRU and update dirty flag**/
-        updatePromotionPolicy(cache, line);
+        updatePromotionPolicy(cache, line, mask);
         if(op == 'w')
             setFlags(line, DIRTY);
 
@@ -1673,18 +1718,6 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
 // ********************************************************************************************
 // ***************               ACCElGraph Policy                               **************
 // ********************************************************************************************
-
-void AccessDoubleTaggedCacheFloat(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, float value)
-{
-
-    #pragma omp critical
-    {
-        // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
-        AccessAccelGraphGRASP(cache->accel_graph, addr, op, node, 0);
-        // AccessAccelGraphExpress(cache->accel_graph, addr, op, node,);
-        Access(cache->ref_cache, addr, op, node, 0);
-    }
-}
 
 void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
 {
@@ -1777,48 +1810,6 @@ void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, u
     else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
     {
         Access(accel_graph->hot_cache, addr, op, node, mask);
-    }
-}
-
-
-void AccessAccelGraphExpressFloat(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, float value)
-{
-    // struct CacheLine *victim = NULL;
-
-    if(checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
-    {
-        if(value <= 0.0015)
-        {
-            Access(accel_graph->cold_cache, addr, op, node, 0);
-            Access(accel_graph->hot_cache, addr, op, node, 0);
-            // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
-            // if(isValid(victim))
-            // {
-            //     // Prefetch(accel_graph->warm_cache, victim->addr, 'r', victim_node);
-            //     Access(accel_graph->warm_cache, victim->addr, 'd', victim->idx);
-            // }
-        }
-        else if(value > 0.0015 && value <= 0.015)
-        {
-            Access(accel_graph->cold_cache, addr, op, node, 0);
-            Access(accel_graph->warm_cache, addr, op, node, 0);
-        }
-        else
-        {
-            Access(accel_graph->cold_cache, addr, op, node, 0);
-        }
-    }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->warm_cache, addr, op, node, 0);
-    }
-    else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->hot_cache, addr, op, node, 0);
-    }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->hot_cache, addr, op, node, 0);
     }
 }
 
@@ -2059,6 +2050,9 @@ void printStatsCache(struct Cache *cache)
         break;
     case GRASPXP_POLICY:
         printf("| %-51s | \n", "GRASPXP_POLICY");
+        break;
+    case MASK_POLICY:
+        printf("| %-51s | \n", "MASK_POLICY");
         break;
     default :
         printf("| %-51s | \n", "LRU_POLICY");
