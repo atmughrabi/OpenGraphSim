@@ -116,7 +116,7 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 4
+export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 1
