@@ -1393,21 +1393,17 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
 
     FILE *pText;
     uint32_t i;
-    uint32_t v;
+    uint32_t v = 0;
     uint32_t dest = 0;
     uint32_t x = 0;
+    uint32_t *labels = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
 
-    uint32_t *labels;
+    // char *fname_txt = (char *) malloc((strlen(fnameb) + 10) * sizeof(char));
 
-    labels = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    // fname_txt = strcpy (fname_txt, fnameb);
 
-
-    char *fname_txt = (char *) malloc((strlen(fnameb) + 10) * sizeof(char));
-
-    fname_txt = strcpy (fname_txt, fnameb);
-
-    printf("%s\n", fname_txt );
-    pText = fopen(fname_txt, "r");
+    printf("%s\n", fnameb );
+    pText = fopen(fnameb, "r");
 
     if (pText == NULL)
     {
@@ -1420,6 +1416,9 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
         i = fscanf(pText, "%u\n", &dest);
         labels[x] = dest;
         x++;
+
+        if( x == edgeList->num_vertices )
+            break;
 
         if( i == EOF )
             break;
@@ -1438,7 +1437,7 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
     }
 
     free(labels);
-    free(fname_txt);
+    // free(fname_txt);
 
     return edgeList;
 }

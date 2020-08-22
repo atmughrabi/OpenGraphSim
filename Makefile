@@ -14,8 +14,8 @@ export APP_DIR              ?= .
 
 
 # export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-# export BENCHMARKS_DIR    	?= ../01_test_graphs
+# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+export BENCHMARKS_DIR    	?= ../01_test_graphs
 # export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
 # export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
 
@@ -54,21 +54,20 @@ export MAIN_DIR		  	= main
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
 # export GRAPH_SUIT ?= TEST
-# export GRAPH_SUIT ?= LAW
-export GRAPH_SUIT ?= GAP
+export GRAPH_SUIT ?= LAW
+# export GRAPH_SUIT ?= GAP
 # export GRAPH_SUIT ?= SNAP
 
 # TEST # small test graphs
 # export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= v300_e2730
-# export GRAPH_NAME ?= amazon
 
 # GONG # https://gonglab.pratt.duke.edu/google-dataset
 # export GRAPH_NAME ?= Gong-gplus
 
 # GAP # https://sparse.tamu.edu/MM/GAP/
-export GRAPH_NAME ?= GAP-twitter
+# export GRAPH_NAME ?= GAP-twitter
 # export GRAPH_NAME ?= GAP-road
 
 # SNAP # https://snap.stanford.edu/data/
@@ -83,7 +82,7 @@ export GRAPH_NAME ?= GAP-twitter
 # LAW # https://sparse.tamu.edu/MM/LAW/
 # export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
-# export GRAPH_NAME ?= cnr-2000
+export GRAPH_NAME ?= cnr-2000
 # export GRAPH_NAME ?= dblp-2010
 # export GRAPH_NAME ?= enron
 # export GRAPH_NAME ?= eu-2005
@@ -117,7 +116,7 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 11
+export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 6
@@ -139,7 +138,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 0
+export MASK_MODE 		?= 1
 
 ##################################################
 
@@ -152,7 +151,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
+export ARGS ?= -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
 ##################################################
 ##################################################
 

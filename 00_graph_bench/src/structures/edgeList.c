@@ -191,7 +191,18 @@ struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
 #if WEIGHTED
     tempEdgeList->max_weight = edgeList->max_weight ;
 #endif
-    tempEdgeList->avg_degree = tempEdgeList->num_edges / tempEdgeList->num_vertices ;
+    tempEdgeList->avg_degree = tempEdgeList->num_edges / tempEdgeList->num_vertices;
+
+    tempEdgeList->mask_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
+    tempEdgeList->label_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
+
+    #pragma omp parallel for
+    for (i = 0; i < edgeList->num_vertices; ++i)
+    {
+        tempEdgeList->mask_array[i] = edgeList->mask_array[i] ;
+        tempEdgeList->label_array[i] =  edgeList->label_array[i];
+    }
+
     freeEdgeList(edgeList);
     return tempEdgeList;
 
