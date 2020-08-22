@@ -360,7 +360,7 @@ struct EdgeList *reorderGraphListDegree(struct EdgeList *edgeList, uint32_t *deg
     #pragma omp parallel for
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
-        edgeList->label_array[v] = labels[v];
+        edgeList->label_array[v] = labels[edgeList->label_array[v]];
     }
 
     free(timer);
@@ -531,7 +531,7 @@ struct EdgeList *reorderGraphListDBG(struct EdgeList *edgeList, uint32_t *degree
     #pragma omp parallel for
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
-        edgeList->label_array[v] = labels[v];
+        edgeList->label_array[v] = labels[edgeList->label_array[v]];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -731,7 +731,7 @@ struct EdgeList *reorderGraphListHUBSort(struct EdgeList *edgeList, uint32_t *de
     #pragma omp parallel for
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
-        edgeList->label_array[v] = labels[v];
+        edgeList->label_array[v] = labels[edgeList->label_array[v]];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -911,7 +911,7 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
     #pragma omp parallel for
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
-        edgeList->label_array[v] = labels[v];
+        edgeList->label_array[v] = labels[edgeList->label_array[v]];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -1433,7 +1433,7 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
     #pragma omp parallel for
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
-        edgeList->label_array[v] = labels[v];
+        edgeList->label_array[v] = labels[edgeList->label_array[v]];
     }
 
     free(labels);

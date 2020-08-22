@@ -83,10 +83,10 @@ main (int argc, char **argv)
     arguments.lmode_l2 = 0;
     arguments.mmode = 0;
     arguments.symmetric = 0;
-    arguments.weighted = 1;
+    arguments.weighted = 0;
     arguments.delta = 1;
     arguments.numThreads = 4;
-    arguments.fnameb = "../01_test_graphs/Gnutella/graph.wbin";
+    arguments.fnameb = "../01_test_graphs/LAW/cnr-2000/graph.bin";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
 

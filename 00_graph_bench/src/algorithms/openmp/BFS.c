@@ -180,6 +180,7 @@ struct BFSStats *breadthFirstSearchGraphCSR(uint32_t source, uint32_t pushpull, 
 {
 
     struct BFSStats *stats = NULL;
+    source = graph->sorted_edges_array->label_array[source];
 
     switch (pushpull)
     {
@@ -448,7 +449,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(uint32_t source, struct GraphCSR
 #ifdef CACHE_HARNESS
     printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
 #endif
-    
+
     for(i = 0 ; i < P ; i++)
     {
         freeArrayQueue(localFrontierQueues[i]);

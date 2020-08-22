@@ -771,7 +771,8 @@ struct BellmanFordStats *bellmanFordGraphCSR(uint32_t source,  uint32_t iteratio
 {
 
     struct BellmanFordStats *stats = NULL;
-
+    source = graph->sorted_edges_array->label_array[source];
+    
     switch (pushpull)
     {
     case 0: // pull
@@ -835,6 +836,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uin
     sorted_edges_array = graph->sorted_edges_array;
 #endif
 
+    
 
     Start(timer);
 

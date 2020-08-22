@@ -587,7 +587,8 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 {
 
     struct SSSPStats *stats = NULL;
-
+    source = graph->sorted_edges_array->label_array[source];
+    
     switch (pushpull)
     {
     case 0: // push

@@ -72,7 +72,7 @@ uint32_t compareFloatArrays(float *arr1, float *arr2, uint32_t arr1_size, uint32
         }
     }
 
-    if (missmatch < 5)
+    if (missmatch < 20)
         missmatch = 0;
     
     return missmatch;
