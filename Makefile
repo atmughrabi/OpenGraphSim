@@ -117,9 +117,9 @@ export PULL_PUSH 		?= 2
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 11
-export REORDER_LAYER2   ?= 0
+export REORDER_LAYER2   ?= 4
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 0
+export ALGORITHMS 		?= 8
 
 export ROOT 			?= 13373
 export TOLERANCE 		?= 1e-8

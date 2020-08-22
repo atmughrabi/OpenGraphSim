@@ -198,10 +198,10 @@ uint32_t *radixSortEdgesByPageRank (float *pageRanks, uint32_t *labels, uint32_t
     }
 
 
-    // free(buckets_count);
-    // free(pageRanksFP);
-    // free(pageRanksFPTemp);
-    // free(labelsTemp);
+    free(buckets_count);
+    free(pageRanksFP);
+    free(pageRanksFPTemp);
+    free(labelsTemp);
 
     //  for(v = 0; v < num_vertices; v++)
     // {

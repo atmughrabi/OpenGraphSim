@@ -151,6 +151,8 @@ void freeBetweennessCentralityStats(struct BetweennessCentralityStats *stats)
             free(stats->sigma);
         if(stats->betweennessCentrality)
             free(stats->betweennessCentrality);
+        if(stats->realRanks)
+            free(stats->realRanks);
         if(stats->stack)
         {
             if(stats->stack->nodes)

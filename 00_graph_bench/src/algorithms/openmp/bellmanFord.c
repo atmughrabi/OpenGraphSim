@@ -1007,8 +1007,6 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uin
     int activeVertices = 0;
 
 
-
-
     Start(timer);
 
     Start(timer_inner);
@@ -1328,8 +1326,8 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t so
     freeBitmap(bitmapNext);
     freeBitmap(bitmapCurr);
 
-    // graphCSRFree(graphPlus);
-    // graphCSRFree(graphMinus);
+    graphCSRFree(graphPlus);
+    graphCSRFree(graphMinus);
 
 
     // bellmanFordPrintStats(stats);

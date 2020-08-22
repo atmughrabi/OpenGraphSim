@@ -111,6 +111,11 @@ struct GraphCSR *graphCSRNew(uint32_t V, uint32_t E, uint8_t inverse)
     graphCSR->num_vertices = V;
     graphCSR->num_edges = E;
     graphCSR->avg_degree = E / V;
+    graphCSR->sorted_edges_array = NULL; // sorted edge array
+
+#if DIRECTED
+    graphCSR->inverse_sorted_edges_array = NULL; // sorted edge array
+#endif
 
 #if WEIGHTED
     graphCSR->max_weight = 0;

@@ -150,6 +150,8 @@ void freeSPMVStats(struct SPMVStats *stats)
     {
         if(stats->vector_output)
             free(stats->vector_output);
+        if(stats->vector_input)
+            free(stats->vector_input);
 
 #ifdef CACHE_HARNESS_META
         freeDoubleTaggedCache(stats->cache);
