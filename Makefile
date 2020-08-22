@@ -53,33 +53,34 @@ export MAIN_DIR		  	= main
 #########################################################
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
-
+# export GRAPH_SUIT ?= TEST
 # export GRAPH_SUIT ?= LAW
-# export GRAPH_SUIT ?= GAP
-export GRAPH_SUIT ?= SNAP
+export GRAPH_SUIT ?= GAP
+# export GRAPH_SUIT ?= SNAP
 
-# # small test graphs
+# TEST # small test graphs
 # export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= v300_e2730
 # export GRAPH_NAME ?= amazon
 
-
-# GAP https://sparse.tamu.edu/MM/GAP/
-# https://gonglab.pratt.duke.edu/google-dataset
-
-
+# GONG # https://gonglab.pratt.duke.edu/google-dataset
 # export GRAPH_NAME ?= Gong-gplus
+
+# GAP # https://sparse.tamu.edu/MM/GAP/
+export GRAPH_NAME ?= GAP-twitter
 # export GRAPH_NAME ?= GAP-road
+
+# SNAP # https://snap.stanford.edu/data/
 # export GRAPH_NAME ?= SNAP-soc-pokec
-export GRAPH_NAME ?= SNAP-web-Google
+# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
 # export GRAPH_NAME ?= SNAP-com-orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
+
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
-
-# LAW https://sparse.tamu.edu/MM/LAW/
+# LAW # https://sparse.tamu.edu/MM/LAW/
 # export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
 # export GRAPH_NAME ?= cnr-2000
@@ -91,18 +92,18 @@ export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= indochina-2004
 # export GRAPH_NAME ?= it-2004
 # export GRAPH_NAME ?= ljournal-2008
-# export GRAPH_NAME ?= sk-2005
 # export GRAPH_NAME ?= uk-2002
 # export GRAPH_NAME ?= uk-2005
 # export GRAPH_NAME ?= webbase-2001
+
 
 # export LAW = amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
 # export MIX = Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en
 export LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001 Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en gplus USA-Road enwiki-2013 KONECT-wikipedia_link_en twitter
 
 # export FILE_BIN_TYPE ?= graph
-# export FILE_BIN_TYPE = graph.bin
-export FILE_BIN_TYPE ?= graph.wbin
+export FILE_BIN_TYPE ?= graph.bin
+# export FILE_BIN_TYPE ?= graph.wbin
 
 export FILE_LABEL_TYPE ?= graph_Gorder.labels
 # export FILE_LABEL_TYPE ?= graph_Rabbit.labels
@@ -116,20 +117,20 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 0
+export REORDER_LAYER1 	?= 11
 export REORDER_LAYER2   ?= 0
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 1
+export ALGORITHMS 		?= 6
 
-export ROOT 			?= 164
+export ROOT 			?= 9773
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 
 export START_THREADS	?= 1
 export INC_THREADS      ?= 1
-export NUM_THREADS  	?= 1
-# NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_ITERATIONS	?= 1
+# export NUM_THREADS  	?= 60
+export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_ITERATIONS	?= 10
 export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1
@@ -138,7 +139,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 0
 
 ##################################################
 
@@ -151,7 +152,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -w -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
+export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
 ##################################################
 ##################################################
 
