@@ -357,6 +357,11 @@ struct EdgeList *reorderGraphListDegree(struct EdgeList *edgeList, uint32_t *deg
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
+    #pragma omp parallel for
+    for (v = 0; v < edgeList->num_vertices; ++v)
+    {
+        edgeList->label_array[v] = labels[v];
+    }
 
     free(timer);
     free(labelsInverse);
@@ -523,6 +528,11 @@ struct EdgeList *reorderGraphListDBG(struct EdgeList *edgeList, uint32_t *degree
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
+    #pragma omp parallel for
+    for (v = 0; v < edgeList->num_vertices; ++v)
+    {
+        edgeList->label_array[v] = labels[v];
+    }
 
     for (i = 0; i < (P * num_buckets); ++i)
     {
@@ -718,7 +728,11 @@ struct EdgeList *reorderGraphListHUBSort(struct EdgeList *edgeList, uint32_t *de
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
-
+    #pragma omp parallel for
+    for (v = 0; v < edgeList->num_vertices; ++v)
+    {
+        edgeList->label_array[v] = labels[v];
+    }
 
     for (i = 0; i < (P * num_buckets); ++i)
     {
@@ -894,6 +908,11 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
     printf("| %-51f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
 
+    #pragma omp parallel for
+    for (v = 0; v < edgeList->num_vertices; ++v)
+    {
+        edgeList->label_array[v] = labels[v];
+    }
 
     for (i = 0; i < (P * num_buckets); ++i)
     {
@@ -1374,6 +1393,7 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
 
     FILE *pText;
     uint32_t i;
+    uint32_t v;
     uint32_t dest = 0;
     uint32_t x = 0;
 
@@ -1411,6 +1431,11 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
 
     edgeList = relabelEdgeList(edgeList, labels);
 
+    #pragma omp parallel for
+    for (v = 0; v < edgeList->num_vertices; ++v)
+    {
+        edgeList->label_array[v] = labels[v];
+    }
 
     free(labels);
     free(fname_txt);

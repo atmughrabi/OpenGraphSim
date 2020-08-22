@@ -119,6 +119,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
     }
 
     newEdgeList->mask_array = NULL;
+    newEdgeList->label_array = NULL;
     newEdgeList->num_edges = num_edges;
     newEdgeList->num_vertices = 0;
     newEdgeList->avg_degree = 0;
@@ -208,6 +209,8 @@ void freeEdgeList( struct EdgeList *edgeList)
             free(edgeList->edges_array_dest);
         if(edgeList->mask_array)
             free(edgeList->mask_array);
+        if(edgeList->label_array)
+            free(edgeList->label_array);
 
 #if WEIGHTED
         if(edgeList->edges_array_weight)
@@ -548,11 +551,13 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     // edgeListPrint(edgeList);
 
     edgeList->mask_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    edgeList->label_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
 
     #pragma omp parallel for
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         edgeList->mask_array[i] = 0;
+        edgeList->label_array[i] = i;
     }
 
     munmap(buf_addr, fs.st_size);
@@ -583,6 +588,18 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
         for ( i = 0; i < num_vertices; ++i)
         {
             edgeList->mask_array[i] = edgeListmem->mask_array[i];
+        }
+
+    }
+
+    if(edgeListmem->label_array)
+    {
+        edgeList->label_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+
+        #pragma omp parallel for
+        for ( i = 0; i < num_vertices; ++i)
+        {
+            edgeList->label_array[i] = edgeListmem->label_array[i];
         }
 
     }
