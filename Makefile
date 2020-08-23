@@ -82,9 +82,9 @@ export GRAPH_SUIT ?= LAW
 # LAW # https://sparse.tamu.edu/MM/LAW/
 # export GRAPH_NAME ?= amazon-2008
 # export GRAPH_NAME ?= arabic-2005
-export GRAPH_NAME ?= cnr-2000
+# export GRAPH_NAME ?= cnr-2000
 # export GRAPH_NAME ?= dblp-2010
-# export GRAPH_NAME ?= enron
+export GRAPH_NAME ?= enron
 # export GRAPH_NAME ?= eu-2005
 # export GRAPH_NAME ?= hollywood-2009
 # export GRAPH_NAME ?= in-2004
@@ -112,14 +112,14 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 2
+export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 11
-export REORDER_LAYER2   ?= 4
-export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 8
+export REORDER_LAYER1 	?= 0
+export REORDER_LAYER2   ?= 0
+export DATA_STRUCTURES  ?= 2
+export ALGORITHMS 		?= 6
 
 export ROOT 			?= 13373
 export TOLERANCE 		?= 1e-8
@@ -127,8 +127,8 @@ export DELTA			?= 800
 
 export START_THREADS	?= 1
 export INC_THREADS      ?= 1
-# export NUM_THREADS  	?= 60
-export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS  	?= 8
+# export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 10
 export NUM_TRIALS 		?= 1
 
@@ -138,7 +138,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 0
 
 ##################################################
 

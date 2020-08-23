@@ -78,8 +78,8 @@ main (int argc, char **argv)
     arguments.algorithm = 0;
     arguments.datastructure = 0;
     arguments.pushpull = 0;
-    arguments.sort = 0;
-    arguments.lmode = 4;
+    arguments.sort = 1;
+    arguments.lmode = 0;
     arguments.lmode_l2 = 0;
     arguments.mmode = 0;
     arguments.symmetric = 0;

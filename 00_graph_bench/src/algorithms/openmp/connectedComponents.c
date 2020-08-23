@@ -426,7 +426,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
@@ -693,7 +693,7 @@ struct CCStats *connectedComponentsWeaklyGraphCSR( uint32_t iterations, struct G
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,degree,edge_idx) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
@@ -1327,7 +1327,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphAdjArrayList(uint32_t ite
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(v,degree,Nodes) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,degree,Nodes) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
@@ -1566,7 +1566,7 @@ struct CCStats *connectedComponentsWeaklyGraphAdjArrayList( uint32_t iterations,
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(v) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
@@ -1685,15 +1685,15 @@ struct CCStats *connectedComponentsShiloachVishkinGraphAdjLinkedList(uint32_t it
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(v,degree,Nodes) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,degree,Nodes) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
             uint32_t src = v;
             uint32_t dest;
 
-            Nodes = graph->vertices[v].outNodes;
-            degree = graph->vertices[v].out_degree;
+            Nodes = graph->vertices[src].outNodes;
+            degree = graph->vertices[src].out_degree;
 
             for(j = 0 ; j < (degree) ; j++)
             {
@@ -1934,7 +1934,7 @@ struct CCStats *connectedComponentsWeaklyGraphAdjLinkedList( uint32_t iterations
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(v) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v) schedule(dynamic, 512)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t j;
