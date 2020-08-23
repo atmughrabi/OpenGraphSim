@@ -57,6 +57,8 @@ export MAIN_DIR		  	= main
 export GRAPH_SUIT ?= LAW
 # export GRAPH_SUIT ?= GAP
 # export GRAPH_SUIT ?= SNAP
+# export GRAPH_SUIT ?= KONECT
+# export GRAPH_SUIT ?= GONG
 
 # TEST # small test graphs
 # export GRAPH_NAME ?= test
@@ -64,7 +66,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= v300_e2730
 
 # GONG # https://gonglab.pratt.duke.edu/google-dataset
-# export GRAPH_NAME ?= Gong-gplus
+# export GRAPH_NAME ?= GONG-gplus
 
 # GAP # https://sparse.tamu.edu/MM/GAP/
 # export GRAPH_NAME ?= GAP-twitter
@@ -80,20 +82,20 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
 # LAW # https://sparse.tamu.edu/MM/LAW/
-# export GRAPH_NAME ?= amazon-2008
-# export GRAPH_NAME ?= arabic-2005
-# export GRAPH_NAME ?= cnr-2000
-# export GRAPH_NAME ?= dblp-2010
-export GRAPH_NAME ?= enron
-# export GRAPH_NAME ?= eu-2005
-# export GRAPH_NAME ?= hollywood-2009
-# export GRAPH_NAME ?= in-2004
-# export GRAPH_NAME ?= indochina-2004
-# export GRAPH_NAME ?= it-2004
-# export GRAPH_NAME ?= ljournal-2008
-# export GRAPH_NAME ?= uk-2002
-# export GRAPH_NAME ?= uk-2005
-# export GRAPH_NAME ?= webbase-2001
+# export GRAPH_NAME ?= LAW-amazon-2008
+# export GRAPH_NAME ?= LAW-arabic-2005
+# export GRAPH_NAME ?= LAW-cnr-2000
+# export GRAPH_NAME ?= LAW-dblp-2010
+# export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-eu-2005
+# export GRAPH_NAME ?= LAW-hollywood-2009
+# export GRAPH_NAME ?= LAW-in-2004
+# export GRAPH_NAME ?= LAW-indochina-2004
+# export GRAPH_NAME ?= LAW-it-2004
+# export GRAPH_NAME ?= LAW-ljournal-2008
+# export GRAPH_NAME ?= LAW-uk-2002
+# export GRAPH_NAME ?= LAW-uk-2005
+# export GRAPH_NAME ?= LAW-webbase-2001
 
 
 # export LAW = amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
