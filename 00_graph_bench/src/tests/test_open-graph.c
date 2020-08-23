@@ -86,7 +86,7 @@ main (int argc, char **argv)
     arguments.weighted = 0;
     arguments.delta = 1;
     arguments.numThreads = 4;
-    arguments.fnameb = "../01_test_graphs/LAW/enron/graph.bin";
+    arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
 
