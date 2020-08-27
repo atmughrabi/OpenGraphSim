@@ -306,7 +306,7 @@ run-cache: app-cache
 sim-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
 sim-cache: INTEGRATION  = openmp
 sim-cache: test-cache
-	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS) >> $(APP_DIR)/cache-results/full_results.perf
 
 # http://snipersim.org/w/Multiple_regions_of_interest
 .PHONY: run-sniper
