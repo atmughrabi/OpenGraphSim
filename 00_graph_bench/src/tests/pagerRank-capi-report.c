@@ -88,34 +88,34 @@ int main (int argc, char **argv)
 
     char *benchmarks[GRAPH_NUM] =
     {
-        "../../01_GraphDatasets/amazon-2008/graph.wbin",
-        "../../01_GraphDatasets/arabic-2005/graph.wbin",
-        "../../01_GraphDatasets/cnr-2000/graph.wbin",
-        "../../01_GraphDatasets/dblp-2010/graph.wbin",
-        "../../01_GraphDatasets/enron/graph.wbin",
-        "../../01_GraphDatasets/eu-2005/graph.wbin",
-        "../../01_GraphDatasets/hollywood-2009/graph.wbin",
-        "../../01_GraphDatasets/in-2004/graph.wbin",
-        "../../01_GraphDatasets/indochina-2004/graph.wbin",
-        "../../01_GraphDatasets/it-2004/graph.wbin",
-        "../../01_GraphDatasets/ljournal-2008/graph.wbin",
-        "../../01_GraphDatasets/sk-2005/graph.wbin",
-        "../../01_GraphDatasets/uk-2002/graph.wbin",
-        "../../01_GraphDatasets/uk-2005/graph.wbin",
-        "../../01_GraphDatasets/webbase-2001/graph.wbin",
+        "../../01_GraphDatasets/amazon-2008/graph.bin",
+        "../../01_GraphDatasets/arabic-2005/graph.bin",
+        "../../01_GraphDatasets/cnr-2000/graph.bin",
+        "../../01_GraphDatasets/dblp-2010/graph.bin",
+        "../../01_GraphDatasets/enron/graph.bin",
+        "../../01_GraphDatasets/eu-2005/graph.bin",
+        "../../01_GraphDatasets/hollywood-2009/graph.bin",
+        "../../01_GraphDatasets/in-2004/graph.bin",
+        "../../01_GraphDatasets/indochina-2004/graph.bin",
+        "../../01_GraphDatasets/it-2004/graph.bin",
+        "../../01_GraphDatasets/ljournal-2008/graph.bin",
+        "../../01_GraphDatasets/sk-2005/graph.bin",
+        "../../01_GraphDatasets/uk-2002/graph.bin",
+        "../../01_GraphDatasets/uk-2005/graph.bin",
+        "../../01_GraphDatasets/webbase-2001/graph.bin",
 
-        "../../01_GraphDatasets/Gong-gplus/graph.wbin",
-        "../../01_GraphDatasets/GAP-road/graph.wbin",
-        "../../01_GraphDatasets/SNAP-soc-pokec/graph.wbin",
-        "../../01_GraphDatasets/SNAP-cit-Patents/graph.wbin",
-        "../../01_GraphDatasets/SNAP-com-orkut/graph.wbin",
-        "../../01_GraphDatasets/SNAP-soc-LiveJournal1/graph.wbin",
-        "../../01_GraphDatasets/KONECT-wikipedia_link_en/graph.wbin",
+        "../../01_GraphDatasets/Gong-gplus/graph.bin",
+        "../../01_GraphDatasets/GAP-road/graph.bin",
+        "../../01_GraphDatasets/SNAP-soc-pokec/graph.bin",
+        "../../01_GraphDatasets/SNAP-cit-Patents/graph.bin",
+        "../../01_GraphDatasets/SNAP-com-orkut/graph.bin",
+        "../../01_GraphDatasets/SNAP-soc-LiveJournal1/graph.bin",
+        "../../01_GraphDatasets/KONECT-wikipedia_link_en/graph.bin",
 
-        "../../01_GraphDatasets/gplus/graph.wbin",
-        "../../01_GraphDatasets/USA-Road/graph.wbin",
-        "../../01_GraphDatasets/enwiki-2013/graph.wbin",
-        "../../01_GraphDatasets/twitter/graph.wbin"
+        "../../01_GraphDatasets/gplus/graph.bin",
+        "../../01_GraphDatasets/USA-Road/graph.bin",
+        "../../01_GraphDatasets/enwiki-2013/graph.bin",
+        "../../01_GraphDatasets/twitter/graph.bin"
     };
 
     uint64_t configs[CONFIG_NUM] =
@@ -132,13 +132,13 @@ int main (int argc, char **argv)
 
     // char *benchmarks[GRAPH_NUM] =
     // {
-    //     "../04_test_graphs/test/graph.wbin",
-    //     "../04_test_graphs/v51_e1021/graph.wbin"
-    //     // "../04_test_graphs/v300_e2730/graph.wbin",
-    //     // "../04_test_graphs/amazon/graph.wbin",
-    //     // "../04_test_graphs/dblp/graph.wbin",
-    //     // "../04_test_graphs/euall/graph.wbin",
-    //     // "../04_test_graphs/Gnutella/graph.wbin"
+    //     "../04_test_graphs/test/graph.bin",
+    //     "../04_test_graphs/v51_e1021/graph.bin"
+    //     // "../04_test_graphs/v300_e2730/graph.bin",
+    //     // "../04_test_graphs/amazon/graph.bin",
+    //     // "../04_test_graphs/dblp/graph.bin",
+    //     // "../04_test_graphs/euall/graph.bin",
+    //     // "../04_test_graphs/Gnutella/graph.bin"
     // };
 
     //config

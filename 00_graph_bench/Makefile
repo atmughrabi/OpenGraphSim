@@ -55,10 +55,6 @@ GRAPH_NAME ?= test
 # GRAPH_NAME ?= v51_e1021
 # GRAPH_NAME  ?= v300_e2730
 
-
-LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
-MIX ?= GAP-kron GAP-road GAP-twitter GAP-urand GAP-web
-
 # TEXT formant
 # export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph
 
@@ -71,7 +67,6 @@ FILE_BIN_TYPE ?= graph.wbin
 
 #WEIGHTED
 FILE_BIN ?= $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
-
 
 
 #GRAPH RUN
@@ -216,6 +211,7 @@ directories-openmp :
 .PHONY: directories-cache
 directories-cache :
 	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim
+	@mkdir -p $(APP_DIR)/cache-results
 
 .PHONY: directories-sniper
 directories-sniper :
@@ -273,50 +269,7 @@ clean-stats:
 	@rm -f $(BENCHMARKS_DIR)/*/*.perf
 	@rm -f $(BENCHMARKS_DIR)/*/*.stats
 	@rm -fr $(APP_DIR)/sniper-results
-
-
-.PHONY: results-law
-results-law:
-	@mkdir -p $(APP_DIR)/$(RES_DIR)/results-law_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)
-	@for graph in $(LAW); do \
-			if [ -e $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).perf ]; then \
-				cp $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).perf $(APP_DIR)/$(RES_DIR)/results-law_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)/$$graph; \
-			fi ; \
-	done
-
-.PHONY: results-mix
-results-mix:
-	@mkdir -p $(APP_DIR)/$(RES_DIR)/results-mix_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)
-	@for graph in $(MIX); do \
-			if [ -e $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).perf ]; then \
-				cp $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).perf $(APP_DIR)/$(RES_DIR)/results-mix_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)/$$graph; \
-			fi ; \
-	done
-
-.PHONY: stats-law
-stats-law:
-	@mkdir -p $(APP_DIR)/$(RES_DIR)/stats-law_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)
-	@for graph in $(LAW); do \
-			if [ -e $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).stats ]; then \
-				cp $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).stats $(APP_DIR)/$(RES_DIR)/stats-law_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)/$$graph; \
-			fi ; \
-	done
-
-.PHONY: stats-mix
-stats-mix:
-	@mkdir -p $(APP_DIR)/$(RES_DIR)/stats-mix_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)
-	@for graph in $(MIX); do \
-			if [ -e $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).stats ]; then \
-				cp $(BENCHMARKS_DIR)/$$graph/$(FILE_BIN_TYPE)_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH).stats $(APP_DIR)/$(RES_DIR)/stats-mix_$(ALGORITHMS)_$(DATA_STRUCTURES)_$(NUM_TRIALS)_$(PULL_PUSH)/$$graph; \
-			fi ; \
-	done
-
-
-.PHONY: results
-results: results-law results-mix
-
-.PHONY: stats
-stats: stats-law stats-mix
+	@rm -fr $(APP_DIR)/cache-results
 
 ##################################################
 ##################################################
@@ -428,22 +381,19 @@ cache-perf-openmp: INTEGRATION = openmp
 cache-perf-openmp: app-openmp
 	sudo perf record -d ./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp -f $(FILE_BIN) $(ARGS)
 
-.PHONY: law
-law: app-openmp
-	@for graph in $(LAW); do \
-	    for num in `seq $(START_THREADS) $(INC_THREADS) $(NUM_THREADS)`; do \
-	    	echo $$config $$graph $$num ; \
-	    	./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -j $(INOUT_STATS) -f $(BENCHMARKS_DIR)/$$graph/graph.wbin -m $(AFU_CONFIG_GENERIC) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $$num  -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA) ;\
-	    done ; \
-    done
-
-.PHONY: mix
-mix: app-openmp
-	@for graph in $(MIX); do \
-	    for num in `seq $(START_THREADS) $(INC_THREADS) $(NUM_THREADS)`; do \
-	    	echo $$config $$graph $$num ; \
-	    	./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -j $(INOUT_STATS) -f $(BENCHMARKS_DIR)/$$graph/graph.wbin -m $(AFU_CONFIG_GENERIC) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $$num  -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER) -b $(DELTA) ;\
-	    done ; \
+.PHONY: sim-cache
+sim-cache: MODE 		= -DCACHE_HARNESS -DCACHE_HARNESS_META
+sim-cache: INTEGRATION 	= openmp
+sim-cache: app-cache
+	@for dir in ${BENCHMARKS_DIR}/*;      													\
+    do                                      												\
+        for graph_dir in $${dir}/*;               											\
+        do                                  												\
+        	if [ -e $${graph_dir}/graph.bin ]; then											\
+            	echo "Processing $${graph_dir}/graph.bin";									\
+            	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $${graph_dir}/graph.bin $(ARGS); \
+        	fi; 																			\
+        done                                												\
     done
 
 ##################################################

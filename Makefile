@@ -5,9 +5,10 @@
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-export APP_TEST           ?=  test_open-graph
+# export APP_TEST           ?=  test_open-graph
 # export APP_TEST           ?=  pagerRank-accuracy-report
 # export APP_TEST           ?=  test_grasp-cache
+export APP_TEST           ?=  cache-reorder-report
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -73,12 +74,13 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= GAP-road
 
 # SNAP # https://snap.stanford.edu/data/
-# export GRAPH_NAME ?= SNAP-soc-pokec
-# export GRAPH_NAME ?= SNAP-web-Google
 # export GRAPH_NAME ?= SNAP-cit-Patents
-# export GRAPH_NAME ?= SNAP-com-orkut
+# export GRAPH_NAME ?= SNAP-com-Orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
+# export GRAPH_NAME ?= SNAP-soc-Pokec
+# export GRAPH_NAME ?= SNAP-web-Google
 
+# KONECT # http://konect.cc/networks/wikipedia_link_en/
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
 # LAW # https://sparse.tamu.edu/MM/LAW/
@@ -86,7 +88,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-# export GRAPH_NAME ?= LAW-enron
+export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -96,11 +98,6 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-uk-2002
 # export GRAPH_NAME ?= LAW-uk-2005
 # export GRAPH_NAME ?= LAW-webbase-2001
-
-
-# export LAW = amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001
-# export MIX = Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en
-export LAW ?= amazon-2008 arabic-2005 cnr-2000 dblp-2010 enron eu-2005 hollywood-2009 in-2004 indochina-2004 it-2004 ljournal-2008 sk-2005 uk-2002 uk-2005 webbase-2001 Gong-gplus GAP-road SNAP-soc-pokec SNAP-cit-Patents SNAP-com-orkut SNAP-soc-LiveJournal1 KONECT-wikipedia_link_en gplus USA-Road enwiki-2013 KONECT-wikipedia_link_en twitter
 
 # export FILE_BIN_TYPE ?= graph
 export FILE_BIN_TYPE ?= graph.bin
@@ -118,10 +115,10 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 0
+export REORDER_LAYER1 	?= 4
 export REORDER_LAYER2   ?= 0
-export DATA_STRUCTURES  ?= 2
-export ALGORITHMS 		?= 6
+export DATA_STRUCTURES  ?= 0
+export ALGORITHMS 		?= 1
 
 export ROOT 			?= 13373
 export TOLERANCE 		?= 1e-8
@@ -131,7 +128,7 @@ export START_THREADS	?= 1
 export INC_THREADS      ?= 1
 export NUM_THREADS  	?= 8
 # export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_ITERATIONS	?= 10
+export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1
@@ -140,7 +137,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 0
+export MASK_MODE 		?= 1
 
 ##################################################
 
@@ -172,6 +169,10 @@ run:
 .PHONY: run-cache
 run-cache:
 	$(MAKE) run-cache $(MAKE_ARGS)
+
+.PHONY: sim-cache
+sim-cache:
+	$(MAKE) sim-cache $(MAKE_ARGS)
 
 .PHONY: run-sniper
 run-sniper:
@@ -259,38 +260,6 @@ clean-stats:
 .PHONY: clean-nohup
 clean-nohup:
 	@rm -f $(APP_DIR)/nohup.out
-
-.PHONY: law
-law:
-	$(MAKE) law $(MAKE_ARGS)
-
-.PHONY: mix
-mix:
-	$(MAKE) mix $(MAKE_ARGS)
-
-.PHONY: results
-results:
-	$(MAKE) results $(MAKE_ARGS)
-
-.PHONY: results-law
-results-law:
-	$(MAKE) results-law $(MAKE_ARGS)
-
-.PHONY: results-mix
-results-mix:
-	$(MAKE) results-mix $(MAKE_ARGS)
-
-PHONY: stats
-stats:
-	$(MAKE) stats $(MAKE_ARGS)
-
-.PHONY: stats-law
-stats-law:
-	$(MAKE) stats-law $(MAKE_ARGS)
-
-.PHONY: stats-mix
-stats-mix:
-	$(MAKE) stats-mix $(MAKE_ARGS)
 
 ##################################################
 ##################################################

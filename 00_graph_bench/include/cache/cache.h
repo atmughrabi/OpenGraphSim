@@ -46,21 +46,24 @@
 // #define POLICY GRASPXP_POLICY
 // #define POLICY MASK_POLICY
 
-#ifndef POLICY
-#define POLICY GRASP_POLICY
+#ifndef POLICY1
+#define POLICY1 PLRU_POLICY
+#define POLICY2 SRRIP_POLICY
+#define POLICY3 GRASP_POLICY
+#define POLICY4 MASK_POLICY
 #endif
 
-// #define BLOCKSIZE   64
-// #define L1_SIZE     1048576
-// #define L1_ASSOC    16
+#define BLOCKSIZE   64
+#define L1_SIZE     1048576
+#define L1_ASSOC    16
 
 // #define BLOCKSIZE   64
 // #define L1_SIZE     1048576
 // #define L1_ASSOC    16
 
-#define BLOCKSIZE   128
-#define L1_SIZE     (262144 + 262144 + (262144))
-#define L1_ASSOC    8
+// #define BLOCKSIZE   128
+// #define L1_SIZE     (262144 + 262144 + (262144))
+// #define L1_ASSOC    8
 
 // #define BLOCKSIZE   128
 // #define L1_SIZE     524288
@@ -187,7 +190,10 @@ struct AccelGraphCache
 struct DoubleTaggedCache
 {
     struct AccelGraphCache *accel_graph;// psl_cache
-    struct Cache *ref_cache; // psl_cache
+    struct Cache *ref_cache; // PLRU
+    struct Cache *ref2_cache; // psl_cache
+    struct Cache *ref3_cache; // psl_cache
+    struct Cache *ref4_cache; // psl_cache
 };
 
 ///cacheline helper functions
