@@ -8,7 +8,7 @@ APP                         ?= open-graph
 # export APP_TEST           ?=  test_open-graph
 # export APP_TEST           ?=  pagerRank-accuracy-report
 # export APP_TEST           ?=  test_grasp-cache
-export APP_TEST           ?=  cache-reorder-report
+export APP_TEST           ?=  test_cache-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -124,8 +124,6 @@ export ROOT 			?= 13373
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 
-export START_THREADS	?= 1
-export INC_THREADS      ?= 1
 export NUM_THREADS  	?= 8
 # export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1

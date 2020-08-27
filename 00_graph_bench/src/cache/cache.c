@@ -2096,6 +2096,80 @@ void printStatsCache(struct Cache *cache)
     printf(" -----------------------------------------------------\n");
 }
 
+void printStatsCacheToFile(struct Cache *cache, char *fname_perf)
+{
+
+    FILE *fptr1;
+    fptr1 = fopen(fname_perf, "a+");
+
+    float missRate = (double)((getWM(cache) + getRM(cache)) * 100) / (getReads(cache) + getWrites(cache)); //calculate miss rate
+    missRate       = roundf(missRate * 100) / 100;                                                //rounding miss rate
+
+    float missRateRead = (double)((getRM(cache)) * 100) / (getReads(cache));   //calculate miss rate
+    missRateRead       = roundf(missRateRead * 100) / 100;                     //rounding miss rate
+
+    float missRateWrite = (double)((getWM(cache)) * 100) / (getWrites(cache)); //calculate miss rate
+    missRateWrite       = roundf(missRateWrite * 100) / 100;                   //rounding miss rate
+
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-51s | \n", "Simulation results (Cache)");
+    fprintf(fptr1, " -----------------------------------------------------\n");
+
+    switch(cache->policy)
+    {
+    case LRU_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "LRU_POLICY");
+        break;
+    case LFU_POLICY:
+        printf("| %-51s | \n", "LFU_POLICY");
+        break;
+    case GRASP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "GRASP_POLICY");
+        break;
+    case SRRIP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "SRRIP_POLICY");
+        break;
+    case PIN_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "PIN_POLICY");
+        break;
+    case PLRU_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "PLRU_POLICY");
+        break;
+    case GRASPXP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "GRASPXP_POLICY");
+        break;
+    case MASK_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "MASK_POLICY");
+        break;
+    default :
+        fprintf(fptr1, "| %-51s | \n", "LRU_POLICY");
+    }
+
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Cache Size (KB)", cache->size / 1024 );
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Block Size",    cache->lineSize);
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Associativity", cache->assoc);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads/Writes", (getReads(cache) + getWrites(cache)) );
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads/Writes misses", (getWM(cache) + getRM(cache)));
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Miss rate(%)", missRate);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads", getReads(cache) );
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Read misses", getRM(cache) );
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Rd Miss rate(%)", missRateRead);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Writes", getWrites(cache) );
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Write misses", getWM(cache) );
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Wrt Miss rate(%)", missRateWrite);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Writebacks", getWB(cache) );
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Evictions", getEVC(cache) );
+    fprintf(fptr1, " -----------------------------------------------------\n");
+
+    fclose(fptr1);
+}
+
 void printStatsGraphReuse(struct Cache *cache, uint32_t *degrees)
 {
     uint32_t  i = 0;
@@ -2274,6 +2348,7 @@ void printStatsGraphCache(struct Cache *cache, uint32_t *in_degree, uint32_t *ou
     }
 }
 
+
 void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degree, uint32_t *out_degree)
 {
     //rounding miss rate
@@ -2399,6 +2474,15 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
     printf("\n===================== cache Stats (ref4_cache Stats)  =================\n");
     printStatsGraphCache(cache->ref4_cache, in_degree, out_degree);
 
+}
+
+
+void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf)
+{
+    printStatsCacheToFile(cache->ref_cache, fname_perf);
+    printStatsCacheToFile(cache->ref2_cache, fname_perf);
+    printStatsCacheToFile(cache->ref3_cache, fname_perf);
+    printStatsCacheToFile(cache->ref4_cache, fname_perf);
 }
 
 void printStats(struct Cache *cache)

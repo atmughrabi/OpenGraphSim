@@ -1,6 +1,6 @@
 
 #########################################################
-#       		 GENERAL DIRECTOIRES   	    			#
+#                GENERAL DIRECTOIRES                    #
 #########################################################
 # globals binaary /bin/accel-graph name doesn't need to match main/accel-graph.c
 APP               ?= open-graph
@@ -10,44 +10,44 @@ APP_TEST          ?= test_open-graph
 
 
 # dirs Root app
-APP_DIR           	?= .
-# BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-BENCHMARKS_DIR    	?= ../01_test_graphs
+APP_DIR             ?= .
+# BENCHMARKS_DIR        ?= ../../01_GraphDatasets
+BENCHMARKS_DIR      ?= ../01_test_graphs
 
 #dir root/managed_folders
-SRC_DIR           	?= src
-OBJ_DIR			  	?= obj
-INC_DIR			  	?= include
-BIN_DIR			  	?= bin
-RES_DIR			  	?= results
-SNI_DIR	            ?= sniper
+SRC_DIR             ?= src
+OBJ_DIR             ?= obj
+INC_DIR             ?= include
+BIN_DIR             ?= bin
+RES_DIR             ?= results
+SNI_DIR             ?= sniper
 
 #if you want to compile from cmake you need this directory
 #cd build
 #cmake ..
-BUILD_DIR		  	?= build
+BUILD_DIR           ?= build
 
 # relative directories used for managing src/obj files
-STRUCT_DIR		  	?= structures
-PREPRO_DIR		  	?= preprocess
-ALGO_DIR		  	?= algorithms
-UTIL_DIR		  	?= utils
-CACHE_DIR		  	?= cache
+STRUCT_DIR          ?= structures
+PREPRO_DIR          ?= preprocess
+ALGO_DIR            ?= algorithms
+UTIL_DIR            ?= utils
+CACHE_DIR           ?= cache
 
 # Folders needed when using CAPI
 
 
 #contains the tests use make run-test to compile what in this directory
-TEST_DIR		  	?= tests
+TEST_DIR            ?= tests
 
 #contains the main for the graph processing framework
-MAIN_DIR		  	?= main
+MAIN_DIR            ?= main
 
 ##################################################
 ##################################################
 
 #########################################################
-#       		 ACCEL RUN GRAPH ARGUMENTS    			#
+#                ACCEL RUN GRAPH ARGUMENTS              #
 #########################################################
 
 #small test graphs
@@ -62,39 +62,36 @@ GRAPH_NAME ?= test
 # export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_NAME)/graph.bin
 
 # FILE_BIN_TYPE ?= graph
-# FILE_BIN_TYPE ?= graph.bin
-FILE_BIN_TYPE ?= graph.wbin
+FILE_BIN_TYPE ?= graph.bin
+# FILE_BIN_TYPE ?= graph.wbin
 
 #WEIGHTED
 FILE_BIN ?= $(BENCHMARKS_DIR)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 
 
 #GRAPH RUN
-SORT_TYPE 		?= 0
-REORDER_LAYER1 	?= 0
+SORT_TYPE       ?= 0
+REORDER_LAYER1  ?= 0
 REORDER_LAYER2  ?= 0
 DATA_STRUCTURES ?= 0
-ALGORITHMS 		?= 1
+ALGORITHMS      ?= 1
 
-ROOT 			?= 164
-PULL_PUSH 		?= 2
-TOLERANCE 		?= 1e-8
-DELTA 			?= 800
+ROOT            ?= 164
+PULL_PUSH       ?= 2
+TOLERANCE       ?= 1e-8
+DELTA           ?= 800
 
-START_THREADS   ?= 1
-INC_THREADS     ?= 1
-NUM_THREADS  	?= 64
-# NUM_THREADS  	= $(shell grep -c ^processor /proc/cpuinfo)
-NUM_ITERATIONS 	?= 1
-NUM_TRIALS 		?= 1
+NUM_THREADS     ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_ITERATIONS  ?= 1
+NUM_TRIALS      ?= 1
 
-FILE_FORMAT 	?= 1
-CONVERT_FORMAT 	?= 1
+FILE_FORMAT     ?= 1
+CONVERT_FORMAT  ?= 1
 
 #STATS COLLECTION VARIABLES
 BIN_SIZE        ?= 512
 INOUT_STATS     ?= 0
-MASK_MODE 		?= 0
+MASK_MODE       ?= 0
 
 ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER_LAYER1) -b $(DELTA)
 
@@ -105,40 +102,40 @@ ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -
 
 
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
-SRC_FILES_ALGO_OPENMP		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/*.c)
-SRC_FILES_UTIL		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
-SRC_FILES_PREPRO	=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
-SRC_FILES_STRUCT	=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
-SRC_FILES_MAIN		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
-SRC_FILES_TEST		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
-SRC_FILES_CACHE		=	$(wildcard $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/*.c)
+SRC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/*.c)
+SRC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/*.c)
+SRC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/*.c)
+SRC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/*.c)
+SRC_FILES_MAIN      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/*.c)
+SRC_FILES_TEST      =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/*.c)
+SRC_FILES_CACHE     =   $(wildcard $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/*.c)
 
-INC_FILES_ALGO_OPENMP		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/openmp/*.h)
-INC_FILES_UTIL		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
-INC_FILES_PREPRO	=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
-INC_FILES_STRUCT	=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
-INC_FILES_CACHE		=	$(wildcard $(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)/*.h)
+INC_FILES_ALGO_OPENMP       =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/openmp/*.h)
+INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
+INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
+INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
+INC_FILES_CACHE     =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)/*.h)
 
 ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CACHE)
 
 #create object file rules for the final binary target
-OBJ_FILES_ALGO_OPENMP 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
-OBJ_FILES_ALGO_CACHE		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o,$(SRC_FILES_ALGO_OPENMP))
-OBJ_FILES_ALGO_SNIPER		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o,$(SRC_FILES_ALGO_OPENMP))
+OBJ_FILES_ALGO_OPENMP       = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
+OBJ_FILES_ALGO_CACHE        = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/cachesim/%.o,$(SRC_FILES_ALGO_OPENMP))
+OBJ_FILES_ALGO_SNIPER       = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o,$(SRC_FILES_ALGO_OPENMP))
 
-OBJ_FILES_UTIL 		= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
-OBJ_FILES_PREPRO 	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
-OBJ_FILES_STRUCT 	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
-OBJ_FILES_MAIN  	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
-OBJ_FILES_TEST  	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
-OBJ_FILES_CACHE  	= $(patsubst $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o,$(SRC_FILES_CACHE))
+OBJ_FILES_UTIL      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o,$(SRC_FILES_UTIL))
+OBJ_FILES_PREPRO    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o,$(SRC_FILES_PREPRO))
+OBJ_FILES_STRUCT    = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o,$(SRC_FILES_STRUCT))
+OBJ_FILES_MAIN      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/%.o,$(SRC_FILES_MAIN))
+OBJ_FILES_TEST      = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/%.o,$(SRC_FILES_TEST))
+OBJ_FILES_CACHE     = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c,$(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o,$(SRC_FILES_CACHE))
 
 
 
-CC				  = gcc
+CC                = gcc
 
-OPENMP_INC = 	-I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
-				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION) 	\
+OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
+				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
 				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)
@@ -160,7 +157,7 @@ FAIL = \033[91mFAIL\033[0m
 ##################################################
 
 #########################################################
-#       		 ACCEL GRAPH GENERATION    				#
+#                ACCEL GRAPH GENERATION                 #
 #########################################################
 
 .PHONY: app-openmp
@@ -230,11 +227,14 @@ $(APP_DIR)/$(BIN_DIR)/$(APP)-sniper : $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o
 $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_OPENMP) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE)
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
+$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO_CACHE) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CACHE) 
+	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
+
 $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
 	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
@@ -291,20 +291,26 @@ help: app-openmp
 run: run-openmp
 
 .PHONY: debug-cache
-debug-cache: MODE 		  = -DCACHE_HARNESS -DCACHE_HARNESS_META
+debug-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
 debug-cache: INTEGRATION  = openmp
 debug-cache: app-cache
 	gdb -ex=r --args ./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim  -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-cache
-run-cache: MODE 		= -DCACHE_HARNESS -DCACHE_HARNESS_META
-run-cache: INTEGRATION 	= openmp
+run-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
+run-cache: INTEGRATION  = openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
 
+.PHONY: sim-cache
+sim-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
+sim-cache: INTEGRATION  = openmp
+sim-cache: test-cache
+	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS)
+
 # http://snipersim.org/w/Multiple_regions_of_interest
 .PHONY: run-sniper
-run-sniper: MODE 		= -DSNIPER_HARNESS
+run-sniper: MODE        = -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
 	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n $(NUM_THREADS) -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
@@ -381,20 +387,3 @@ cache-perf-openmp: INTEGRATION = openmp
 cache-perf-openmp: app-openmp
 	sudo perf record -d ./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp -f $(FILE_BIN) $(ARGS)
 
-.PHONY: sim-cache
-sim-cache: MODE 		= -DCACHE_HARNESS -DCACHE_HARNESS_META
-sim-cache: INTEGRATION 	= openmp
-sim-cache: app-cache
-	@for dir in ${BENCHMARKS_DIR}/*;      													\
-    do                                      												\
-        for graph_dir in $${dir}/*;               											\
-        do                                  												\
-        	if [ -e $${graph_dir}/graph.bin ]; then											\
-            	echo "Processing $${graph_dir}/graph.bin";									\
-            	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $${graph_dir}/graph.bin $(ARGS); \
-        	fi; 																			\
-        done                                												\
-    done
-
-##################################################
-##################################################

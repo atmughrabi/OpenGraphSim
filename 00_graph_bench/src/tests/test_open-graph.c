@@ -46,8 +46,6 @@
 
 #include "graphTest.h"
 
-uint64_t afu_config;
-uint64_t cu_config;
 int numThreads;
 mt19937state *mt19937var;
 

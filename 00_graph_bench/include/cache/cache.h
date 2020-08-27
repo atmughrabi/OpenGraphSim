@@ -53,17 +53,17 @@
 #define POLICY4 MASK_POLICY
 #endif
 
-#define BLOCKSIZE   64
-#define L1_SIZE     1048576
-#define L1_ASSOC    16
+// #define BLOCKSIZE   64
+// #define L1_SIZE     1048576
+// #define L1_ASSOC    16
 
 // #define BLOCKSIZE   64
 // #define L1_SIZE     1048576
 // #define L1_ASSOC    16
 
-// #define BLOCKSIZE   128
-// #define L1_SIZE     (262144 + 262144 + (262144))
-// #define L1_ASSOC    8
+#define BLOCKSIZE   128
+#define L1_SIZE     262144
+#define L1_ASSOC    8
 
 // #define BLOCKSIZE   128
 // #define L1_SIZE     524288
@@ -368,10 +368,12 @@ void online_cache_graph_stats(struct Cache *cache, uint32_t node);
 // void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache);
 void printStats(struct Cache *cache);
 void printStatsCache(struct Cache *cache);
+void printStatsCacheToFile(struct Cache *cache, char *fname_perf);
 void printStatsGraphReuse(struct Cache *cache, uint32_t *degrees);
 void printStatsGraphCache(struct Cache *cache, uint32_t *in_degree, uint32_t *out_degree);
 void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degree, uint32_t *out_degree);
 void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_degree, uint32_t *out_degree);
+void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf);
 
 struct Cache *newCache( uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, uint32_t num_vertices, uint32_t policy, uint32_t numPropertyRegions);
 void freeCache(struct Cache *cache);
