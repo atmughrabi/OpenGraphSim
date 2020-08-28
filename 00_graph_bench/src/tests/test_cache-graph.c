@@ -248,7 +248,7 @@ main (int argc, char **argv)
                 arguments.mmode = mmode[k];
 
                 printf("\n%u %u %u %s %s\n", arguments.lmode, arguments.lmode_l2, arguments.mmode, reorder_labels[j], perf_file);
-
+                
                 graph = generateGraphDataStructure(&arguments);
 
                 arguments.root = generateRandomRootGeneral(graph, &arguments); // random root each trial

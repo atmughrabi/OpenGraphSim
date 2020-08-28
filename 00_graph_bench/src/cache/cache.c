@@ -1730,9 +1730,6 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
 
 void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
 {
-
-    #pragma omp critical
-    {
         // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
         // AccessAccelGraphGRASP(cache->accel_graph, addr, op, node, value);
         // AccessAccelGraphExpress(cache->accel_graph, addr, op, node, value);
@@ -1740,7 +1737,6 @@ void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t add
         Access(cache->ref2_cache, addr, op, node, value);
         Access(cache->ref3_cache, addr, op, node, value);
         Access(cache->ref4_cache, addr, op, node, value);
-    }
 }
 
 void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
