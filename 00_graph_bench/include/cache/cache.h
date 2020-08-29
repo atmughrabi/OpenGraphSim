@@ -22,12 +22,12 @@
 #define PSL_POLICY    PLRU_POLICY
 #define PSL_BLOCKSIZE 128
 
-#define WARM_L1_SIZE   262144
+#define WARM_L1_SIZE   131072
 #define WARM_L1_ASSOC  8
 #define WARM_POLICY    PLRU_POLICY
 #define WARM_BLOCKSIZE 4
 
-#define HOT_L1_SIZE   262144
+#define HOT_L1_SIZE   131072
 #define HOT_L1_ASSOC  8
 #define HOT_POLICY    PLRU_POLICY
 #define HOT_BLOCKSIZE 4
@@ -61,13 +61,13 @@
 // #define L1_SIZE     1048576
 // #define L1_ASSOC    16
 
-#define BLOCKSIZE   128
-#define L1_SIZE     262144
-#define L1_ASSOC    8
-
 // #define BLOCKSIZE   128
-// #define L1_SIZE     524288
+// #define L1_SIZE     262144
 // #define L1_ASSOC    8
+
+#define BLOCKSIZE   128
+#define L1_SIZE     524288
+#define L1_ASSOC    8
 
 // #define BLOCKSIZE   128
 // #define L1_SIZE     262144 + 32768 + 32768
@@ -374,6 +374,7 @@ void printStatsGraphCache(struct Cache *cache, uint32_t *in_degree, uint32_t *ou
 void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degree, uint32_t *out_degree);
 void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_degree, uint32_t *out_degree);
 void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf);
+void printStatsAccelGraphCachetoFile(struct AccelGraphCache *cache, char *fname_perf);
 
 struct Cache *newCache( uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, uint32_t num_vertices, uint32_t policy, uint32_t numPropertyRegions);
 void freeCache(struct Cache *cache);

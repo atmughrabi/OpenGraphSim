@@ -1730,13 +1730,11 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
 
 void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
 {
-        // AccessAccelGraphExpressFloat(cache->accel_graph, addr, op, node, value);
-        // AccessAccelGraphGRASP(cache->accel_graph, addr, op, node, value);
-        // AccessAccelGraphExpress(cache->accel_graph, addr, op, node, value);
-        Access(cache->ref_cache, addr, op, node, value);
-        Access(cache->ref2_cache, addr, op, node, value);
-        Access(cache->ref3_cache, addr, op, node, value);
-        Access(cache->ref4_cache, addr, op, node, value);
+    // AccessAccelGraphExpress(cache->accel_graph, addr, op, node, value);
+    Access(cache->ref_cache, addr, op, node, value);
+    Access(cache->ref2_cache, addr, op, node, value);
+    Access(cache->ref3_cache, addr, op, node, value);
+    Access(cache->ref4_cache, addr, op, node, value);
 }
 
 void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
@@ -2166,6 +2164,83 @@ void printStatsCacheToFile(struct Cache *cache, char *fname_perf)
     fclose(fptr1);
 }
 
+
+void printStatsAccelGraphCachetoFile(struct AccelGraphCache *cache, char *fname_perf)
+{
+    //rounding miss rate
+
+    FILE *fptr1;
+    fptr1 = fopen(fname_perf, "a+");
+
+    uint64_t readsHits_hot    = getReads(cache->hot_cache)  - getRM(cache->hot_cache);
+    uint64_t readsHits_warm   = getReads(cache->warm_cache) - getRM(cache->warm_cache);
+
+    uint64_t readsMisses_cold = getRM(cache->cold_cache);
+
+    uint64_t writesHits_hot   = getWrites(cache->hot_cache)  - getWM(cache->hot_cache);
+    uint64_t writesHits_warm  = getWrites(cache->warm_cache) - getWM(cache->warm_cache);
+
+    uint64_t writesMisses_cold = getWM(cache->cold_cache);
+
+    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+
+    uint64_t ReadWrite_total   = getReads(cache->cold_cache) + getWrites(cache->cold_cache) + ReadWriteHotCold_total;
+    uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
+
+    uint64_t Read_total       = getReads(cache->cold_cache) + readsHits_hot + readsHits_warm;
+    uint64_t ReadMisses_total = readsMisses_cold ;
+
+    uint64_t Write_total       = getWrites(cache->cold_cache) + writesHits_hot + writesHits_warm;
+    uint64_t WriteMisses_total =  writesMisses_cold;
+
+
+
+    float missRate = (double)(ReadWriteMisses_total * 100) / (ReadWrite_total); //calculate miss rate
+    missRate       = roundf(missRate * 100) / 100;
+
+    float missRateRead = (double)((ReadMisses_total) * 100) / (Read_total); //calculate miss rate
+    missRateRead       = roundf(missRateRead * 100) / 100;
+    float missRateWrite = (double)((WriteMisses_total) * 100) / (Write_total); //calculate miss rate
+    missRateWrite       = roundf(missRateWrite * 100) / 100;                            //rounding miss rate
+    float commReduction = (1.0f - ((double)((ReadWrite_total - ReadWriteHotCold_total)) / (double)ReadWrite_total)) * 100;
+    commReduction       = roundf(commReduction * 100) / 100;
+
+    float commCold = (((double)((ReadWrite_total - ReadWriteHotCold_total)) / (double)ReadWrite_total)) * 100;
+    commCold       = roundf(commCold * 100) / 100;
+    float commWarm = (((double)((readsHits_warm + writesHits_warm)) / (double)ReadWrite_total)) * 100;
+    commWarm       = roundf(commWarm * 100) / 100;
+    float commHot = (((double)((readsHits_hot + writesHits_hot)) / (double)ReadWrite_total)) * 100;
+    commHot       = roundf(commHot * 100) / 100;
+
+    fprintf(fptr1, "\n====================== cache Stats Accel Graph =======================\n");
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "PSL Comm Improved(%)", commReduction);
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Cold Comm Cache(%)  ", commCold);
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Warm Comm Cache(%)  ", commWarm);
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Hot Comm Cache(%)   ", commHot);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-51s | \n", "Simulation results (Cache)");
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads/Writes", ReadWrite_total);
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads/Writes misses", ReadWriteMisses_total);
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Miss rate(%)", missRate);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Reads", Read_total);
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Read misses", ReadMisses_total );
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Rd Miss rate(%)", missRateRead);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Writes", Write_total);
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Write misses", WriteMisses_total );
+    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Wrt Miss rate(%)", missRateWrite);
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Writebacks", getWB(cache->cold_cache) );
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fprintf(fptr1, "| %-21s | %'-27lu | \n", "Evictions", getEVC(cache->cold_cache) );
+    fprintf(fptr1, " -----------------------------------------------------\n");
+
+    fclose(fptr1);
+}
+
 void printStatsGraphReuse(struct Cache *cache, uint32_t *degrees)
 {
     uint32_t  i = 0;
@@ -2425,41 +2500,41 @@ void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degre
 
 void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_degree, uint32_t *out_degree)
 {
-    // uint64_t readsHits_hot    = getReads(cache->accel_graph->hot_cache)  - getRM(cache->accel_graph->hot_cache);
-    // uint64_t readsHits_warm   = getReads(cache->accel_graph->warm_cache) - getRM(cache->accel_graph->warm_cache);
+    uint64_t readsHits_hot    = getReads(cache->accel_graph->hot_cache)  - getRM(cache->accel_graph->hot_cache);
+    uint64_t readsHits_warm   = getReads(cache->accel_graph->warm_cache) - getRM(cache->accel_graph->warm_cache);
 
-    // uint64_t readsMisses_cold = getRM(cache->accel_graph->cold_cache);
+    uint64_t readsMisses_cold = getRM(cache->accel_graph->cold_cache);
 
-    // uint64_t writesHits_hot   = getWrites(cache->accel_graph->hot_cache)  - getWM(cache->accel_graph->hot_cache);
-    // uint64_t writesHits_warm  = getWrites(cache->accel_graph->warm_cache) - getWM(cache->accel_graph->warm_cache);
+    uint64_t writesHits_hot   = getWrites(cache->accel_graph->hot_cache)  - getWM(cache->accel_graph->hot_cache);
+    uint64_t writesHits_warm  = getWrites(cache->accel_graph->warm_cache) - getWM(cache->accel_graph->warm_cache);
 
-    // uint64_t writesMisses_cold = getWM(cache->accel_graph->cold_cache);
+    uint64_t writesMisses_cold = getWM(cache->accel_graph->cold_cache);
 
-    // uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
 
-    // uint64_t ReadWrite_total   = getReads(cache->accel_graph->cold_cache) + getWrites(cache->accel_graph->cold_cache) + ReadWriteHotCold_total;
-    // uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
+    uint64_t ReadWrite_total   = getReads(cache->accel_graph->cold_cache) + getWrites(cache->accel_graph->cold_cache) + ReadWriteHotCold_total;
+    uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
 
-    // float missRate = (double)(ReadWriteMisses_total * 100) / (ReadWrite_total); //calculate miss rate
-    // missRate       = roundf(missRate * 100) / 100;
+    float missRate = (double)(ReadWriteMisses_total * 100) / (ReadWrite_total); //calculate miss rate
+    missRate       = roundf(missRate * 100) / 100;
 
 
-    // uint64_t readsMisses_ref = getRM(cache->ref_cache);
+    uint64_t readsMisses_ref = getRM(cache->ref_cache);
 
-    // uint64_t writesMisses_ref = getWM(cache->ref_cache);
+    uint64_t writesMisses_ref = getWM(cache->ref_cache);
 
-    // uint64_t ReadWrite_total_ref   = getReads(cache->ref_cache) + getWrites(cache->ref_cache);
-    // uint64_t ReadWriteMisses_total_ref = readsMisses_ref + writesMisses_ref;
+    uint64_t ReadWrite_total_ref   = getReads(cache->ref_cache) + getWrites(cache->ref_cache);
+    uint64_t ReadWriteMisses_total_ref = readsMisses_ref + writesMisses_ref;
 
-    // float missRate_ref = (double)(ReadWriteMisses_total_ref * 100) / (ReadWrite_total_ref); //calculate miss rate
-    // missRate_ref       = roundf(missRate_ref * 100) / 100;
+    float missRate_ref = (double)(ReadWriteMisses_total_ref * 100) / (ReadWrite_total_ref); //calculate miss rate
+    missRate_ref       = roundf(missRate_ref * 100) / 100;
 
-    // float missRate_perf = 100 * (1.0 - (missRate / missRate_ref));
-    // printf("\n============ Cache Stats AccelGraph (Baseline:ref_cache) =============\n");
-    // printf(" -----------------------------------------------------\n");
-    // printf("| %-21s | %-27.2f | \n", "MissRate Improved(%)", missRate_perf);
-    // printf(" -----------------------------------------------------\n");
-    // printStatsAccelGraphCache(cache->accel_graph, in_degree, out_degree);
+    float missRate_perf = 100 * (1.0 - (missRate / missRate_ref));
+    printf("\n============ Cache Stats AccelGraph (Baseline:ref_cache) =============\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-21s | %-27.2f | \n", "MissRate Improved(%)", missRate_perf);
+    printf(" -----------------------------------------------------\n");
+    printStatsAccelGraphCache(cache->accel_graph, in_degree, out_degree);
     printf("\n======================================================================\n");
     printf("\n===================== cache Stats (ref_cache Stats)  =================\n");
     printStatsGraphCache(cache->ref_cache, in_degree, out_degree);
