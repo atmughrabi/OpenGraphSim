@@ -69,6 +69,7 @@ main (int argc, char **argv)
     char label_dir[1024];
     char unified_perf_file[1024];
     char express_perf_file[1024];
+    char grasp_perf_file[1024];
 
     char *benchmarks_graphs[GRAPH_NUM] =
     {
@@ -239,6 +240,8 @@ main (int argc, char **argv)
             {
                 sprintf(unified_perf_file, "%s/%s_algo%u.un.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
                 sprintf(express_perf_file, "%s/%s_algo%u.ex.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+                sprintf(grasp_perf_file, "%s/%s_algo%u.gs.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 arguments.fnameb = graph_dir;
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
@@ -257,7 +260,8 @@ main (int argc, char **argv)
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
 
                 printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
-                // printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph, express_perf_file);
+                printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_mask, express_perf_file);
+                printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_grasp, grasp_perf_file);
                 freeGraphStatsGeneral(ref_data, arguments.algorithm);
 
                 freeGraphDataStructure(graph, arguments.datastructure);

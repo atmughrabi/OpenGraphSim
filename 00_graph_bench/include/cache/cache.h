@@ -189,7 +189,8 @@ struct AccelGraphCache
 
 struct DoubleTaggedCache
 {
-    struct AccelGraphCache *accel_graph;// psl_cache
+    struct AccelGraphCache *accel_graph_mask;// psl_cache
+    struct AccelGraphCache *accel_graph_grasp;// psl_cache
     struct Cache *ref_cache; // PLRU
     struct Cache *ref2_cache; // psl_cache
     struct Cache *ref3_cache; // psl_cache
