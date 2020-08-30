@@ -31,6 +31,7 @@ struct Arguments
     uint32_t sort;
     uint32_t lmode; // reorder mode
     uint32_t lmode_l2; // reorder mode second layer
+    uint32_t lmode_l3; // reorder mode third layer
     uint32_t mmode; // mask mode
     uint32_t symmetric;
     uint32_t weighted;
@@ -40,6 +41,13 @@ struct Arguments
     char *fnamel;
     uint32_t fnameb_format;
     uint32_t convert_format;
+
+#ifdef CACHE_HARNESS_META
+    uint32_t l1_size;
+    uint32_t l1_assoc;
+    uint32_t blocksize;
+    uint32_t policey;
+#endif
 };
 
 #endif

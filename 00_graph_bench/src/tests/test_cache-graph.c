@@ -71,77 +71,57 @@ main (int argc, char **argv)
     char express_perf_file[1024];
     char grasp_perf_file[1024];
 
-    char *benchmarks_graphs[GRAPH_NUM] =
-    {
-        "LAW-amazon-2008",
-        "LAW-cnr-2000",
-        "LAW-dblp-2010",
-        "LAW-enron"
-    };
-
-    char *benchmarks_dir[GRAPH_NUM] =
-    {
-        "../01_test_graphs/LAW/LAW-amazon-2008",
-        "../01_test_graphs/LAW/LAW-cnr-2000",
-        "../01_test_graphs/LAW/LAW-dblp-2010",
-        "../01_test_graphs/LAW/LAW-enron"
-    };
-
     // char *benchmarks_graphs[GRAPH_NUM] =
     // {
     //     "LAW-amazon-2008",
-    //     "LAW-arabic-2005",
     //     "LAW-cnr-2000",
     //     "LAW-dblp-2010",
-    //     "LAW-enron",
-    //     "LAW-eu-2005",
-    //     "LAW-hollywood-2009",
-    //     "LAW-in-2004",
-    //     "LAW-indochina-2004",
-    //     "LAW-it-2004",
-    //     "LAW-ljournal-2008",
-    //     "LAW-sk-2005",
-    //     "LAW-uk-2002",
-    //     "LAW-uk-2005",
-    //     "LAW-webbase-2001",
-    //     "KONECT-wikipedia_link_en",
-    //     "GAP-road",
-    //     "GAP-twitter",
-    //     "GONG-gplus",
-    //     "SNAP-cit-Patents",
-    //     "SNAP-com-Orkut",
-    //     "SNAP-soc-LiveJournal1",
-    //     "SNAP-soc-Pokec",
-    //     "SNAP-web-Google"
+    //     "LAW-enron"
     // };
 
     // char *benchmarks_dir[GRAPH_NUM] =
     // {
-    //     "../../01_GraphDatasets/LAW/LAW-amazon-2008",
-    //     "../../01_GraphDatasets/LAW/LAW-arabic-2005",
-    //     "../../01_GraphDatasets/LAW/LAW-cnr-2000",
-    //     "../../01_GraphDatasets/LAW/LAW-dblp-2010",
-    //     "../../01_GraphDatasets/LAW/LAW-enron",
-    //     "../../01_GraphDatasets/LAW/LAW-eu-2005",
-    //     "../../01_GraphDatasets/LAW/LAW-hollywood-2009",
-    //     "../../01_GraphDatasets/LAW/LAW-in-2004",
-    //     "../../01_GraphDatasets/LAW/LAW-indochina-2004",
-    //     "../../01_GraphDatasets/LAW/LAW-it-2004",
-    //     "../../01_GraphDatasets/LAW/LAW-ljournal-2008",
-    //     "../../01_GraphDatasets/LAW/LAW-sk-2005",
-    //     "../../01_GraphDatasets/LAW/LAW-uk-2002",
-    //     "../../01_GraphDatasets/LAW/LAW-uk-2005",
-    //     "../../01_GraphDatasets/LAW/LAW-webbase-2001",
-    //     "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
-    //     "../../01_GraphDatasets/GAP/GAP-road",
-    //     "../../01_GraphDatasets/GAP/GAP-twitter",
-    //     "../../01_GraphDatasets/GONG/GONG-gplus",
-    //     "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
-    //     "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
-    //     "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
-    //     "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
-    //     "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+    //     "../01_test_graphs/LAW/LAW-amazon-2008",
+    //     "../01_test_graphs/LAW/LAW-cnr-2000",
+    //     "../01_test_graphs/LAW/LAW-dblp-2010",
+    //     "../01_test_graphs/LAW/LAW-enron"
     // };
+
+    char *benchmarks_graphs[GRAPH_NUM] =
+    {
+        "LAW-in-2004",
+        "LAW-it-2004",
+        "LAW-uk-2002",
+        "LAW-uk-2005",
+        "LAW-webbase-2001",
+        "KONECT-wikipedia_link_en",
+        "GAP-road",
+        "GAP-twitter",
+        "GONG-gplus",
+        "SNAP-cit-Patents",
+        "SNAP-com-Orkut",
+        "SNAP-soc-LiveJournal1",
+        "SNAP-soc-Pokec",
+        "SNAP-web-Google"
+    };
+
+    char *benchmarks_dir[GRAPH_NUM] =
+    {
+        "../../01_GraphDatasets/LAW/LAW-in-2004",
+        "../../01_GraphDatasets/LAW/LAW-it-2004",
+        "../../01_GraphDatasets/LAW/LAW-uk-2002",
+        "../../01_GraphDatasets/LAW/LAW-uk-2005",
+        "../../01_GraphDatasets/LAW/LAW-webbase-2001",
+        "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
+        "../../01_GraphDatasets/GAP/GAP-road",
+        "../../01_GraphDatasets/GAP/GAP-twitter",
+        "../../01_GraphDatasets/GONG/GONG-gplus",
+        "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
+        "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
+        "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
+        "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
+        "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+    };
 
     char *reorder_labels[MODE_NUM] =
     {
@@ -238,9 +218,9 @@ main (int argc, char **argv)
         {
             for (k = 0; k < MODE_NUM; ++k)
             {
-                sprintf(unified_perf_file, "%s/%s_algo%u.un.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-                sprintf(express_perf_file, "%s/%s_algo%u.ex.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-                sprintf(grasp_perf_file, "%s/%s_algo%u.gs.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+                sprintf(unified_perf_file, "%s/%s_algo%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+                sprintf(express_perf_file, "%s/%s_algo%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+                sprintf(grasp_perf_file, "%s/%s_algo%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
 
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 arguments.fnameb = graph_dir;

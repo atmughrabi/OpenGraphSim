@@ -196,8 +196,8 @@ struct DoubleTaggedCache *newDoubleTaggedCache(uint32_t l1_size, uint32_t l1_ass
 {
     struct DoubleTaggedCache *cache = (struct DoubleTaggedCache *) my_malloc(sizeof(struct DoubleTaggedCache));
 
-    cache->accel_graph_mask = newAccelGraphCache(PSL_L1_SIZE, PSL_L1_ASSOC, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
-    cache->accel_graph_grasp = newAccelGraphCache(PSL_L1_SIZE, PSL_L1_ASSOC, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
+    cache->accel_graph_mask = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
+    cache->accel_graph_grasp = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
     cache->ref_cache    = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY1, numPropertyRegions);
     cache->ref2_cache   = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY2, numPropertyRegions);
     cache->ref3_cache   = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY3, numPropertyRegions);
@@ -239,9 +239,9 @@ struct AccelGraphCache *newAccelGraphCache(uint32_t l1_size, uint32_t l1_assoc, 
 {
     struct AccelGraphCache *cache = (struct AccelGraphCache *) my_malloc(sizeof(struct AccelGraphCache));
 
-    cache->cold_cache = newCache( l1_size, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
-    cache->warm_cache = newCache( WARM_L1_SIZE, WARM_L1_ASSOC, WARM_BLOCKSIZE, num_vertices, WARM_POLICY, numPropertyRegions);
-    cache->hot_cache  = newCache( HOT_L1_SIZE, HOT_L1_ASSOC, HOT_BLOCKSIZE, num_vertices, HOT_POLICY, numPropertyRegions);
+    cache->cold_cache = newCache( l1_size / 2, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
+    cache->warm_cache = newCache( l1_size / 4, WARM_L1_ASSOC, WARM_BLOCKSIZE, num_vertices, WARM_POLICY, numPropertyRegions);
+    cache->hot_cache  = newCache( l1_size / 4, HOT_L1_ASSOC, HOT_BLOCKSIZE, num_vertices, HOT_POLICY, numPropertyRegions);
 
     return cache;
 }

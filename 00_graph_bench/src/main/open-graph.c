@@ -273,6 +273,13 @@ main (int argc, char **argv)
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
 
+#ifdef CACHE_HARNESS_META
+    arguments.l1_size = 524288;
+    arguments.l1_assoc = 8;
+    arguments.blocksize = 128;
+    arguments.policey = 0;
+#endif
+
     void *graph = NULL;
 
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
