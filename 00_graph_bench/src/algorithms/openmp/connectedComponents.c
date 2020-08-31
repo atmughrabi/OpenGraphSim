@@ -344,25 +344,25 @@ uint32_t sampleFrequentNode(uint32_t num_vertices, uint32_t num_samples, uint32_
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-struct CCStats *connectedComponentsGraphCSR(uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph)
+struct CCStats *connectedComponentsGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     struct CCStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
 
     case 0: // Shiloach Vishkin
-        stats = connectedComponentsShiloachVishkinGraphCSR( iterations, graph);
+        stats = connectedComponentsShiloachVishkinGraphCSR( arguments, graph);
         break;
     case 1: // Afforest
-        stats = connectedComponentsAfforestGraphCSR( iterations, graph);
+        stats = connectedComponentsAfforestGraphCSR( arguments, graph);
         break;
     case 2: // WCC
-        stats = connectedComponentsWeaklyGraphCSR( iterations, graph);
+        stats = connectedComponentsWeaklyGraphCSR( arguments, graph);
         break;
     default:// Afforest
-        stats = connectedComponentsAfforestGraphCSR( iterations, graph);
+        stats = connectedComponentsAfforestGraphCSR( arguments, graph);
         break;
     }
 
@@ -370,7 +370,7 @@ struct CCStats *connectedComponentsGraphCSR(uint32_t iterations, uint32_t pushpu
 
 }
 
-struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations, struct GraphCSR *graph)
+struct CCStats *connectedComponentsShiloachVishkinGraphCSR( struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     uint32_t v;
@@ -392,7 +392,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t) & (stats->components[0]);
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
@@ -502,7 +502,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( uint32_t iterations,
 
 }
 
-struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct GraphCSR *graph)
+struct CCStats *connectedComponentsAfforestGraphCSR( struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     uint32_t u;
@@ -660,7 +660,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( uint32_t iterations, struct
 
 }
 
-struct CCStats *connectedComponentsWeaklyGraphCSR( uint32_t iterations, struct GraphCSR *graph)
+struct CCStats *connectedComponentsWeaklyGraphCSR( struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     uint32_t v;
@@ -866,24 +866,24 @@ uint32_t connectedComponentsVerifyGraphCSR(struct CCStats *stats, struct GraphCS
 // ***************                  GRID DataStructure                           **************
 // ********************************************************************************************
 
-struct CCStats *connectedComponentsGraphGrid(uint32_t iterations, uint32_t pushpull, struct GraphGrid *graph)
+struct CCStats *connectedComponentsGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     struct CCStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // Shiloach Vishkin
-        stats = connectedComponentsShiloachVishkinGraphGrid( iterations, graph);
+        stats = connectedComponentsShiloachVishkinGraphGrid( arguments, graph);
         break;
     case 1: // Afforest
-        stats = connectedComponentsAfforestGraphGrid( iterations, graph);
+        stats = connectedComponentsAfforestGraphGrid( arguments, graph);
         break;
     case 2: // Weakly Connected
-        stats = connectedComponentsWeaklyGraphGrid( iterations, graph);
+        stats = connectedComponentsWeaklyGraphGrid( arguments, graph);
         break;
     default:// Afforest
-        stats = connectedComponentsWeaklyGraphGrid( iterations, graph);
+        stats = connectedComponentsWeaklyGraphGrid( arguments, graph);
         break;
     }
 
@@ -891,7 +891,7 @@ struct CCStats *connectedComponentsGraphGrid(uint32_t iterations, uint32_t pushp
 
 }
 
-struct CCStats *connectedComponentsShiloachVishkinGraphGrid( uint32_t iterations, struct GraphGrid *graph)
+struct CCStats *connectedComponentsShiloachVishkinGraphGrid( struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     uint32_t i;
@@ -977,7 +977,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphGrid( uint32_t iterations
 }
 
 
-struct CCStats *connectedComponentsAfforestGraphGrid( uint32_t iterations, struct GraphGrid *graph)
+struct CCStats *connectedComponentsAfforestGraphGrid( struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     uint32_t i;
@@ -1175,7 +1175,7 @@ struct CCStats *connectedComponentsAfforestGraphGrid( uint32_t iterations, struc
 }
 
 
-struct CCStats *connectedComponentsWeaklyGraphGrid(uint32_t iterations, struct GraphGrid *graph)
+struct CCStats *connectedComponentsWeaklyGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     uint32_t v;
@@ -1273,24 +1273,24 @@ struct CCStats *connectedComponentsWeaklyGraphGrid(uint32_t iterations, struct G
 // ***************                  ArrayList DataStructure                      **************
 // ********************************************************************************************
 
-struct CCStats *connectedComponentsGraphAdjArrayList(uint32_t iterations, uint32_t pushpull, struct GraphAdjArrayList *graph)
+struct CCStats *connectedComponentsGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     struct CCStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // Shiloach Vishkin
-        stats = connectedComponentsShiloachVishkinGraphAdjArrayList( iterations, graph);
+        stats = connectedComponentsShiloachVishkinGraphAdjArrayList( arguments, graph);
         break;
     case 1: // Afforest
-        stats = connectedComponentsAfforestGraphAdjArrayList( iterations, graph);
+        stats = connectedComponentsAfforestGraphAdjArrayList( arguments, graph);
         break;
     case 2: // Weakly Connected
-        stats = connectedComponentsWeaklyGraphAdjArrayList( iterations, graph);
+        stats = connectedComponentsWeaklyGraphAdjArrayList( arguments, graph);
         break;
     default:// Afforest
-        stats = connectedComponentsAfforestGraphAdjArrayList( iterations, graph);
+        stats = connectedComponentsAfforestGraphAdjArrayList( arguments, graph);
         break;
     }
 
@@ -1298,7 +1298,7 @@ struct CCStats *connectedComponentsGraphAdjArrayList(uint32_t iterations, uint32
 
 }
 
-struct CCStats *connectedComponentsShiloachVishkinGraphAdjArrayList(uint32_t iterations, struct GraphAdjArrayList *graph)
+struct CCStats *connectedComponentsShiloachVishkinGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
     uint32_t v;
     uint32_t degree;
@@ -1382,7 +1382,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphAdjArrayList(uint32_t ite
 
 
 }
-struct CCStats *connectedComponentsAfforestGraphAdjArrayList(uint32_t iterations, struct GraphAdjArrayList *graph)
+struct CCStats *connectedComponentsAfforestGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     uint32_t u;
@@ -1535,7 +1535,7 @@ struct CCStats *connectedComponentsAfforestGraphAdjArrayList(uint32_t iterations
 
 
 }
-struct CCStats *connectedComponentsWeaklyGraphAdjArrayList( uint32_t iterations, struct GraphAdjArrayList *graph)
+struct CCStats *connectedComponentsWeaklyGraphAdjArrayList( struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     uint32_t v;
@@ -1631,24 +1631,24 @@ struct CCStats *connectedComponentsWeaklyGraphAdjArrayList( uint32_t iterations,
 // ***************                  LinkedList DataStructure                     **************
 // ********************************************************************************************
 
-struct CCStats *connectedComponentsGraphAdjLinkedList(uint32_t iterations, uint32_t pushpull, struct GraphAdjLinkedList *graph)
+struct CCStats *connectedComponentsGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     struct CCStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // Shiloach Vishkin
-        stats = connectedComponentsShiloachVishkinGraphAdjLinkedList( iterations, graph);
+        stats = connectedComponentsShiloachVishkinGraphAdjLinkedList( arguments, graph);
         break;
     case 1: // Afforest
-        stats = connectedComponentsAfforestGraphAdjLinkedList( iterations, graph);
+        stats = connectedComponentsAfforestGraphAdjLinkedList( arguments, graph);
         break;
     case 2: // Weakly Connected
-        stats = connectedComponentsWeaklyGraphAdjLinkedList( iterations, graph);
+        stats = connectedComponentsWeaklyGraphAdjLinkedList( arguments, graph);
         break;
     default:// Afforest
-        stats = connectedComponentsAfforestGraphAdjLinkedList( iterations, graph);
+        stats = connectedComponentsAfforestGraphAdjLinkedList( arguments, graph);
         break;
     }
 
@@ -1656,7 +1656,7 @@ struct CCStats *connectedComponentsGraphAdjLinkedList(uint32_t iterations, uint3
 
 }
 
-struct CCStats *connectedComponentsShiloachVishkinGraphAdjLinkedList(uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct CCStats *connectedComponentsShiloachVishkinGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
     uint32_t v;
     uint32_t degree;
@@ -1741,7 +1741,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphAdjLinkedList(uint32_t it
     printCCStats(stats);
     return stats;
 }
-struct CCStats *connectedComponentsAfforestGraphAdjLinkedList(uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct CCStats *connectedComponentsAfforestGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     uint32_t u;
@@ -1903,7 +1903,7 @@ struct CCStats *connectedComponentsAfforestGraphAdjLinkedList(uint32_t iteration
 
 
 }
-struct CCStats *connectedComponentsWeaklyGraphAdjLinkedList( uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct CCStats *connectedComponentsWeaklyGraphAdjLinkedList( struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     uint32_t v;

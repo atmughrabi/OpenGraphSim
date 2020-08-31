@@ -46,10 +46,10 @@ void durstenfeldShuffle(uint32_t *vertices, uint32_t size);
 // ***************					GRID DataStructure							 **************
 // ********************************************************************************************
 
-struct BellmanFordStats *bellmanFordGraphGrid(uint32_t source,  uint32_t iterations, uint32_t pushpull, struct GraphGrid *graph);
+struct BellmanFordStats *bellmanFordGraphGrid(struct Arguments *arguments, struct GraphGrid *graph);
 
-struct BellmanFordStats *bellmanFordPullRowGraphGrid(uint32_t source,  uint32_t iterations, struct GraphGrid *graph);
-struct BellmanFordStats *bellmanFordPushColumnGraphGrid(uint32_t source,  uint32_t iterations, struct GraphGrid *graph);
+struct BellmanFordStats *bellmanFordPullRowGraphGrid(struct Arguments *arguments, struct GraphGrid *graph);
+struct BellmanFordStats *bellmanFordPushColumnGraphGrid(struct Arguments *arguments, struct GraphGrid *graph);
 
 
 
@@ -57,29 +57,29 @@ struct BellmanFordStats *bellmanFordPushColumnGraphGrid(uint32_t source,  uint32
 // ***************					CSR DataStructure							 **************
 // ********************************************************************************************
 
-struct BellmanFordStats *bellmanFordGraphCSR(uint32_t source,  uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph);
+struct BellmanFordStats *bellmanFordGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 
-struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph);
-struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph);
-struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph);
+struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
+struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
+struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 void bellmanFordSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, struct GraphCSR **graphMinus);
 
 // ********************************************************************************************
 // ***************					ArrayList DataStructure					     **************
 // ********************************************************************************************
 
-struct BellmanFordStats *bellmanFordGraphAdjArrayList(uint32_t source,  uint32_t iterations, uint32_t pushpull, struct GraphAdjArrayList *graph);
+struct BellmanFordStats *bellmanFordGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph);
 
-struct BellmanFordStats *bellmanFordDataDrivenPullGraphAdjArrayList(uint32_t source,  uint32_t iterations, struct GraphAdjArrayList *graph);
-struct BellmanFordStats *bellmanFordDataDrivenPushGraphAdjArrayList(uint32_t source,  uint32_t iterations, struct GraphAdjArrayList *graph);
+struct BellmanFordStats *bellmanFordDataDrivenPullGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph);
+struct BellmanFordStats *bellmanFordDataDrivenPushGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph);
 
 // ********************************************************************************************
 // ***************					LinkedList DataStructure					 **************
 // ********************************************************************************************
 
-struct BellmanFordStats *bellmanFordGraphAdjLinkedList(uint32_t source,  uint32_t iterations, uint32_t pushpull, struct GraphAdjLinkedList *graph);
+struct BellmanFordStats *bellmanFordGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph);
 
-struct BellmanFordStats *bellmanFordPullGraphAdjLinkedList(uint32_t source,  uint32_t iterations, struct GraphAdjLinkedList *graph);
-struct BellmanFordStats *bellmanFordPushGraphAdjLinkedList(uint32_t source,  uint32_t iterations, struct GraphAdjLinkedList *graph);
+struct BellmanFordStats *bellmanFordPullGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph);
+struct BellmanFordStats *bellmanFordPushGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph);
 
 #endif

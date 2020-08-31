@@ -220,6 +220,12 @@ void readSerializeGraphDataStructure(struct Arguments *arguments)  // for now th
 void *generateGraphDataStructure(struct Arguments *arguments)
 {
 
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-25s %-25d | \n", "Number of Threads Pre :", arguments->pre_numThreads);
+    printf(" -----------------------------------------------------\n");
+
+    omp_set_num_threads(arguments->pre_numThreads);
+
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     void *graph = NULL;
 
@@ -312,7 +318,12 @@ void *generateGraphDataStructure(struct Arguments *arguments)
 
 void runGraphAlgorithms(struct Arguments *arguments, void *graph)
 {
-    // print total average stats to an external file fnameb.stats numthreads avg trial time
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-25s %-25d | \n", "Number of Threads Algo :", arguments->algo_numThreads);
+    printf(" -----------------------------------------------------\n");
+
+    omp_set_num_threads(arguments->algo_numThreads);
+
     double time_total = 0.0f;
     uint32_t  trials = arguments->trials;
 

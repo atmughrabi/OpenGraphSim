@@ -374,17 +374,17 @@ uint32_t betweennessCentralityBottomUpStepGraphCSR(struct GraphCSR *graph, struc
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-struct BetweennessCentralityStats *betweennessCentralityGraphCSR(uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph)
+struct BetweennessCentralityStats *betweennessCentralityGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
     struct BetweennessCentralityStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // Brandes
-        stats = betweennessCentralityBrandesGraphCSR(iterations, graph);
+        stats = betweennessCentralityBrandesGraphCSR(arguments, graph);
         break;
     default:// Brandes
-        stats = betweennessCentralityBrandesGraphCSR(iterations, graph);
+        stats = betweennessCentralityBrandesGraphCSR(arguments, graph);
         break;
     }
 
@@ -392,7 +392,7 @@ struct BetweennessCentralityStats *betweennessCentralityGraphCSR(uint32_t iterat
     return stats;
 }
 
-struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t iterations, struct GraphCSR *graph)
+struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     struct BetweennessCentralityStats *stats = newBetweennessCentralityStatsGraphCSR(graph);
@@ -413,7 +413,7 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 2;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t) & (stats->sigma[0]);
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
@@ -433,7 +433,7 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t
     SimRoiStart();
 #endif
 
-    for(stats->iteration = 0 ; stats->iteration  < iterations ; stats->iteration++)
+    for(stats->iteration = 0 ; stats->iteration  < arguments->iterations ; stats->iteration++)
     {
         s = generateRandomRootBetweennessCentrality(graph);
         Start(timer_inner);

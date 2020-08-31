@@ -299,27 +299,27 @@ void pageRankPrint(float *pageRankArray, uint32_t num_vertices)
 // end function
 //we assume that the edges are not sorted in each partition
 
-struct PageRankStats  *pageRankGraphGrid(double epsilon,  uint32_t iterations, uint32_t pushpull, struct GraphGrid *graph)
+struct PageRankStats  *pageRankGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     struct PageRankStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // push
-        stats = pageRankPullRowGraphGrid(epsilon, iterations, graph);
+        stats = pageRankPullRowGraphGrid(arguments, graph);
         break;
     case 1: // pull
-        stats = pageRankPushColumnGraphGrid(epsilon, iterations, graph);
+        stats = pageRankPushColumnGraphGrid(arguments, graph);
         break;
     case 2: // pull
-        stats = pageRankPullRowFixedPointGraphGrid(epsilon, iterations, graph);
+        stats = pageRankPullRowFixedPointGraphGrid(arguments, graph);
         break;
     case 3: // push
-        stats = pageRankPushColumnFixedPointGraphGrid(epsilon, iterations, graph);
+        stats = pageRankPushColumnFixedPointGraphGrid(arguments, graph);
         break;
     default:// pull
-        stats = pageRankPullRowGraphGrid(epsilon, iterations, graph);
+        stats = pageRankPullRowGraphGrid(arguments, graph);
         break;
     }
 
@@ -328,7 +328,7 @@ struct PageRankStats  *pageRankGraphGrid(double epsilon,  uint32_t iterations, u
 }
 
 
-struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterations, struct GraphGrid *graph)
+struct PageRankStats *pageRankPullRowGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     double error_total = 0.0;
@@ -349,7 +349,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Row (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -362,7 +362,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -406,7 +406,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
         }
 
 
-        #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext, stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -416,7 +416,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -442,7 +442,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -465,7 +465,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(double epsilon,  uint32_t iterati
 
 
 
-struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32_t iterations, struct GraphGrid *graph)
+struct PageRankStats *pageRankPullRowFixedPointGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     double error_total = 0.0;
@@ -486,7 +486,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Row FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -501,7 +501,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
         pageRanksNext[v] = 0;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -541,7 +541,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
         }
 
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -551,7 +551,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -577,7 +577,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -604,7 +604,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(double epsilon,  uint32
 
 
 
-struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iterations, struct GraphGrid *graph)
+struct PageRankStats *pageRankPushColumnGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     double error_total = 0.0;
@@ -625,7 +625,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Col (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -639,7 +639,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -682,7 +682,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
         }
 
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -692,7 +692,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -718,7 +718,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -740,7 +740,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(double epsilon,  uint32_t iter
 
 
 
-struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uint32_t iterations, struct GraphGrid *graph)
+struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(struct Arguments *arguments, struct GraphGrid *graph)
 {
 
     double error_total = 0.0;
@@ -761,7 +761,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Col FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -775,7 +775,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -817,7 +817,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
         }
 
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -827,7 +827,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -853,7 +853,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -882,66 +882,66 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(double epsilon,  uin
 // ********************************************************************************************
 
 
-struct PageRankStats *pageRankGraphCSR(double epsilon,  uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph)
+struct PageRankStats *pageRankGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     struct PageRankStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
 
     case 0: // pull
-        stats = pageRankPullGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullGraphCSR(arguments, graph);
         break;
     case 1: // push
-        stats = pageRankPushGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPushGraphCSR(arguments, graph);
         break;
     case 2: // pull 64bit FP
-        stats = pageRankPullFixedPoint64BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullFixedPoint64BitGraphCSR(arguments, graph);
         break;
     case 3: // push
-        stats = pageRankPushFixedPointGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPushFixedPointGraphCSR(arguments, graph);
         break;
     case 4: // pull 32bit Quant
-        stats = pageRankPullQuant32BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullQuant32BitGraphCSR(arguments, graph);
         break;
     case 5: // push
-        stats = pageRankPushQuantGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPushQuantGraphCSR(arguments, graph);
         break;
     case 6: // pull
-        stats = pageRankDataDrivenPullGraphCSR(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullGraphCSR(arguments, graph);
         break;
     case 7: // push
-        stats = pageRankDataDrivenPushGraphCSR(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPushGraphCSR(arguments, graph);
         break;
     case 8: // pullpush
-        stats = pageRankDataDrivenPullPushGraphCSR(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullPushGraphCSR(arguments, graph);
         break;
     case 9: // pull 32bit FP
-        stats = pageRankPullFixedPoint32BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullFixedPoint32BitGraphCSR(arguments, graph);
         break;
     case 10: // pull 16bit FP
-        stats = pageRankPullFixedPoint16BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullFixedPoint16BitGraphCSR(arguments, graph);
         break;
     case 11: // pull 8bit FP
-        stats = pageRankPullFixedPoint8BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullFixedPoint8BitGraphCSR(arguments, graph);
         break;
     case 12: // pull 16bit Quant
-        stats = pageRankPullQuant16BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullQuant16BitGraphCSR(arguments, graph);
         break;
     case 13: // pull 8bit Quant
-        stats = pageRankPullQuant8BitGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullQuant8BitGraphCSR(arguments, graph);
         break;
 
     // case 9: // push
-    //     pageRankDataDrivenPullFixedPointGraphCSR(epsilon, iterations, graph);
+    //     pageRankDataDrivenPullFixedPointGraphCSR(arguments, graph);
     // break;
     // case 10: // pull
-    //     pageRankDataDrivenPushFixedPointGraphCSR(epsilon, iterations, graph);
+    //     pageRankDataDrivenPushFixedPointGraphCSR(arguments, graph);
     // break;
 
     default:// pull
-        stats = pageRankPullGraphCSR(epsilon, iterations, graph);
+        stats = pageRankPullGraphCSR(arguments, graph);
         break;
     }
 
@@ -950,7 +950,7 @@ struct PageRankStats *pageRankGraphCSR(double epsilon,  uint32_t iterations, uin
 }
 
 // topoligy driven approach
-struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -974,7 +974,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
@@ -999,7 +999,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1016,7 +1016,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -1060,7 +1060,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -1070,7 +1070,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1099,7 +1099,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1118,7 +1118,7 @@ struct PageRankStats *pageRankPullGraphCSR(double epsilon,  uint32_t iterations,
     return stats;
 }
 
-struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
 
@@ -1141,7 +1141,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
@@ -1158,7 +1158,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1177,7 +1177,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -1225,7 +1225,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -1236,7 +1236,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1266,7 +1266,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1287,7 +1287,7 @@ struct PageRankStats *pageRankPushGraphCSR(double epsilon,  uint32_t iterations,
 
 
 // topoligy driven approach
-struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -1302,7 +1302,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
 
 
     // uint64_t stats->base_pr_fp = FloatToFixed64(stats->base_pr);
-    // uint64_t epsilon_fp = DoubleToFixed64(epsilon);
+    // uint64_t epsilon_fp = DoubleToFixed64(arguments->epsilon);
     // uint64_t num_vertices_fp = UInt32ToFixed64();
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Vertex *vertices = NULL;
@@ -1328,7 +1328,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint64_t);
@@ -1346,7 +1346,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_64 (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1365,7 +1365,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -1406,7 +1406,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -1417,7 +1417,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1447,7 +1447,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1467,7 +1467,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(double epsilon,  uint3
 
 }
 
-struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -1482,7 +1482,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
 
 
     // uint64_t stats->base_pr_fp = FloatToFixed64(stats->base_pr);
-    // uint64_t epsilon_fp = DoubleToFixed64(epsilon);
+    // uint64_t epsilon_fp = DoubleToFixed64(arguments->epsilon);
     // uint64_t num_vertices_fp = UInt32ToFixed64();
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Vertex *vertices = NULL;
@@ -1508,7 +1508,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
@@ -1525,7 +1525,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_32 (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1544,7 +1544,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -1585,7 +1585,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -1596,7 +1596,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1626,7 +1626,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1645,7 +1645,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(double epsilon,  uint3
 
 }
 
-struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -1660,7 +1660,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
 
 
     // uint64_t stats->base_pr_fp = FloatToFixed64(stats->base_pr);
-    // uint64_t epsilon_fp = DoubleToFixed64(epsilon);
+    // uint64_t epsilon_fp = DoubleToFixed64(arguments->epsilon);
     // uint64_t num_vertices_fp = UInt32ToFixed64();
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Vertex *vertices = NULL;
@@ -1684,7 +1684,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint16_t);
@@ -1701,7 +1701,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_16 (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1720,7 +1720,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -1761,7 +1761,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -1772,7 +1772,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1801,7 +1801,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1820,7 +1820,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(double epsilon,  uint3
 
 }
 
-struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -1835,7 +1835,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
 
 
     // uint64_t stats->base_pr_fp = FloatToFixed64(stats->base_pr);
-    // uint64_t epsilon_fp = DoubleToFixed64(epsilon);
+    // uint64_t epsilon_fp = DoubleToFixed64(arguments->epsilon);
     // uint64_t num_vertices_fp = UInt32ToFixed64();
     struct PageRankStats *stats = newPageRankStatsGraphCSR(graph);
     struct Vertex *vertices = NULL;
@@ -1861,7 +1861,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint8_t);
@@ -1878,7 +1878,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP_8 (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -1897,7 +1897,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -1938,7 +1938,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -1949,7 +1949,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -1978,7 +1978,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1997,7 +1997,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(double epsilon,  uint32
 
 }
 
-struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPushFixedPointGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -2022,7 +2022,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint64_t);
@@ -2039,7 +2039,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2059,7 +2059,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -2106,7 +2106,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -2117,7 +2117,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -2146,7 +2146,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2166,7 +2166,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(double epsilon,  uint32_t i
 
 //done by mohannad Ibranim
 //v_0: No need for next iteration's quantization parameters. (eqn 1)
-struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullQuant32BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
     //QUANT_SCALE = 32;
     uint32_t j;
@@ -2197,7 +2197,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
@@ -2214,7 +2214,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_32", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2230,7 +2230,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -2289,7 +2289,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
         SimMarker(2, iter);
 #endif
         //uint64_t temp_degree = 0;
-        #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -2299,7 +2299,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
             double error = fabs(nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
                 //temp_degree += vertices[v].in_degree;
@@ -2329,7 +2329,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2348,7 +2348,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(double epsilon,  uint32_t i
     return stats;
 }
 
-struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullQuant16BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
     //QUANT_SCALE = 32;
     uint32_t j;
@@ -2379,7 +2379,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint16_t);
@@ -2396,7 +2396,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_16", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2413,7 +2413,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -2472,7 +2472,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
         SimMarker(2, iter);
 #endif
         //uint64_t temp_degree = 0;
-        #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -2482,7 +2482,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
             double error = fabs(nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
                 //temp_degree += vertices[v].in_degree;
@@ -2512,7 +2512,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2531,7 +2531,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(double epsilon,  uint32_t i
     return stats;
 }
 
-struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPullQuant8BitGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
     //QUANT_SCALE = 32;
     uint32_t j;
@@ -2562,7 +2562,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint8_t);
@@ -2579,7 +2579,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Pull Quant_8", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2595,7 +2595,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -2656,7 +2656,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
 #endif
 
         //uint64_t temp_degree = 0;
-        #pragma omp parallel for private(v) shared(epsilon,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments,pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -2666,7 +2666,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
             double error = fabs(nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
                 //temp_degree += vertices[v].in_degree;
@@ -2696,7 +2696,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2716,7 +2716,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(double epsilon,  uint32_t it
 }
 
 //done by mohannad Ibranim
-struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankPushQuantGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
     //QUANT_SCALE = 16;
     // uint32_t i;
@@ -2736,7 +2736,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause_quant[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(uint32_t);
@@ -2753,7 +2753,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
     printf(" -----------------------------------------------------\n");
     printf("| %-30s %-19s| \n", "Starting Page Rank Push Quant_32", "(tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2771,7 +2771,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
 #endif
 
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -2829,7 +2829,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
         SimMarker(2, iter);
 #endif
 
-        #pragma omp parallel for private(v) shared(epsilon, stats,pageRanksNext) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, stats,pageRanksNext) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -2840,7 +2840,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
             double error = fabs(nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -2869,7 +2869,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2889,7 +2889,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(double epsilon,  uint32_t iterat
 
 
 
-struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankDataDrivenPullGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
 
@@ -2934,7 +2934,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 2;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
@@ -2953,7 +2953,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -2977,7 +2977,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -2997,7 +2997,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) shared(epsilon,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) shared(arguments,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3022,7 +3022,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
                 float newPageRank =  stats->base_pr + (stats->damp * nodeIncomingPR);
                 error = fabs(newPageRank - oldPageRank);
                 error_total += error / graph->num_vertices;
-                if(error >= epsilon)
+                if(error >= arguments->epsilon)
                 {
                     stats->pageRanks[v] = newPageRank;
 #ifdef CACHE_HARNESS
@@ -3081,7 +3081,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3100,7 +3100,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(double epsilon,  uint32_t i
     return stats;
 }
 
-struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankDataDrivenPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -3142,7 +3142,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 2;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
@@ -3160,7 +3160,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -3196,7 +3196,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -3207,7 +3207,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3235,7 +3235,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
                     AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
                     AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
 #endif
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
 #ifdef CACHE_HARNESS
@@ -3286,7 +3286,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3307,7 +3307,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(double epsilon,  uint32_t i
 }
 
 
-struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR *graph)
+struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     double error_total = 0.0;
@@ -3353,7 +3353,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 3;
     stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
-    stats->cache = newDoubleTaggedCache(L1_SIZE,  L1_ASSOC,  BLOCKSIZE, graph->num_vertices, POLICY, stats->numPropertyRegions);
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
 
     stats->propertyMetaData[0].base_address = (uint64_t)&riDividedOnDiClause[0];
     stats->propertyMetaData[0].size = graph->num_vertices * sizeof(float);
@@ -3374,7 +3374,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull-Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -3410,7 +3410,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     SimRoiStart();
 #endif
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -3420,7 +3420,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
         int iter = stats->iterations;
         SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3463,7 +3463,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
                     AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
                     AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (aResiduals[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
 #endif
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
                         aResiduals[u] += delta;
@@ -3514,7 +3514,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3536,17 +3536,17 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
 }
 
 
-// float* pageRankDataDrivenPullFixedPointGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR* graph){
+// float* pageRankDataDrivenPullFixedPointGraphCSR(struct Arguments *arguments, struct GraphCSR* graph){
 
 
 // }
 
-// float* pageRankDataDrivenPushFixedPointGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR* graph){
+// float* pageRankDataDrivenPushFixedPointGraphCSR(struct Arguments *arguments, struct GraphCSR* graph){
 
 
 // }
 
-// float* pageRankDataDrivenPullPushFixedPointGraphCSR(double epsilon,  uint32_t iterations, struct GraphCSR* graph){
+// float* pageRankDataDrivenPullPushFixedPointGraphCSR(struct Arguments *arguments, struct GraphCSR* graph){
 
 
 // }
@@ -3558,37 +3558,37 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(double epsilon,  uint32
 // ********************************************************************************************
 
 
-struct PageRankStats *pageRankGraphAdjArrayList(double epsilon,  uint32_t iterations, uint32_t pushpull, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     struct PageRankStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
 
     case 0: // pull
-        stats = pageRankPullGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankPullGraphAdjArrayList(arguments, graph);
         break;
     case 1: // push
-        stats = pageRankPushGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankPushGraphAdjArrayList(arguments, graph);
         break;
     case 2: // pull
-        stats = pageRankPullFixedPointGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankPullFixedPointGraphAdjArrayList(arguments, graph);
         break;
     case 3: // push
-        stats = pageRankPushFixedPointGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankPushFixedPointGraphAdjArrayList(arguments, graph);
         break;
     case 4: // pull
-        stats = pageRankDataDrivenPullGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullGraphAdjArrayList(arguments, graph);
         break;
     case 5: // push
-        stats = pageRankDataDrivenPushGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPushGraphAdjArrayList(arguments, graph);
         break;
     case 6: // pullpush
-        stats = pageRankDataDrivenPullPushGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullPushGraphAdjArrayList(arguments, graph);
         break;
     default:// push
-        stats = pageRankPullGraphAdjArrayList(epsilon, iterations, graph);
+        stats = pageRankPullGraphAdjArrayList(arguments, graph);
         break;
     }
 
@@ -3597,7 +3597,7 @@ struct PageRankStats *pageRankGraphAdjArrayList(double epsilon,  uint32_t iterat
 
 }
 
-struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankPullGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -3624,7 +3624,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -3637,7 +3637,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
         pageRanksNext[v] = 0;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -3673,7 +3673,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
             pageRanksNext[v] = nodeIncomingPR;
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -3683,7 +3683,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -3709,7 +3709,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3729,7 +3729,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(double epsilon,  uint32_t it
     return stats;
 }
 
-struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankPushGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -3766,7 +3766,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -3781,7 +3781,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -3825,7 +3825,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
             }
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -3838,7 +3838,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -3865,7 +3865,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3888,7 +3888,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(double epsilon,  uint32_t it
 
 }
 
-struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -3915,7 +3915,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -3928,7 +3928,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
         pageRanksNext[v] = 0;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -3964,7 +3964,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
             pageRanksNext[v] = nodeIncomingPR;
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -3974,7 +3974,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -4000,7 +4000,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4020,7 +4020,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(double epsilon,  u
     return stats;
 }
 
-struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -4056,7 +4056,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4071,7 +4071,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -4115,7 +4115,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
             }
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -4128,7 +4128,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -4155,7 +4155,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4177,7 +4177,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(double epsilon,  u
     return stats;
 }
 
-struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -4209,7 +4209,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4229,7 +4229,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -4244,7 +4244,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        #pragma omp parallel for default(none) shared(epsilon,riDividedOnDiClause,workListCurr,workListNext,stats,graph) private(v,Nodes) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) shared(arguments,riDividedOnDiClause,workListCurr,workListNext,stats,graph) private(v,Nodes) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -4273,7 +4273,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
                 float newPageRank =  stats->base_pr + (stats->damp * nodeIncomingPR);
                 error = fabs(newPageRank - oldPageRank);
                 error_total += error / graph->num_vertices;
-                if(error >= epsilon)
+                if(error >= arguments->epsilon)
                 {
                     stats->pageRanks[v] = newPageRank;
                     Nodes = graph->vertices[v].outNodes;
@@ -4317,7 +4317,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4334,7 +4334,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(double epsilon,  u
     return stats;
 }
 
-struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -4365,7 +4365,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  u
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4404,13 +4404,13 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  u
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -4436,7 +4436,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  u
                     #pragma omp atomic update
                     aResiduals[u] += delta;
 
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
                         if(!workListNext[u])
@@ -4476,7 +4476,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  u
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4494,7 +4494,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(double epsilon,  u
     return stats;
 }
 
-struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon,  uint32_t iterations, struct GraphAdjArrayList *graph)
+struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(struct Arguments *arguments, struct GraphAdjArrayList *graph)
 {
 
     double error_total = 0.0;
@@ -4529,7 +4529,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull-Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4569,13 +4569,13 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -4621,7 +4621,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon
                     #pragma omp atomic update
                     aResiduals[u] += delta;
 
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
                         if(!workListNext[u])
@@ -4658,7 +4658,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4682,36 +4682,36 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(double epsilon
 // ********************************************************************************************
 
 
-struct PageRankStats *pageRankGraphAdjLinkedList(double epsilon,  uint32_t iterations, uint32_t pushpull, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     struct PageRankStats *stats = NULL;
 
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // pull
-        stats = pageRankPullGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankPullGraphAdjLinkedList(arguments, graph);
         break;
     case 1: // push
-        stats = pageRankPushGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankPushGraphAdjLinkedList(arguments, graph);
         break;
     case 2: // pull
-        stats = pageRankPullFixedPointGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankPullFixedPointGraphAdjLinkedList(arguments, graph);
         break;
     case 3: // push
-        stats = pageRankPushFixedPointGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankPushFixedPointGraphAdjLinkedList(arguments, graph);
         break;
     case 4: // pull
-        stats = pageRankDataDrivenPullGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullGraphAdjLinkedList(arguments, graph);
         break;
     case 5: // push
-        stats = pageRankDataDrivenPushGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPushGraphAdjLinkedList(arguments, graph);
         break;
     case 6: // pullpush
-        stats = pageRankDataDrivenPullPushGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankDataDrivenPullPushGraphAdjLinkedList(arguments, graph);
         break;
     default:// push
-        stats = pageRankPullGraphAdjLinkedList(epsilon, iterations, graph);
+        stats = pageRankPullGraphAdjLinkedList(arguments, graph);
         break;
     }
 
@@ -4720,7 +4720,7 @@ struct PageRankStats *pageRankGraphAdjLinkedList(double epsilon,  uint32_t itera
 
 }
 
-struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankPullGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -4747,7 +4747,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4760,7 +4760,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
         pageRanksNext[v] = 0;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -4797,7 +4797,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
             pageRanksNext[v] = nodeIncomingPR;
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -4807,7 +4807,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -4833,7 +4833,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4854,7 +4854,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(double epsilon,  uint32_t i
 
 }
 
-struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankPushGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -4891,7 +4891,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -4906,7 +4906,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -4951,7 +4951,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
             }
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -4964,7 +4964,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -4991,7 +4991,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5014,7 +5014,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(double epsilon,  uint32_t i
 
 }
 
-struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -5041,7 +5041,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -5054,7 +5054,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
         pageRanksNext[v] = 0;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         error_total = 0;
         activeVertices = 0;
@@ -5091,7 +5091,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
             pageRanksNext[v] = nodeIncomingPR;
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float prevPageRank =  stats->pageRanks[v];
@@ -5101,7 +5101,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -5127,7 +5127,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5148,7 +5148,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(double epsilon,  
 
 }
 
-struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -5185,7 +5185,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push FP (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -5200,7 +5200,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
         pageRanksNext[v] = 0.0f;
     }
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -5244,12 +5244,9 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
             }
         }
 
-        #pragma omp parallel for private(v) shared(epsilon, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
+        #pragma omp parallel for private(v) shared(arguments, pageRanksNext,stats) reduction(+ : error_total, activeVertices)
         for(v = 0; v < graph->num_vertices; v++)
         {
-
-
-
             float prevPageRank =  stats->pageRanks[v];
             float nextPageRank =  stats->base_pr + (stats->damp * Fixed64ToDouble(pageRanksNext[v]));
             stats->pageRanks[v] = nextPageRank;
@@ -5257,7 +5254,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
             double error = fabs( nextPageRank - prevPageRank);
             error_total += (error / graph->num_vertices);
 
-            if(error >= epsilon)
+            if(error >= arguments->epsilon)
             {
                 activeVertices++;
             }
@@ -5284,7 +5281,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5307,7 +5304,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(double epsilon,  
 
 }
 
-struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -5344,7 +5341,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -5364,7 +5361,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
@@ -5379,12 +5376,11 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
                 riDividedOnDiClause[v] = 0.0f;
         }
 
-        #pragma omp parallel for default(none) shared(epsilon,riDividedOnDiClause,workListCurr,workListNext,stats,graph) private(v,Nodes) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) shared(arguments, riDividedOnDiClause, workListCurr, workListNext, stats, graph) private(v,Nodes) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
             {
-
                 uint32_t degree;
                 uint32_t j;
                 uint32_t u;
@@ -5409,7 +5405,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
                 float newPageRank =  stats->base_pr + (stats->damp * nodeIncomingPR);
                 error = fabs(newPageRank - oldPageRank);
                 error_total += error / graph->num_vertices;
-                if(error >= epsilon)
+                if(error >= arguments->epsilon)
                 {
                     stats->pageRanks[v] = newPageRank;
                     Nodes = graph->vertices[v].outNodes;
@@ -5453,7 +5449,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5471,7 +5467,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(double epsilon,  
 
 }
 
-struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -5511,7 +5507,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -5553,13 +5549,13 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -5587,7 +5583,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  
                     #pragma omp atomic update
                     aResiduals[u] += delta;
 
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
                         if(!workListNext[u])
@@ -5627,7 +5623,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5646,7 +5642,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(double epsilon,  
 
 }
 
-struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(double epsilon,  uint32_t iterations, struct GraphAdjLinkedList *graph)
+struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(struct Arguments *arguments, struct GraphAdjLinkedList *graph)
 {
 
     double error_total = 0.0;
@@ -5681,7 +5677,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(double epsilo
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Page Rank Pull-Push DD (tolerance/epsilon)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51.13lf | \n", epsilon);
+    printf("| %-51.13lf | \n", arguments->epsilon);
     printf(" -----------------------------------------------------\n");
     printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iteration", "Active", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
@@ -5722,13 +5718,13 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(double epsilo
     Stop(timer_inner);
     printf("| %-10s | %-8u | %-15.13lf | %-9f | \n", "Init", activeVertices, error_total, Seconds(timer_inner));
 
-    for(stats->iterations = 0; stats->iterations < iterations; stats->iterations++)
+    for(stats->iterations = 0; stats->iterations < arguments->iterations; stats->iterations++)
     {
         Start(timer_inner);
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -5777,7 +5773,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(double epsilo
                     #pragma omp atomic update
                     aResiduals[u] += delta;
 
-                    if ((fabs(prevResidual + delta) >= epsilon) && (prevResidual <= epsilon))
+                    if ((fabs(prevResidual + delta) >= arguments->epsilon) && (prevResidual <= arguments->epsilon))
                     {
                         activeVertices++;
                         if(!workListNext[u])
@@ -5814,7 +5810,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(double epsilo
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");

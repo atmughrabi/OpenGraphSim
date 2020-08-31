@@ -29,6 +29,9 @@
 #include "graphStats.h"
 #include "edgeList.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
 
 int numThreads;
 mt19937state *mt19937var;
@@ -76,8 +79,16 @@ static struct argp_option options[] =
         "\n[0]-radix-src [1]-radix-src-dest [2]-count-src [3]-count-src-dst.\n"
     },
     {
-        "num-threads",       'n', "[DEFAULT:MAX]\n",      0,
-        "\nDefault:max number of threads the system has"
+        "pre-num-threads",    'n', "[DEFAULT:MAX]\n",      0,
+        "\nNumber of threads for preprocessing (graph structure) step "
+    },
+    {
+        "algo-num-threads",   'N', "[DEFAULT:MAX]\n",      0,
+        "\nNumber of threads for graph processing (graph algorithm)"
+    },
+    {
+        "Kernel-num-threads", 'K', "[DEFAULT:algo-num-threads]\n",      0,
+        "\nNumber of threads for graph processing kernel (critical-path) (graph algorithm)"
     },
     {
         "num-iterations",    'i', "[DEFAULT:20]\n",      0,
@@ -96,11 +107,11 @@ static struct argp_option options[] =
         "\nSSSP Delta value [Default:1].\n"
     },
     {
-        "light-reorder-l1",     'l', "[ORDER:0]\n",      0,
+        "light-reorder-l1",   'l', "[ORDER:0]\n",      0,
         "\nRelabels the graph for better cache performance (first layer). [default:0]-no-reordering [1]-out-degree [2]-in-degree [3]-(in+out)-degree [4]-DBG-out [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in [8]-HUBCluster-out [9]-HUBCluster-in [10]-(random)-degree  [11]-LoadFromFile\n"
     },
     {
-        "light-reorder-l2",     'L', "[ORDER:0]\n",      0,
+        "light-reorder-l2",   'L', "[ORDER:0]\n",      0,
         "\nRelabels the graph for better cache performance (second layer). [default:0]-no-reordering [1]-out-degree [2]-in-degree [3]-(in+out)-degree [4]-DBG-out [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in [8]-HUBCluster-out [9]-HUBCluster-in [10]-(random)-degree  [11]-LoadFromFile\n"
     },
     {
@@ -177,7 +188,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
         arguments->root = atoi(arg);
         break;
     case 'n':
-        arguments->numThreads = atoi(arg);
+        arguments->pre_numThreads = atoi(arg);
+        break;
+    case 'N':
+        arguments->algo_numThreads = atoi(arg);
+        break;
+    case 'K':
+        arguments->ker_numThreads = atoi(arg);
         break;
     case 'i':
         arguments->iterations = atoi(arg);
@@ -264,28 +281,31 @@ main (int argc, char **argv)
     arguments.mmode = 0;
     arguments.lmode = 0;
     arguments.lmode_l2 = 0;
+    arguments.lmode_l3 = 0;
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
-    arguments.numThreads = omp_get_max_threads();
+    arguments.pre_numThreads  = omp_get_max_threads();
+    arguments.algo_numThreads = omp_get_max_threads();
+    arguments.ker_numThreads  = arguments.algo_numThreads;
     arguments.fnameb = NULL;
     arguments.fnamel = NULL;
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
+    initializeMersenneState (&(arguments.mt19937var), 27491095);
 
 #ifdef CACHE_HARNESS_META
-    arguments.l1_size = 524288;
-    arguments.l1_assoc = 8;
-    arguments.blocksize = 128;
-    arguments.policey = 0;
+    arguments.l1_size   = L1_SIZE;
+    arguments.l1_assoc  = L1_ASSOC;
+    arguments.blocksize = BLOCKSIZE;
+    arguments.policey   = LRU_POLICY;
 #endif
 
     void *graph = NULL;
-
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
     // numThreads =  omp_get_max_threads();
-    numThreads =  arguments.numThreads;
+    numThreads =  arguments.pre_numThreads;
 
     if(arguments.dflag)
         arguments.sort = 1;
@@ -295,14 +315,6 @@ main (int argc, char **argv)
     mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
     initializeMersenneState (mt19937var, 27491095);
 
-    omp_set_nested(1);
-    omp_set_num_threads(numThreads);
-
-
-
-    printf("*-----------------------------------------------------*\n");
-    printf("| %-25s %-25d | \n", "Number of Threads Pre :", numThreads);
-    printf(" -----------------------------------------------------\n");
 
     if(arguments.xflag) // if stats flag is on collect stats or serialize your graph
     {
@@ -314,20 +326,13 @@ main (int argc, char **argv)
         graph = generateGraphDataStructure(&arguments);
 
 
-        numThreads =  arguments.numThreads;
+        numThreads =  arguments.algo_numThreads;
         omp_set_num_threads(numThreads);
-
-        printf("*-----------------------------------------------------*\n");
-        printf("| %-25s %-25d | \n", "Number of Threads Algo :", numThreads);
-        printf(" -----------------------------------------------------\n");
 
 
         runGraphAlgorithms(graph, &arguments);
         freeGraphDataStructure(graph, arguments.datastructure);
     }
-
-
-
 
     free(timer);
     exit (0);

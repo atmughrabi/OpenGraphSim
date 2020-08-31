@@ -36,11 +36,14 @@ struct Arguments
     uint32_t symmetric;
     uint32_t weighted;
     uint32_t delta;
-    uint32_t numThreads;
+    uint32_t pre_numThreads;
+    uint32_t algo_numThreads;
+    uint32_t ker_numThreads;
     char *fnameb;
     char *fnamel;
     uint32_t fnameb_format;
     uint32_t convert_format;
+    mt19937state mt19937var;
 
 #ifdef CACHE_HARNESS_META
     uint32_t l1_size;
@@ -48,6 +51,7 @@ struct Arguments
     uint32_t blocksize;
     uint32_t policey;
 #endif
+
 };
 
 #endif

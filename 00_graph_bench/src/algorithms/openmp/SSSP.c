@@ -48,7 +48,7 @@
 // ********************************************************************************************
 // ***************                  Stats DataStructure                          **************
 // ********************************************************************************************
-struct SSSPStats *newSSSPStatsGeneral(uint32_t num_vertices, uint32_t delta)
+struct SSSPStats *newSSSPStatsGeneral(uint32_t num_vertices)
 {
 
     uint32_t v;
@@ -80,7 +80,7 @@ struct SSSPStats *newSSSPStatsGeneral(uint32_t num_vertices, uint32_t delta)
 }
 
 
-struct SSSPStats *newSSSPStatsGraphCSR(struct GraphCSR *graph, uint32_t delta)
+struct SSSPStats *newSSSPStatsGraphCSR(struct GraphCSR *graph)
 {
 
     uint32_t v;
@@ -111,7 +111,7 @@ struct SSSPStats *newSSSPStatsGraphCSR(struct GraphCSR *graph, uint32_t delta)
 
 }
 
-struct SSSPStats *newSSSPStatsGraphGrid(struct GraphGrid *graph, uint32_t delta)
+struct SSSPStats *newSSSPStatsGraphGrid(struct GraphGrid *graph)
 {
 
     uint32_t v;
@@ -141,7 +141,7 @@ struct SSSPStats *newSSSPStatsGraphGrid(struct GraphGrid *graph, uint32_t delta)
     return stats;
 }
 
-struct SSSPStats *newSSSPStatsGraphAdjArrayList(struct GraphAdjArrayList *graph, uint32_t delta)
+struct SSSPStats *newSSSPStatsGraphAdjArrayList(struct GraphAdjArrayList *graph)
 {
 
     uint32_t v;
@@ -171,7 +171,7 @@ struct SSSPStats *newSSSPStatsGraphAdjArrayList(struct GraphAdjArrayList *graph,
     return stats;
 }
 
-struct SSSPStats *newSSSPStatsGraphAdjLinkedList(struct GraphAdjLinkedList *graph, uint32_t delta)
+struct SSSPStats *newSSSPStatsGraphAdjLinkedList(struct GraphAdjLinkedList *graph)
 {
 
     uint32_t v;
@@ -447,7 +447,7 @@ void SSSPPrintStatsDetails(struct SSSPStats *stats)
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-void SSSPSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, struct GraphCSR **graphMinus, uint32_t delta)
+void SSSPSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, struct GraphCSR **graphMinus)
 {
 
     // The first subset, Ef, contains all edges (vi, vj) such that i < j; the second, Eb, contains edges (vi, vj) such that i > j.
@@ -503,7 +503,7 @@ void SSSPSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, stru
     uint32_t edgesPlus_idx = 0;
     uint32_t edgesMinus_idx = 0;
 
-    #pragma omp parallel for private(e,weight) shared(edgesMinus_idx,edgesPlus_idx, delta,edgesPlus,edgesMinus,graph)
+    #pragma omp parallel for private(e,weight) shared(edgesMinus_idx,edgesPlus_idx,edgesPlus,edgesMinus,graph)
     for(e = 0 ; e < graph->num_edges ; e++)
     {
 
@@ -583,23 +583,23 @@ int test_13(int x)
     return x;
 }
 
-struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph, uint32_t delta)
+struct SSSPStats *SSSPGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     struct SSSPStats *stats = NULL;
-    source = graph->sorted_edges_array->label_array[source];
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
     
-    switch (pushpull)
+    switch (arguments->pushpull)
     {
     case 0: // push
-        stats = SSSPDataDrivenPushGraphCSR(source, iterations, graph, delta);
-        // SSSPDataDrivenPullGraphCSR(source, iterations, graph, delta); BUGGY
+        stats = SSSPDataDrivenPushGraphCSR(arguments, graph);
+        // SSSPDataDrivenPullGraphCSR(arguments, graph); BUGGY
         break;
     case 1: // push
-        stats = SSSPDataDrivenSplitPushGraphCSR(source, iterations, graph, delta);
+        stats = SSSPDataDrivenSplitPushGraphCSR(arguments, graph);
         break;
     default:// push
-        stats = SSSPDataDrivenPushGraphCSR(source, iterations, graph, delta);
+        stats = SSSPDataDrivenPushGraphCSR(arguments, graph);
         break;
     }
 
@@ -607,12 +607,12 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 
 }
 
-// struct SSSPStats *SSSPDataDrivenPullGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph, uint32_t delta)
+// struct SSSPStats *SSSPDataDrivenPullGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 // {
 
 //     uint32_t v;
 //     uint32_t iter = 0;
-//     iterations = graph->num_vertices - 1;
+//
 
 
 //     struct SSSPStats *stats = (struct SSSPStats *) malloc(sizeof(struct SSSPStats));
@@ -644,7 +644,7 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 //     printf(" -----------------------------------------------------\n");
 //     printf("| %-51s | \n", "Starting Delta-Stepping Algorithm Pull DD (Source)");
 //     printf(" -----------------------------------------------------\n");
-//     printf("| %-51u | \n", source);
+//     printf("| %-51u | \n", arguments->source);
 //     printf(" -----------------------------------------------------\n");
 //     printf("| %-51s | \n", "Start Split Heavy/Light");
 //     printf(" -----------------------------------------------------\n");
@@ -670,7 +670,7 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 //     printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Active vertices", "Time (Seconds)");
 //     printf(" -----------------------------------------------------\n");
 
-//     if(source > graph->num_vertices)
+//     if(arguments->source > graph->num_vertices)
 //     {
 //         printf(" -----------------------------------------------------\n");
 //         printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
@@ -692,25 +692,25 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 
 //     }
 
-//     stats->parents[source] = source;
-//     stats->distances[source] = 0;
+//     stats->parents[arguments->source] = arguments->source;
+//     stats->distances[arguments->source] = 0;
 
-//     stats->buckets_map[source] = 0; // maps to bucket zero
+//     stats->buckets_map[arguments->source] = 0; // maps to bucket zero
 //     stats->bucket_counter = 1;
 //     stats->buckets_total = 1;
 //     stats->bucket_current = 0;
 
 //     activeVertices = 1;
 
-//     uint32_t degree = graph->vertices[source].out_degree;
-//     uint32_t edge_idx = graph->vertices[source].edges_idx;
+//     uint32_t degree = graph->vertices[arguments->source].out_degree;
+//     uint32_t edge_idx = graph->vertices[arguments->source].edges_idx;
 
 //     for(v = edge_idx ; v < (edge_idx + degree) ; v++)
 //     {
 
 //         uint32_t t = graph->sorted_edges_array[v].dest;
 //         stats->buckets_map[t] = stats->bucket_current;
-//         stats->parents[t] = source;
+//         stats->parents[t] = arguments->source;
 //         setBitAtomic(bitmapSetCurr, t);
 //         // activeVertices++;
 //         stats->buckets_total++;
@@ -924,21 +924,20 @@ struct SSSPStats *SSSPGraphCSR(uint32_t source,  uint32_t iterations, uint32_t p
 // }
 
 
-struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph, uint32_t delta)
+struct SSSPStats *SSSPDataDrivenPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     uint32_t v;
     uint32_t iter = 0;
 
-    iterations = graph->num_vertices - 1;
 
-    struct SSSPStats *stats = newSSSPStatsGraphCSR(graph, delta);
+    struct SSSPStats *stats = newSSSPStatsGraphCSR(graph);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Delta-Stepping Algorithm Push DD (Source)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", source);
-    if(source > graph->num_vertices)
+    printf("| %-51u | \n", arguments->source);
+    if(arguments->source > graph->num_vertices)
     {
         printf(" -----------------------------------------------------\n");
         printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
@@ -967,10 +966,10 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
     //order vertices according to degree
 
 
-    stats->parents[source] = source;
-    stats->distances[source] = 0;
+    stats->parents[arguments->source] = arguments->source;
+    stats->distances[arguments->source] = 0;
 
-    stats->buckets_map[source] = 0; // maps to bucket zero
+    stats->buckets_map[arguments->source] = 0; // maps to bucket zero
     stats->bucket_counter = 1;
     stats->buckets_total = 1;
     stats->bucket_current = 0;
@@ -1084,21 +1083,20 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(uint32_t source,  uint32_t iteratio
 }
 
 
-struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t iterations, struct GraphCSR *graph, uint32_t delta)
+struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph)
 {
 
     uint32_t v;
     uint32_t iter = 0;
 
-    iterations = graph->num_vertices - 1;
 
-    struct SSSPStats *stats = newSSSPStatsGraphCSR(graph, delta);
+    struct SSSPStats *stats = newSSSPStatsGraphCSR(graph);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Delta-Stepping Algorithm Push DD (Source)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", source);
-    if(source > graph->num_vertices)
+    printf("| %-51u | \n", arguments->source);
+    if(arguments->source > graph->num_vertices)
     {
         printf(" -----------------------------------------------------\n");
         printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
@@ -1153,10 +1151,10 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(uint32_t source,  uint32_t ite
     //order vertices according to degree
 
 
-    stats->parents[source] = source;
-    stats->distances[source] = 0;
+    stats->parents[arguments->source] = arguments->source;
+    stats->distances[arguments->source] = 0;
 
-    stats->buckets_map[source] = 0; // maps to bucket zero
+    stats->buckets_map[arguments->source] = 0; // maps to bucket zero
     stats->bucket_counter = 1;
     stats->buckets_total = 1;
     stats->bucket_current = 0;

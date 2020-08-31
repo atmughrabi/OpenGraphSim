@@ -39,12 +39,13 @@ struct BetweennessCentralityStats
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     double time_total;
-    
+
 #ifdef CACHE_HARNESS_META
     uint32_t numPropertyRegions;
     struct PropertyMetaData *propertyMetaData;
     struct DoubleTaggedCache *cache;
 #endif
+
 };
 
 struct BetweennessCentralityStats *newBetweennessCentralityStatsGraphCSR(struct GraphCSR *graph);
@@ -70,8 +71,8 @@ uint32_t betweennessCentralityBottomUpStepGraphCSR(struct GraphCSR *graph, struc
 // ***************                  CSR DataStructure                            **************
 // ********************************************************************************************
 
-struct BetweennessCentralityStats *betweennessCentralityGraphCSR(uint32_t iterations, uint32_t pushpull, struct GraphCSR *graph);
-struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(uint32_t iterations, struct GraphCSR *graph);
+struct BetweennessCentralityStats *betweennessCentralityGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
+struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 
 
 #endif
