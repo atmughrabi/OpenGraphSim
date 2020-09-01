@@ -66,8 +66,7 @@ main (int argc, char **argv)
         "LAW-amazon-2008",
         "LAW-cnr-2000",
         "LAW-dblp-2010",
-        "LAW-enron",
-        "SNAP-web-Google"
+        "LAW-enron"
     };
 
     char *benchmarks_dir[GRAPH_NUM] =
@@ -75,8 +74,7 @@ main (int argc, char **argv)
         "../01_test_graphs/LAW/LAW-amazon-2008",
         "../01_test_graphs/LAW/LAW-cnr-2000",
         "../01_test_graphs/LAW/LAW-dblp-2010",
-        "../01_test_graphs/LAW/LAW-enron",
-        "../01_test_graphs/SNAP/SNAP-web-Google"
+        "../01_test_graphs/LAW/LAW-enron"
     };
 
     // char *benchmarks_graphs[GRAPH_NUM] =
