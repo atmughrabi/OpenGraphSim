@@ -154,7 +154,7 @@ main (int argc, char **argv)
     arguments.iterations = 200;
     arguments.trials = 100;
     arguments.epsilon = 0.0001;
-    arguments.root = 5319;
+    arguments.source = 5319;
     arguments.algorithm = 1;
     arguments.datastructure = 0;
     arguments.pushpull = 0;
@@ -163,10 +163,10 @@ main (int argc, char **argv)
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
-    
-    arguments.pre_numThreads = 4;
-    arguments.algo_numThreads = 4;
-    arguments.ker_numThreads = 4;
+
+    arguments.pre_numThreads  = omp_get_max_threads();
+    arguments.algo_numThreads = omp_get_max_threads();
+    arguments.ker_numThreads = 1;
 
     arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
@@ -181,17 +181,14 @@ main (int argc, char **argv)
     arguments.lmode_l3 = 0;
     arguments.mmode = 0;
 
+#ifdef CACHE_HARNESS_META
+    arguments.l1_size   = L1_SIZE;
+    arguments.l1_assoc  = L1_ASSOC;
+    arguments.blocksize = BLOCKSIZE;
+    arguments.policey   = LRU_POLICY;
+#endif
+
     void *graph = NULL;
-
-
-    struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
-
-    printf("*-----------------------------------------------------*\n");
-    printf("| %-20s %-30u | \n", "Number of Threads :", numThreads);
-    printf(" -----------------------------------------------------\n");
-
-    // char *fname_perf = (char *) my_malloc((strlen(arguments.fnameb) + 50) * sizeof(char));
-
 
     uint32_t i = 0;
     uint32_t j = 0;
@@ -222,7 +219,7 @@ main (int argc, char **argv)
 
                 graph = generateGraphDataStructure(&arguments);
 
-                arguments.root = generateRandomRootGeneral(&arguments, graph); // random root each trial
+                arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
 
@@ -236,10 +233,6 @@ main (int argc, char **argv)
         }
     }
 
-
-
-
-    free(timer);
     exit (0);
 }
 
