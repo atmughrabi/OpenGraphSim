@@ -46,13 +46,6 @@
 // #define POLICY GRASPXP_POLICY
 // #define POLICY MASK_POLICY
 
-#ifndef POLICY1
-#define POLICY1 PLRU_POLICY
-#define POLICY2 SRRIP_POLICY
-#define POLICY3 GRASP_POLICY
-#define POLICY4 MASK_POLICY
-#endif
-
 // #define BLOCKSIZE   64
 // #define L1_SIZE     1048576
 // #define L1_ASSOC    16

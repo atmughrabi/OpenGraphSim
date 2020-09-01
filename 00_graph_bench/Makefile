@@ -234,13 +234,13 @@ $(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim : $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$
 	@$(CC) $(CFLAGS) -o $@ $^  $(LFLAGS)
 
 $(APP_DIR)/$(OBJ_DIR)/$(MAIN_DIR)/$(APP).o : $(APP_DIR)/$(SRC_DIR)/$(MAIN_DIR)/$(APP).c $(ALL_HEADER_FILES)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(TEST_DIR)/$(APP_TEST).o : $(APP_DIR)/$(SRC_DIR)/$(TEST_DIR)/$(APP_TEST).c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(UTIL_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(UTIL_DIR)/%.c $(INC_FILES_UTIL)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c $(ALL_HEADER_FILES)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
@@ -252,13 +252,13 @@ $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/sniper/%.o : $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)
 	$(CC) $(CFLAGS) $(OPENMP_INC) $(SNIPER_INC) $(SNIPER_CFLAGS) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(CACHE_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(CACHE_DIR)/%.c $(INC_FILES_CACHE)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(PREPRO_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(PREPRO_DIR)/%.c $(INC_FILES_PREPRO)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 $(APP_DIR)/$(OBJ_DIR)/$(STRUCT_DIR)/%.o : $(APP_DIR)/$(SRC_DIR)/$(STRUCT_DIR)/%.c $(INC_FILES_STRUCT)
-	$(CC) $(CFLAGS) $(OPENMP_INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OPENMP_INC) $(MODE) -c -o $@ $<
 
 .PHONY: clean
 clean:
@@ -305,10 +305,10 @@ run-cache: INTEGRATION  = openmp
 run-cache: app-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-cachesim -f $(FILE_BIN) $(ARGS)
 
-.PHONY: sim-cache
-sim-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
-sim-cache: INTEGRATION  = openmp
-sim-cache: test-cache
+.PHONY: sweep-cache
+sweep-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
+sweep-cache: INTEGRATION  = openmp
+sweep-cache: test-cache
 	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS) >> $(APP_DIR)/cache-results/full_results.perf
 
 # http://snipersim.org/w/Multiple_regions_of_interest

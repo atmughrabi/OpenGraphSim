@@ -283,9 +283,11 @@ main (int argc, char **argv)
     arguments->pushpull = 0;
     arguments->sort = 0;
     arguments->mmode = 0;
+    
     arguments->lmode = 0;
     arguments->lmode_l2 = 0;
     arguments->lmode_l3 = 0;
+
     arguments->symmetric = 0;
     arguments->weighted = 0;
     arguments->delta = 1;
@@ -302,7 +304,7 @@ main (int argc, char **argv)
     arguments->l1_size   = L1_SIZE;
     arguments->l1_assoc  = L1_ASSOC;
     arguments->blocksize = BLOCKSIZE;
-    arguments->policey   = LRU_POLICY;
+    arguments->policey   = POLICY;
 #endif
 
     void *graph = NULL;

@@ -114,7 +114,7 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 0
+export REORDER_LAYER1 	?= 10
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 export DATA_STRUCTURES  ?= 0
@@ -126,7 +126,7 @@ export DELTA			?= 800
 
 export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_KER  ?= 1
 export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
@@ -136,7 +136,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 0
 
 ##################################################
 
@@ -169,9 +169,9 @@ run:
 run-cache:
 	$(MAKE) run-cache $(MAKE_ARGS)
 
-.PHONY: sim-cache
-sim-cache:
-	$(MAKE) sim-cache $(MAKE_ARGS)
+.PHONY: sweep-cache
+sweep-cache:
+	$(MAKE) sweep-cache $(MAKE_ARGS)
 
 .PHONY: run-sniper
 run-sniper:
