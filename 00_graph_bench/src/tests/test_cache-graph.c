@@ -163,9 +163,11 @@ main (int argc, char **argv)
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
+    
     arguments.pre_numThreads = 4;
     arguments.algo_numThreads = 4;
     arguments.ker_numThreads = 4;
+
     arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
@@ -220,7 +222,7 @@ main (int argc, char **argv)
 
                 graph = generateGraphDataStructure(&arguments);
 
-                arguments.root = generateRandomRootGeneral(graph, &arguments); // random root each trial
+                arguments.root = generateRandomRootGeneral(&arguments, graph); // random root each trial
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
 

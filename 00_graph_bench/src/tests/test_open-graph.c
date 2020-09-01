@@ -71,12 +71,14 @@ main (int argc, char **argv)
     arguments.lmode_l2 = 0;
     arguments.lmode_l3 = 0;
     arguments.mmode = 0;
+
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
     arguments.pre_numThreads = 4;
     arguments.algo_numThreads = 4;
     arguments.ker_numThreads = 4;
+    
     arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
