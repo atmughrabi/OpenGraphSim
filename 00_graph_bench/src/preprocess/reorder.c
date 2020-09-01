@@ -1284,52 +1284,59 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
     mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
     initializeMersenneState (mt19937var, 27491095);
 
-    #pragma omp parallel for default(none) private(i,src,dest) shared(mt19937var,edgeList,degrees,lmode)
-    for(i = 0; i < edgeList->num_edges; i++)
+    if(lmode != 10)
     {
-        src  = edgeList->edges_array_src[i];
-        dest = edgeList->edges_array_dest[i];
+        #pragma omp parallel for default(none) private(i,src,dest) shared(edgeList,degrees,lmode)
+        for(i = 0; i < edgeList->num_edges; i++)
+        {
+            src  = edgeList->edges_array_src[i];
+            dest = edgeList->edges_array_dest[i];
 
-        switch(lmode)
-        {
-        case 1 :
-        case 4 :
-        case 6 :
-        case 8 :
-        {
-            #pragma omp atomic update
-            degrees[src]++;
-        } // degree
-        break;
-        case 2 :
-        case 5 :
-        case 7 :
-        case 9 :
-        {
-            #pragma omp atomic update
-            degrees[dest]++;
+            switch(lmode)
+            {
+            case 1 :
+            case 4 :
+            case 6 :
+            case 8 :
+            {
+                #pragma omp atomic update
+                degrees[src]++;
+            } // degree
+            break;
+            case 2 :
+            case 5 :
+            case 7 :
+            case 9 :
+            {
+                #pragma omp atomic update
+                degrees[dest]++;
+            }
+            break;
+            case 3 :
+            {
+                #pragma omp atomic update
+                degrees[dest]++;
+                #pragma omp atomic update
+                degrees[src]++;
+            }
+            break;
+            default :
+            {
+                #pragma omp atomic update
+                degrees[src]++;
+            }// out-degree
+            }
         }
-        break;
-        case 3 :
-        {
-            #pragma omp atomic update
-            degrees[dest]++;
-            #pragma omp atomic update
-            degrees[src]++;
-        }
-        break;
-        case 10  :
-        {
-            degrees[src] = (generateRandInt(mt19937var) % edgeList->num_vertices) + 1;
-        }
-        break;
-        default :
-        {
-            #pragma omp atomic update
-            degrees[src]++;
-        }// out-degree
-        }
+    }
 
+
+    if(lmode == 10)
+    {
+        #pragma omp parallel for firstprivate(mt19937var)
+        for (i = 0; i < edgeList->num_vertices; ++i)
+        {
+            degrees[i] = (generateRandInt(mt19937var) % edgeList->num_vertices) + omp_get_thread_num();
+        }
     }
 
     free(mt19937var);

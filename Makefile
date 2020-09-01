@@ -54,9 +54,9 @@ export MAIN_DIR		  	= main
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
 # export GRAPH_SUIT ?= TEST
-export GRAPH_SUIT ?= LAW
+# export GRAPH_SUIT ?= LAW
 # export GRAPH_SUIT ?= GAP
-# export GRAPH_SUIT ?= SNAP
+export GRAPH_SUIT ?= SNAP
 # export GRAPH_SUIT ?= KONECT
 # export GRAPH_SUIT ?= GONG
 
@@ -77,7 +77,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= SNAP-com-Orkut
 # export GRAPH_NAME ?= SNAP-soc-LiveJournal1
 # export GRAPH_NAME ?= SNAP-soc-Pokec
-# export GRAPH_NAME ?= SNAP-web-Google
+export GRAPH_NAME ?= SNAP-web-Google
 
 # KONECT # http://konect.cc/networks/wikipedia_link_en/
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
@@ -87,7 +87,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -115,7 +115,7 @@ export PULL_PUSH 		?= 0
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 10
-export REORDER_LAYER2   ?= 0
+export REORDER_LAYER2   ?= 4
 export REORDER_LAYER3   ?= 0
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 1

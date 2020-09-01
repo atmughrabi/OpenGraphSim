@@ -46,9 +46,9 @@
 // #define POLICY GRASPXP_POLICY
 // #define POLICY MASK_POLICY
 
-// #define BLOCKSIZE   64
-// #define L1_SIZE     1048576
-// #define L1_ASSOC    16
+#define BLOCKSIZE   64
+#define L1_SIZE     1048576
+#define L1_ASSOC    16
 
 // #define BLOCKSIZE   64
 // #define L1_SIZE     1048576
@@ -58,9 +58,9 @@
 // #define L1_SIZE     262144
 // #define L1_ASSOC    8
 
-#define BLOCKSIZE   128
-#define L1_SIZE     524288
-#define L1_ASSOC    8
+// #define BLOCKSIZE   128
+// #define L1_SIZE     524288
+// #define L1_ASSOC    8
 
 // #define BLOCKSIZE   128
 // #define L1_SIZE     262144 + 32768 + 32768
