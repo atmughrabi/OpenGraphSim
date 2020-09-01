@@ -5,10 +5,10 @@
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-# export APP_TEST           ?=  test_open-graph
+export APP_TEST           ?=  test_open-graph
 # export APP_TEST           ?=  pagerRank-accuracy-report
 # export APP_TEST           ?=  test_grasp-cache
-export APP_TEST           ?=  test_cache-graph
+# export APP_TEST           ?=  test_cache-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -118,14 +118,15 @@ export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 4
 export REORDER_LAYER2   ?= 0
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 1
+export ALGORITHMS 		?= 0
 
 export ROOT 			?= 13373
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 
-export NUM_THREADS  	?= 8
-# export NUM_THREADS  	?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
@@ -148,7 +149,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
+export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -b $(DELTA)
 ##################################################
 ##################################################
 

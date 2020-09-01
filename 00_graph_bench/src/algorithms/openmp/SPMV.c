@@ -261,7 +261,7 @@ struct SPMVStats *SPMVPullRowGraphGrid( struct Arguments *arguments, struct Grap
         }
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -278,7 +278,7 @@ struct SPMVStats *SPMVPullRowGraphGrid( struct Arguments *arguments, struct Grap
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -349,7 +349,7 @@ struct SPMVStats *SPMVPushColumnGraphGrid( struct Arguments *arguments, struct G
         }
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -366,7 +366,7 @@ struct SPMVStats *SPMVPushColumnGraphGrid( struct Arguments *arguments, struct G
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -447,7 +447,7 @@ struct SPMVStats *SPMVPullRowFixedPointGraphGrid( struct Arguments *arguments, s
         }
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -471,7 +471,7 @@ struct SPMVStats *SPMVPullRowFixedPointGraphGrid( struct Arguments *arguments, s
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -557,7 +557,7 @@ struct SPMVStats *SPMVPushColumnFixedPointGraphGrid( struct Arguments *arguments
         }
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -581,7 +581,7 @@ struct SPMVStats *SPMVPushColumnFixedPointGraphGrid( struct Arguments *arguments
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -738,7 +738,7 @@ struct SPMVStats *SPMVPullGraphCSR( struct Arguments *arguments, struct GraphCSR
 #endif
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -758,7 +758,7 @@ struct SPMVStats *SPMVPullGraphCSR( struct Arguments *arguments, struct GraphCSR
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 #ifdef CACHE_HARNESS
@@ -852,7 +852,7 @@ struct SPMVStats *SPMVPushGraphCSR( struct Arguments *arguments, struct GraphCSR
 #endif
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -874,7 +874,7 @@ struct SPMVStats *SPMVPushGraphCSR( struct Arguments *arguments, struct GraphCSR
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1023,7 +1023,7 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( struct Arguments *arguments, struc
 #endif
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1051,7 +1051,7 @@ struct SPMVStats *SPMVPullFixedPointGraphCSR( struct Arguments *arguments, struc
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 #ifdef CACHE_HARNESS
@@ -1160,7 +1160,7 @@ struct SPMVStats *SPMVPushFixedPointGraphCSR( struct Arguments *arguments, struc
         SimMarker(2, iter);
 #endif
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1187,7 +1187,7 @@ struct SPMVStats *SPMVPushFixedPointGraphCSR( struct Arguments *arguments, struc
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1296,7 +1296,7 @@ struct SPMVStats *SPMVPullGraphAdjArrayList( struct Arguments *arguments, struct
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1313,7 +1313,7 @@ struct SPMVStats *SPMVPullGraphAdjArrayList( struct Arguments *arguments, struct
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1382,7 +1382,7 @@ struct SPMVStats *SPMVPushGraphAdjArrayList( struct Arguments *arguments, struct
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1398,7 +1398,7 @@ struct SPMVStats *SPMVPushGraphAdjArrayList( struct Arguments *arguments, struct
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1485,7 +1485,7 @@ struct SPMVStats *SPMVPullFixedPointGraphAdjArrayList( struct Arguments *argumen
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1510,7 +1510,7 @@ struct SPMVStats *SPMVPullFixedPointGraphAdjArrayList( struct Arguments *argumen
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1590,7 +1590,7 @@ struct SPMVStats *SPMVPushFixedPointGraphAdjArrayList( struct Arguments *argumen
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1614,7 +1614,7 @@ struct SPMVStats *SPMVPushFixedPointGraphAdjArrayList( struct Arguments *argumen
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1724,7 +1724,7 @@ struct SPMVStats *SPMVPullGraphAdjLinkedList( struct Arguments *arguments, struc
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1741,7 +1741,7 @@ struct SPMVStats *SPMVPullGraphAdjLinkedList( struct Arguments *arguments, struc
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1809,7 +1809,7 @@ struct SPMVStats *SPMVPushGraphAdjLinkedList( struct Arguments *arguments, struc
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1826,7 +1826,7 @@ struct SPMVStats *SPMVPushGraphAdjLinkedList( struct Arguments *arguments, struc
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -1907,7 +1907,7 @@ struct SPMVStats *SPMVPullFixedPointGraphAdjLinkedList( struct Arguments *argume
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -1932,7 +1932,7 @@ struct SPMVStats *SPMVPullFixedPointGraphAdjLinkedList( struct Arguments *argume
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 
@@ -2013,7 +2013,7 @@ struct SPMVStats *SPMVPushFixedPointGraphAdjLinkedList( struct Arguments *argume
 
 
         Stop(timer_inner);
-        printf("| %-21u | %-27f | \n", stats->arguments, Seconds(timer_inner));
+        printf("| %-21u | %-27f | \n", stats->iterations, Seconds(timer_inner));
 
     }// end iteration loop
 
@@ -2038,7 +2038,7 @@ struct SPMVStats *SPMVPushFixedPointGraphAdjLinkedList( struct Arguments *argume
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15s | %-15s | \n", "Iterations", "Sum", "Time (S)");
     printf(" -----------------------------------------------------\n");
-    printf("| %-15u | %-15lf | %-15f | \n", stats->arguments, sum, stats->time_total);
+    printf("| %-15u | %-15lf | %-15f | \n", stats->iterations, sum, stats->time_total);
     printf(" -----------------------------------------------------\n");
 
 

@@ -81,7 +81,9 @@ PULL_PUSH       ?= 2
 TOLERANCE       ?= 1e-8
 DELTA           ?= 800
 
-NUM_THREADS     ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_PRE     ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_ALGO     ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_KER     ?= $(shell grep -c ^processor /proc/cpuinfo)
 NUM_ITERATIONS  ?= 1
 NUM_TRIALS      ?= 1
 
@@ -93,7 +95,7 @@ BIN_SIZE        ?= 512
 INOUT_STATS     ?= 0
 MASK_MODE       ?= 0
 
-ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER_LAYER1) -b $(DELTA)
+ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER_LAYER1) -b $(DELTA)
 
 
 ##############################################

@@ -1035,7 +1035,7 @@ struct PageRankStats *pageRankPullGraphCSR(struct Arguments *arguments, struct G
         SimMarker(1, iter);
 #endif
 
-        // #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             float nodeIncomingPR = 0.0f;
@@ -3207,7 +3207,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3420,7 +3420,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(struct Arguments *argum
         int iter = stats->iterations;
         SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -4410,7 +4410,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(struct Arguments *
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -4575,7 +4575,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(struct Argumen
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -5555,7 +5555,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(struct Arguments 
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -5724,7 +5724,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(struct Argume
         error_total = 0;
         activeVertices = 0;
 
-        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments->epsilon,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(Nodes,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])

@@ -20,6 +20,7 @@
 
 struct CCStats
 {
+    uint32_t iterations;
     uint32_t neighbor_rounds;
     struct Arguments *arguments;
     uint32_t num_vertices;

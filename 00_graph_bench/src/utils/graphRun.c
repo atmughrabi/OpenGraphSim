@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <omp.h>
 
 #include "mt19937.h"
 #include "graphConfig.h"
@@ -221,7 +222,7 @@ void *generateGraphDataStructure(struct Arguments *arguments)
 {
 
     printf("*-----------------------------------------------------*\n");
-    printf("| %-25s %-25d | \n", "Number of Threads Pre :", arguments->pre_numThreads);
+    printf("| %-35s %-15d | \n", "Number of Threads Preprocessing:", arguments->pre_numThreads);
     printf(" -----------------------------------------------------\n");
 
     omp_set_num_threads(arguments->pre_numThreads);
@@ -319,9 +320,11 @@ void *generateGraphDataStructure(struct Arguments *arguments)
 void runGraphAlgorithms(struct Arguments *arguments, void *graph)
 {
     printf("*-----------------------------------------------------*\n");
-    printf("| %-25s %-25d | \n", "Number of Threads Algo :", arguments->algo_numThreads);
+    printf("| %-35s %-15d | \n", "Number of Threads Algorithm :", arguments->algo_numThreads);
     printf(" -----------------------------------------------------\n");
-
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-35s %-15d | \n", "Number of Threads Kernel    :", arguments->ker_numThreads);
+    printf(" -----------------------------------------------------\n");
     omp_set_num_threads(arguments->algo_numThreads);
 
     double time_total = 0.0f;
@@ -420,7 +423,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
         break;
         }
 
-        arguments->root = generateRandomRootGeneral(arguments, graph);
+        arguments->source = generateRandomRootGeneral(arguments, graph);
         trials--;
     }
 
@@ -432,7 +435,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
         sprintf(fname_txt, "%s_%d_%d_%d_%d.%s", arguments->fnameb, arguments->algorithm, arguments->datastructure, arguments->trials, arguments->pushpull, "perf");
         FILE *fptr;
         fptr = fopen(fname_txt, "a+");
-        fprintf(fptr, "%u %lf \n", arguments->numThreads, (time_total / (double)arguments->trials));
+        fprintf(fptr, "%u %lf \n", arguments->algo_numThreads, (time_total / (double)arguments->trials));
         fclose(fptr);
         free(fname_txt);
     }
@@ -441,19 +444,19 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
 uint32_t generateRandomRootGraphCSR(struct GraphCSR *graph)
 {
 
-    uint32_t root = 0;
+    uint32_t source = 0;
 
     while(1)
     {
-        root = generateRandInt(mt19937var);
-        if(root < graph->num_vertices)
+        source = generateRandInt(mt19937var);
+        if(source < graph->num_vertices)
         {
-            if(graph->vertices->out_degree[root] > 0)
+            if(graph->vertices->out_degree[source] > 0)
                 break;
         }
     }
 
-    return root;
+    return source;
 
 }
 
@@ -461,57 +464,57 @@ uint32_t generateRandomRootGraphCSR(struct GraphCSR *graph)
 uint32_t generateRandomRootGraphGrid(struct GraphGrid *graph)
 {
 
-    uint32_t root = 0;
+    uint32_t source = 0;
 
     while(1)
     {
-        root = generateRandInt(mt19937var);
-        if(root < graph->num_vertices)
+        source = generateRandInt(mt19937var);
+        if(source < graph->num_vertices)
         {
-            if(graph->grid->out_degree[root] > 0)
+            if(graph->grid->out_degree[source] > 0)
                 break;
         }
     }
 
-    return root;
+    return source;
 
 }
 
 uint32_t generateRandomRootGraphAdjLinkedList(struct GraphAdjLinkedList *graph)
 {
 
-    uint32_t root = 0;
+    uint32_t source = 0;
 
     while(1)
     {
-        root = generateRandInt(mt19937var);
-        if(root < graph->num_vertices)
+        source = generateRandInt(mt19937var);
+        if(source < graph->num_vertices)
         {
-            if(graph->vertices[root].out_degree > 0)
+            if(graph->vertices[source].out_degree > 0)
                 break;
         }
     }
 
-    return root;
+    return source;
 
 }
 
 uint32_t generateRandomRootGraphAdjArrayList(struct GraphAdjArrayList *graph)
 {
 
-    uint32_t root = 0;
+    uint32_t source = 0;
 
     while(1)
     {
-        root = generateRandInt(mt19937var);
-        if(root < graph->num_vertices)
+        source = generateRandInt(mt19937var);
+        if(source < graph->num_vertices)
         {
-            if(graph->vertices[root].out_degree > 0)
+            if(graph->vertices[source].out_degree > 0)
                 break;
         }
     }
 
-    return root;
+    return source;
 
 }
 
@@ -527,31 +530,31 @@ uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
     {
     case 0: // CSR
         graphCSR = (struct GraphCSR *)graph;
-        arguments->root = generateRandomRootGraphCSR(graphCSR);
+        arguments->source = generateRandomRootGraphCSR(graphCSR);
         break;
 
     case 1: // Grid
         graphGrid = (struct GraphGrid *)graph;
-        arguments->root = generateRandomRootGraphGrid(graphGrid);
+        arguments->source = generateRandomRootGraphGrid(graphGrid);
         break;
 
     case 2: // Adj Linked List
         graphAdjLinkedList = (struct GraphAdjLinkedList *)graph;
-        arguments->root = generateRandomRootGraphAdjLinkedList(graphAdjLinkedList);
+        arguments->source = generateRandomRootGraphAdjLinkedList(graphAdjLinkedList);
         break;
 
     case 3: // Adj Array List
         graphAdjArrayList = (struct GraphAdjArrayList *)graph;
-        arguments->root = generateRandomRootGraphAdjArrayList(graphAdjArrayList);
+        arguments->source = generateRandomRootGraphAdjArrayList(graphAdjArrayList);
         break;
 
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
-        arguments->root = generateRandomRootGraphCSR(graphCSR);
+        arguments->source = generateRandomRootGraphCSR(graphCSR);
         break;
     }
 
-    return arguments->root;
+    return arguments->source;
 
 }
 

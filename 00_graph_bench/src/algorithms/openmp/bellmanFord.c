@@ -417,7 +417,7 @@ struct BellmanFordStats *bellmanFordPullRowGraphGrid(struct Arguments *arguments
     struct BellmanFordStats *stats = newBellmanFordStatsGraphGrid(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm ROW-WISE DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm ROW-WISE DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -474,7 +474,7 @@ struct BellmanFordStats *bellmanFordPullRowGraphGrid(struct Arguments *arguments
         activeVertices = 0;
 
         uint32_t i;
-        #pragma omp parallel for private(i) reduction(+ : activeVertices) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(i) reduction(+ : activeVertices) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)  // iterate over partitions rowwise
         {
             uint32_t j;
@@ -496,7 +496,7 @@ struct BellmanFordStats *bellmanFordPullRowGraphGrid(struct Arguments *arguments
 
                     if(getBit(bitmapCurr, src))
                     {
-                        if(numThreads == 1)
+                        if(arguments->algo_numThreads == 1)
                             activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                         else
                             activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -546,7 +546,7 @@ struct BellmanFordStats *bellmanFordPushColumnGraphGrid(struct Arguments *argume
     struct BellmanFordStats *stats = newBellmanFordStatsGraphGrid(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm COL-WISE DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm COL-WISE DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -597,11 +597,11 @@ struct BellmanFordStats *bellmanFordPushColumnGraphGrid(struct Arguments *argume
         activeVertices = 0;
 
         uint32_t j;
-        #pragma omp parallel for private(j) reduction(+ : activeVertices) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(j) reduction(+ : activeVertices) schedule (dynamic,arguments->algo_numThreads)
         for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
         {
             uint32_t i;
-            // #pragma omp parallel for private(i) reduction(+ : activeVertices) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(i) reduction(+ : activeVertices) schedule (dynamic,arguments->algo_numThreads)
             for (i = 0; i < totalPartitions; ++i)
             {
                 uint32_t k;
@@ -619,7 +619,7 @@ struct BellmanFordStats *bellmanFordPushColumnGraphGrid(struct Arguments *argume
 
                     if(getBit(bitmapCurr, src))
                     {
-                        // if(numThreads == 1)
+                        // if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                         // else
                         // activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -802,7 +802,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(struct Arguments *arg
     struct BellmanFordStats *stats = newBellmanFordStatsGraphCSR(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -983,7 +983,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(struct Arguments *arg
     struct BellmanFordStats *stats = newBellmanFordStatsGraphCSR(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -1060,7 +1060,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphCSR(struct Arguments *arg
                     weight = graph->sorted_edges_array->edges_array_weight[j];
 #endif
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                     else
                         activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -1139,7 +1139,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
 
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD");
-    printf("| %-51s | \n", "Randomized G+/G- optimization (arguments->Source)");
+    printf("| %-51s | \n", "Randomized G+/G- optimization (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
 
@@ -1248,7 +1248,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
                     weight = graphPlus->sorted_edges_array->edges_array_weight[j];
 #endif
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                     else
                         activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -1284,7 +1284,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
 #endif
 
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                     else
                         activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -1372,7 +1372,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphAdjArrayList(struct Argum
     struct BellmanFordStats *stats = newBellmanFordStatsGraphAdjArrayList(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -1541,7 +1541,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphAdjArrayList(struct Argum
     struct BellmanFordStats *stats = newBellmanFordStatsGraphAdjArrayList(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -1613,7 +1613,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPushGraphAdjArrayList(struct Argum
                     weight = nodes->edges_array_weight[j];
 #endif
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(src, dest, weight, stats, bitmapNext);
                     else
                         activeVertices += bellmanFordAtomicRelax(src, dest, weight, stats, bitmapNext);
@@ -1690,7 +1690,7 @@ struct BellmanFordStats *bellmanFordPullGraphAdjLinkedList(struct Arguments *arg
     struct BellmanFordStats *stats = newBellmanFordStatsGraphAdjLinkedList(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Pull DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -1862,7 +1862,7 @@ struct BellmanFordStats *bellmanFordPushGraphAdjLinkedList(struct Arguments *arg
     struct BellmanFordStats *stats = newBellmanFordStatsGraphAdjLinkedList(graph);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (arguments->Source)");
+    printf("| %-51s | \n", "Starting Bellman-Ford Algorithm Push DD (Source)");
     printf(" -----------------------------------------------------\n");
     printf("| %-51u | \n", arguments->source);
     printf(" -----------------------------------------------------\n");
@@ -1934,7 +1934,7 @@ struct BellmanFordStats *bellmanFordPushGraphAdjLinkedList(struct Arguments *arg
 #endif
                     nodes = nodes->next;
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += bellmanFordRelax(v, u, w, stats, bitmapNext);
                     else
                         activeVertices += bellmanFordAtomicRelax(v, u, w, stats, bitmapNext);

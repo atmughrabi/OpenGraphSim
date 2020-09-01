@@ -387,11 +387,11 @@ void parallelDepthFirstSearchGraphCSRTask(struct Arguments *arguments, struct Gr
             if(__sync_bool_compare_and_swap(&(stats->parents[u]), u_parent, v))
             {
 
-
+                arguments->source = u;
                 stats->distances[u] = stats->distances[v] + 1;
 
                 // #pragma omp task
-                parallelDepthFirstSearchGraphCSRTask( u, graph, stats);
+                parallelDepthFirstSearchGraphCSRTask( arguments, graph, stats);
 
             }
         }

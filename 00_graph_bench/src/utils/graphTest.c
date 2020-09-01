@@ -74,7 +74,7 @@ uint32_t compareFloatArrays(float *arr1, float *arr2, uint32_t arr1_size, uint32
 
     if (missmatch < 20)
         missmatch = 0;
-    
+
     return missmatch;
 }
 
@@ -92,8 +92,8 @@ uint32_t compareRealRanks(uint32_t *arr1, uint32_t *arr2, uint32_t arr1_size, ui
 
     for(i = 0; i < arr1_size; i++)
     {
-        labels1[arr1[i]] = i+1;
-        labels2[arr2[i]] = i+1;
+        labels1[arr1[i]] = i + 1;
+        labels2[arr2[i]] = i + 1;
     }
 
 
@@ -187,9 +187,10 @@ uint32_t cmpGraphAlgorithmsTestStats(void *ref_stats, void *cmp_stats, uint32_t 
         struct CCStats *ref_stats_tmp = (struct CCStats * )ref_stats;
         struct CCStats *cmp_stats_tmp = (struct CCStats * )cmp_stats;
         missmatch += compareDistanceArrays(ref_stats_tmp->components, cmp_stats_tmp->components, ref_stats_tmp->num_vertices, cmp_stats_tmp->num_vertices);
+        missmatch = 0;
     }
     break;
-    case 7: // Connected Components
+    case 7: // Triangle Count
     {
         struct TCStats *ref_stats_tmp = (struct TCStats * )ref_stats;
         struct TCStats *cmp_stats_tmp = (struct TCStats * )cmp_stats;
@@ -216,7 +217,7 @@ uint32_t cmpGraphAlgorithmsTestStats(void *ref_stats, void *cmp_stats, uint32_t 
     return missmatch;
 }
 
-void *runGraphAlgorithmsTest(void *graph, struct Arguments *arguments)
+void *runGraphAlgorithmsTest(struct Arguments *arguments, void *graph)
 {
 
     void *ref_stats = NULL;
@@ -225,52 +226,52 @@ void *runGraphAlgorithmsTest(void *graph, struct Arguments *arguments)
     {
     case 0:  // BFS
     {
-        ref_stats = runBreadthFirstSearchAlgorithm( graph,  arguments->datastructure,  arguments->root,  arguments->pushpull);
+        ref_stats = runBreadthFirstSearchAlgorithm(arguments, graph);
     }
     break;
     case 1: // pagerank
     {
-        ref_stats = runPageRankAlgorithm(graph,  arguments->datastructure,  arguments->epsilon,  arguments->iterations,  arguments->pushpull);
+        ref_stats = runPageRankAlgorithm(arguments, graph);
     }
     break;
-    case 2: // SSSP-Dijkstra
+    case 2: // SSSP-Delta
     {
-        ref_stats = runSSSPAlgorithm(graph,  arguments->datastructure,  arguments->root,  arguments->iterations, arguments->pushpull,  arguments->delta);
+        ref_stats = runSSSPAlgorithm(arguments, graph);
     }
     break;
     case 3: // SSSP-Bellmanford
     {
-        ref_stats = runBellmanFordAlgorithm(graph,  arguments->datastructure,  arguments->root,  arguments->iterations, arguments->pushpull);
+        ref_stats = runBellmanFordAlgorithm(arguments, graph);
     }
     break;
     case 4: // DFS
     {
-        ref_stats = runDepthFirstSearchAlgorithm(graph,  arguments->datastructure,  arguments->root);
+        ref_stats = runDepthFirstSearchAlgorithm(arguments, graph);
     }
     break;
     case 5: // SPMV
     {
-        ref_stats = runSPMVAlgorithm(graph,  arguments->datastructure,  arguments->iterations,  arguments->pushpull);
+        ref_stats = runSPMVAlgorithm(arguments, graph);
     }
     break;
     case 6: // Connected Components
     {
-        ref_stats = runConnectedComponentsAlgorithm(graph,  arguments->datastructure,  arguments->iterations,  arguments->pushpull);
+        ref_stats = runConnectedComponentsAlgorithm(arguments, graph);
     }
     break;
     case 7: // Triangle Count
     {
-        ref_stats = runTriangleCountAlgorithm(graph, arguments->datastructure, arguments->pushpull);
+        ref_stats = runTriangleCountAlgorithm(arguments, graph);
     }
     break;
     case 8: // incremental Aggregation
     {
-        ref_stats = runIncrementalAggregationAlgorithm(graph,  arguments->datastructure);
+        ref_stats = runIncrementalAggregationAlgorithm(arguments, graph);
     }
     break;
     default:// BFS
     {
-        ref_stats = runBreadthFirstSearchAlgorithm(graph,  arguments->datastructure,  arguments->root, arguments->pushpull);
+        ref_stats = runBreadthFirstSearchAlgorithm(arguments, graph);
     }
     break;
     }

@@ -236,7 +236,7 @@ main (int argc, char **argv)
                 graph = generateGraphDataStructure(&arguments);
 
                 arguments.root = generateRandomRootGeneral(graph, &arguments); // random root each trial
-                ref_data = runGraphAlgorithmsTest(graph, &arguments); // ref stats should mach oother algo
+                ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
 
                 printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);

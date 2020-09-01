@@ -29,11 +29,11 @@ struct SSSPStats
     double time_total;
 };
 
-struct SSSPStats *newSSSPStatsGeneral(uint32_t num_vertices);
-struct SSSPStats *newSSSPStatsGraphCSR(struct GraphCSR *graph);
-struct SSSPStats *newSSSPStatsGraphGrid(struct GraphGrid *graph);
-struct SSSPStats *newSSSPStatsGraphAdjArrayList(struct GraphAdjArrayList *graph);
-struct SSSPStats *newSSSPStatsGraphAdjLinkedList(struct GraphAdjLinkedList *graph);
+struct SSSPStats *newSSSPStatsGeneral(uint32_t num_vertices, uint32_t delta);
+struct SSSPStats *newSSSPStatsGraphCSR(struct GraphCSR *graph, uint32_t delta);
+struct SSSPStats *newSSSPStatsGraphGrid(struct GraphGrid *graph, uint32_t delta);
+struct SSSPStats *newSSSPStatsGraphAdjArrayList(struct GraphAdjArrayList *graph, uint32_t delta);
+struct SSSPStats *newSSSPStatsGraphAdjLinkedList(struct GraphAdjLinkedList *graph, uint32_t delta);
 
 void freeSSSPStats(struct SSSPStats *stats);
 
@@ -66,7 +66,7 @@ struct SSSPStats *SSSPGraphCSR(struct Arguments *arguments, struct GraphCSR *gra
 struct SSSPStats *SSSPDataDrivenPullGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 struct SSSPStats *SSSPDataDrivenPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
 struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(struct Arguments *arguments, struct GraphCSR *graph);
-void SSSPSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, struct GraphCSR **graphMinus);
+void SSSPSpiltGraphCSR(struct GraphCSR *graph, struct GraphCSR **graphPlus, struct GraphCSR **graphMinus, uint32_t delta);
 
 // ********************************************************************************************
 // ***************                  ArrayList DataStructure                      **************

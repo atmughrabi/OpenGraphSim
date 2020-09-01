@@ -24,7 +24,7 @@ struct Arguments
     uint32_t iterations;
     uint32_t trials;
     double epsilon;
-    int root;
+    int source;
     uint32_t algorithm;
     uint32_t datastructure;
     uint32_t pushpull;
@@ -36,14 +36,16 @@ struct Arguments
     uint32_t symmetric;
     uint32_t weighted;
     uint32_t delta;
-    uint32_t pre_numThreads;
-    uint32_t algo_numThreads;
-    uint32_t ker_numThreads;
+    int pre_numThreads;
+    int algo_numThreads;
+    int ker_numThreads;
     char *fnameb;
     char *fnamel;
     uint32_t fnameb_format;
     uint32_t convert_format;
     mt19937state mt19937var;
+
+    
 
 #ifdef CACHE_HARNESS_META
     uint32_t l1_size;
