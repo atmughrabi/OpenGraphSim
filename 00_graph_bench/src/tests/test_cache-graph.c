@@ -52,13 +52,6 @@
 #define GRAPH_NUM 4
 #define MODE_NUM 3
 
-// "   mm                        ""#             mmm                       #     \n"
-// "   ##    mmm    mmm    mmm     #           m"   "  m mm   mmm   mmmm   # mm  \n"
-// "  #  #  #"  "  #"  "  #"  #    #           #   mm  #"  " "   #  #" "#  #"  # \n"
-// "  #mm#  #      #      #""""    #     """   #    #  #     m"""#  #   #  #   # \n"
-// " #    # "#mm"  "#mm"  "#mm"    "mm          "mmm"  #     "mm"#  ##m#"  #   # \n"
-// "                                                                #            \n"
-
 int
 main (int argc, char **argv)
 {
@@ -179,19 +172,17 @@ main (int argc, char **argv)
     arguments.convert_format = 1;
     arguments.iterations = 1;
     arguments.trials = 1; // random number of trials
-
+    initializeMersenneState (&(arguments.mt19937var), 27491095);
 
     arguments.lmode = 0;
     arguments.lmode_l2 = 0;
+    arguments.lmode_l3 = 0;
     arguments.mmode = 0;
 
     void *graph = NULL;
 
 
     struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
-
-    mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
 
     printf("*-----------------------------------------------------*\n");
     printf("| %-20s %-30u | \n", "Number of Threads :", numThreads);

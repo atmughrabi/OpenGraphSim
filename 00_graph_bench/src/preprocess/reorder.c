@@ -77,10 +77,18 @@ void radixSortCountSortEdgesByRanks (uint32_t **pageRanksFP, uint32_t **pageRank
     uint32_t offset_end = 0;
     uint32_t base = 0;
 
-    #pragma omp parallel default(none) num_threads(P) shared(pageRanksFP, pageRanksFPTemp,radix,labels,labelsTemp,buckets,buckets_count, num_vertices) firstprivate(t_id, P, offset_end,offset_start,base,i,j,t,u,o)
+    #pragma omp parallel default(none) shared(P,pageRanksFP, pageRanksFPTemp,radix,labels,labelsTemp,buckets,buckets_count, num_vertices) firstprivate(t_id, offset_end,offset_start,base,i,j,t,u,o)
     {
-        P = omp_get_num_threads();
+
         t_id = omp_get_thread_num();
+
+        if(t_id == 0)
+        {
+            P = omp_get_num_threads();
+        }
+
+        #pragma omp barrier
+
         offset_start = t_id * (num_vertices / P);
 
 
@@ -450,7 +458,7 @@ struct EdgeList *reorderGraphListDBG(struct EdgeList *edgeList, uint32_t *degree
 
 
     Start(timer);
-    #pragma omp parallel default(none) shared(labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,P,t)
+    #pragma omp parallel default(none) shared(P,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,t)
     {
 
         t_id = omp_get_thread_num();
@@ -638,7 +646,7 @@ struct EdgeList *reorderGraphListHUBSort(struct EdgeList *edgeList, uint32_t *de
     uint32_t **verticesHot  = (uint32_t **) my_malloc(num_buckets * sizeof(uint32_t *));
 
     Start(timer);
-    #pragma omp parallel default(none) shared(verticesHot,degreesHot,sizeHot,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,P,t)
+    #pragma omp parallel default(none) shared(P,verticesHot,degreesHot,sizeHot,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,t)
     {
         t_id = omp_get_thread_num();
 
@@ -851,7 +859,7 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
 
     Start(timer);
-    #pragma omp parallel default(none) shared(labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,P,t)
+    #pragma omp parallel default(none) shared(P,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,k,offset_start,offset_end,t_id,i,j,v,t)
     {
         t_id = omp_get_thread_num();
 
@@ -1138,7 +1146,7 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
     }
 
     Start(timer);
-    #pragma omp parallel default(none) shared(mask_array,mmode,cache_regions,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,offset_start,offset_end,t_id,i,j,v,P,t)
+    #pragma omp parallel default(none) shared(P,mask_array,mmode,cache_regions,labels,buckets,edgeList,num_buckets,degrees,thresholds,start_idx) firstprivate(iter,temp_idx,offset_start,offset_end,t_id,i,j,v,t)
     {
         t_id = omp_get_thread_num();
 

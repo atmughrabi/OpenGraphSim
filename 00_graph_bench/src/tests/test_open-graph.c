@@ -81,7 +81,7 @@ main (int argc, char **argv)
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
-    initializeMersenneState (&(arguments->mt19937var), 27491095);
+    initializeMersenneState (&(arguments.mt19937var), 27491095);
 
     void *graph = NULL;
     uint32_t missmatch = 0;
@@ -110,7 +110,7 @@ main (int argc, char **argv)
             graph = generateGraphDataStructure(&arguments);
 
             arguments.iterations = 100;
-            arguments.trials = (generateRandInt(&(arguments->mt19937var)) % 50) + 1; // random number of trials
+            arguments.trials = (generateRandInt(&(arguments.mt19937var)) % 50) + 1; // random number of trials
 
 
             while(arguments.trials)
