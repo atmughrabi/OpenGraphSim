@@ -46,17 +46,6 @@
 
 #include "graphTest.h"
 
-int numThreads;
-mt19937state *mt19937var;
-
-// "   mm                        ""#             mmm                       #     \n"
-// "   ##    mmm    mmm    mmm     #           m"   "  m mm   mmm   mmmm   # mm  \n"
-// "  #  #  #"  "  #"  "  #"  #    #           #   mm  #"  " "   #  #" "#  #"  # \n"
-// "  #mm#  #      #      #""""    #     """   #    #  #     m"""#  #   #  #   # \n"
-// " #    # "#mm"  "#mm"  "#mm"    "mm          "mmm"  #     "mm"#  ##m#"  #   # \n"
-// "                                                                #            \n"
-
-
 int
 main (int argc, char **argv)
 {
@@ -92,14 +81,9 @@ main (int argc, char **argv)
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
+    initializeMersenneState (&(arguments->mt19937var), 27491095);
 
     void *graph = NULL;
-    numThreads =  arguments.pre_numThreads;
-    struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
-
-    mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
-
     uint32_t missmatch = 0;
     uint32_t total_missmatch = 0;
     void *ref_data;
@@ -126,7 +110,7 @@ main (int argc, char **argv)
             graph = generateGraphDataStructure(&arguments);
 
             arguments.iterations = 100;
-            arguments.trials = (generateRandInt(mt19937var) % 50) + 1; // random number of trials
+            arguments.trials = (generateRandInt(&(arguments->mt19937var)) % 50) + 1; // random number of trials
 
 
             while(arguments.trials)
@@ -176,8 +160,6 @@ main (int argc, char **argv)
         printf("PASS : Trial [%u] Graph [%s] Missmatches [%u]\n", arguments.trials, arguments.fnameb, total_missmatch);
     }
 
-
-    free(timer);
     exit (0);
 }
 

@@ -53,7 +53,7 @@ uint32_t atomicMin(uint32_t *oldValue, uint32_t newValue);
 void addSample(uint32_t id);
 void linkNodes(uint32_t u, uint32_t v, uint32_t *components);
 void compressNodes(uint32_t num_vertices, uint32_t *components);
-uint32_t sampleFrequentNode(uint32_t num_vertices, uint32_t num_samples, uint32_t *components);
+uint32_t sampleFrequentNode(mt19937state *mt19937var, uint32_t num_vertices, uint32_t num_samples, uint32_t *components);
 
 // ********************************************************************************************
 // ***************                  CSR DataStructure                            **************

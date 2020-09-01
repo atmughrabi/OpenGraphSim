@@ -441,7 +441,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
     }
 }
 
-uint32_t generateRandomRootGraphCSR(struct GraphCSR *graph)
+uint32_t generateRandomRootGraphCSR(mt19937state *mt19937var, struct GraphCSR *graph)
 {
 
     uint32_t source = 0;
@@ -461,7 +461,7 @@ uint32_t generateRandomRootGraphCSR(struct GraphCSR *graph)
 }
 
 
-uint32_t generateRandomRootGraphGrid(struct GraphGrid *graph)
+uint32_t generateRandomRootGraphGrid(mt19937state *mt19937var, struct GraphGrid *graph)
 {
 
     uint32_t source = 0;
@@ -480,7 +480,7 @@ uint32_t generateRandomRootGraphGrid(struct GraphGrid *graph)
 
 }
 
-uint32_t generateRandomRootGraphAdjLinkedList(struct GraphAdjLinkedList *graph)
+uint32_t generateRandomRootGraphAdjLinkedList(mt19937state *mt19937var, struct GraphAdjLinkedList *graph)
 {
 
     uint32_t source = 0;
@@ -499,7 +499,7 @@ uint32_t generateRandomRootGraphAdjLinkedList(struct GraphAdjLinkedList *graph)
 
 }
 
-uint32_t generateRandomRootGraphAdjArrayList(struct GraphAdjArrayList *graph)
+uint32_t generateRandomRootGraphAdjArrayList(mt19937state *mt19937var, struct GraphAdjArrayList *graph)
 {
 
     uint32_t source = 0;
@@ -530,27 +530,27 @@ uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
     {
     case 0: // CSR
         graphCSR = (struct GraphCSR *)graph;
-        arguments->source = generateRandomRootGraphCSR(graphCSR);
+        arguments->source = generateRandomRootGraphCSR(&(arguments->mt19937var), graphCSR);
         break;
 
     case 1: // Grid
         graphGrid = (struct GraphGrid *)graph;
-        arguments->source = generateRandomRootGraphGrid(graphGrid);
+        arguments->source = generateRandomRootGraphGrid(&(arguments->mt19937var), graphGrid);
         break;
 
     case 2: // Adj Linked List
         graphAdjLinkedList = (struct GraphAdjLinkedList *)graph;
-        arguments->source = generateRandomRootGraphAdjLinkedList(graphAdjLinkedList);
+        arguments->source = generateRandomRootGraphAdjLinkedList(&(arguments->mt19937var), graphAdjLinkedList);
         break;
 
     case 3: // Adj Array List
         graphAdjArrayList = (struct GraphAdjArrayList *)graph;
-        arguments->source = generateRandomRootGraphAdjArrayList(graphAdjArrayList);
+        arguments->source = generateRandomRootGraphAdjArrayList(&(arguments->mt19937var), graphAdjArrayList);
         break;
 
     default:// CSR
         graphCSR = (struct GraphCSR *)graph;
-        arguments->source = generateRandomRootGraphCSR(graphCSR);
+        arguments->source = generateRandomRootGraphCSR(&(arguments->mt19937var), graphCSR);
         break;
     }
 

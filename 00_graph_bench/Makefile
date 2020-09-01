@@ -82,9 +82,9 @@ PULL_PUSH       ?= 2
 TOLERANCE       ?= 1e-8
 DELTA           ?= 800
 
-NUM_THREADS_PRE     ?= $(shell grep -c ^processor /proc/cpuinfo)
-NUM_THREADS_ALGO     ?= $(shell grep -c ^processor /proc/cpuinfo)
-NUM_THREADS_KER     ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_PRE   ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_ALGO  ?= $(shell grep -c ^processor /proc/cpuinfo)
+NUM_THREADS_KER   ?= $(shell grep -c ^processor /proc/cpuinfo)
 NUM_ITERATIONS  ?= 1
 NUM_TRIALS      ?= 1
 

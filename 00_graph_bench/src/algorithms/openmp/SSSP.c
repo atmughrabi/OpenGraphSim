@@ -719,7 +719,7 @@ struct SSSPStats *SSSPDataDrivenPushGraphCSR(struct Arguments *arguments, struct
                         weight = graph->sorted_edges_array->edges_array_weight[j];
 #endif
 
-                        if(numThreads == 1)
+                        if(arguments->algo_numThreads == 1)
                             activeVertices += SSSPRelax(src, dest, weight, stats);
                         else
                             activeVertices += SSSPAtomicRelax(src, dest, weight, stats);
@@ -900,7 +900,7 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(struct Arguments *arguments, s
                         weight = graphLight->sorted_edges_array->edges_array_weight[j];
 #endif
 
-                        if(numThreads == 1)
+                        if(arguments->algo_numThreads == 1)
                             activeVertices += SSSPRelax(src, dest, weight, stats);
                         else
                             activeVertices += SSSPAtomicRelax(src, dest, weight, stats);
@@ -942,7 +942,7 @@ struct SSSPStats *SSSPDataDrivenSplitPushGraphCSR(struct Arguments *arguments, s
                     weight = graphHeavy->sorted_edges_array->edges_array_weight[j];
 #endif
 
-                    if(numThreads == 1)
+                    if(arguments->algo_numThreads == 1)
                         activeVertices += SSSPRelax(src, dest, weight, stats);
                     else
                         activeVertices += SSSPAtomicRelax(src, dest, weight, stats);

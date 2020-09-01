@@ -44,7 +44,6 @@ uint32_t SSSPAtomicMin(uint32_t *dist, uint32_t new);
 uint32_t SSSPCompareDistanceArrays(struct SSSPStats *stats1, struct SSSPStats *stats2);
 int SSSPAtomicRelax(uint32_t src, uint32_t dest, float weight, struct SSSPStats *stats);
 int SSSPRelax(uint32_t src, uint32_t dest, float weight, struct SSSPStats *stats);
-void durstenfeldShuffle(uint32_t *vertices, uint32_t size);
 
 // ********************************************************************************************
 // ***************                  GRID DataStructure                           **************

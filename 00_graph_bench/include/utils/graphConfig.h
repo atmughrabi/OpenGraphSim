@@ -4,12 +4,8 @@
 #include <stdint.h>
 #include "mt19937.h"
 
-
 #define WEIGHTED 0
 #define DIRECTED 1
-
-extern int numThreads;
-extern mt19937state *mt19937var;
 
 /* Used by main to communicate with parse_opt. */
 struct Arguments
@@ -44,8 +40,6 @@ struct Arguments
     uint32_t fnameb_format;
     uint32_t convert_format;
     mt19937state mt19937var;
-
-    
 
 #ifdef CACHE_HARNESS_META
     uint32_t l1_size;

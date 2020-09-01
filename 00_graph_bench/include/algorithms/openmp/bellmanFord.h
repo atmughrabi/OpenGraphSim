@@ -40,7 +40,7 @@ uint32_t bellmanFordAtomicMin(uint32_t *dist, uint32_t new);
 uint32_t bellmanFordCompareDistanceArrays(struct BellmanFordStats *stats1, struct BellmanFordStats *stats2);
 int bellmanFordAtomicRelax(uint32_t src, uint32_t dest, float weight, struct BellmanFordStats *stats, struct Bitmap *bitmapNext);
 int bellmanFordRelax(uint32_t src, uint32_t dest, float weight, struct BellmanFordStats *stats, struct Bitmap *bitmapNext);
-void durstenfeldShuffle(uint32_t *vertices, uint32_t size);
+void durstenfeldShuffle(mt19937state *mt19937var, uint32_t *vertices, uint32_t size);
 
 // ********************************************************************************************
 // ***************					GRID DataStructure							 **************

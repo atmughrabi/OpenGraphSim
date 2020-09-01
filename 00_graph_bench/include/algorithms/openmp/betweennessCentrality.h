@@ -61,7 +61,7 @@ void printRanksBetweennessCentralityStats(struct BetweennessCentralityStats *sta
 // ********************************************************************************************
 // ***************                  Auxiliary functions                          **************
 // ********************************************************************************************
-uint32_t generateRandomRootBetweennessCentrality(struct GraphCSR *graph);
+uint32_t generateRandomRootBetweennessCentrality(mt19937state *mt19937var, struct GraphCSR *graph);
 void copyBitmapToStack(struct Bitmap *q_bitmap, struct Predecessor *stack, uint32_t num_vertices);
 struct Predecessor *creatNewPredecessorList(uint32_t *degrees, uint32_t num_vertices);
 struct BetweennessCentralityStats *betweennessCentralityBFSPullGraphCSR(uint32_t source, struct GraphCSR *graph, struct BetweennessCentralityStats *stats);

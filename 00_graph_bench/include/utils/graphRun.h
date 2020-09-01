@@ -24,10 +24,10 @@
 
 
 // Random root helper functions
-uint32_t generateRandomRootGraphCSR(struct GraphCSR *graph);
-uint32_t generateRandomRootGraphGrid(struct GraphGrid *graph);
-uint32_t generateRandomRootGraphAdjLinkedList(struct GraphAdjLinkedList *graph);
-uint32_t generateRandomRootGraphAdjArrayList(struct GraphAdjArrayList *graph);
+uint32_t generateRandomRootGraphCSR(mt19937state *mt19937var, struct GraphCSR *graph);
+uint32_t generateRandomRootGraphGrid(mt19937state *mt19937var, struct GraphGrid *graph);
+uint32_t generateRandomRootGraphAdjLinkedList(mt19937state *mt19937var, struct GraphAdjLinkedList *graph);
+uint32_t generateRandomRootGraphAdjArrayList(mt19937state *mt19937var, struct GraphAdjArrayList *graph);
 uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph);
 
 void freeGraphDataStructure(void *graph, uint32_t datastructure);

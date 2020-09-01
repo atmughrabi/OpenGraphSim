@@ -52,9 +52,6 @@
 #define GRAPH_NUM 4
 #define MODE_NUM 3
 
-int numThreads;
-mt19937state *mt19937var;
-
 // "   mm                        ""#             mmm                       #     \n"
 // "   ##    mmm    mmm    mmm     #           m"   "  m mm   mmm   mmmm   # mm  \n"
 // "  #  #  #"  "  #"  "  #"  #    #           #   mm  #"  " "   #  #" "#  #"  # \n"
@@ -71,57 +68,57 @@ main (int argc, char **argv)
     char express_perf_file[1024];
     char grasp_perf_file[1024];
 
-    // char *benchmarks_graphs[GRAPH_NUM] =
-    // {
-    //     "LAW-amazon-2008",
-    //     "LAW-cnr-2000",
-    //     "LAW-dblp-2010",
-    //     "LAW-enron"
-    // };
-
-    // char *benchmarks_dir[GRAPH_NUM] =
-    // {
-    //     "../01_test_graphs/LAW/LAW-amazon-2008",
-    //     "../01_test_graphs/LAW/LAW-cnr-2000",
-    //     "../01_test_graphs/LAW/LAW-dblp-2010",
-    //     "../01_test_graphs/LAW/LAW-enron"
-    // };
-
     char *benchmarks_graphs[GRAPH_NUM] =
     {
-        "LAW-in-2004",
-        "LAW-it-2004",
-        "LAW-uk-2002",
-        "LAW-uk-2005",
-        "LAW-webbase-2001",
-        "KONECT-wikipedia_link_en",
-        "GAP-road",
-        "GAP-twitter",
-        "GONG-gplus",
-        "SNAP-cit-Patents",
-        "SNAP-com-Orkut",
-        "SNAP-soc-LiveJournal1",
-        "SNAP-soc-Pokec",
-        "SNAP-web-Google"
+        "LAW-amazon-2008",
+        "LAW-cnr-2000",
+        "LAW-dblp-2010",
+        "LAW-enron"
     };
 
     char *benchmarks_dir[GRAPH_NUM] =
     {
-        "../../01_GraphDatasets/LAW/LAW-in-2004",
-        "../../01_GraphDatasets/LAW/LAW-it-2004",
-        "../../01_GraphDatasets/LAW/LAW-uk-2002",
-        "../../01_GraphDatasets/LAW/LAW-uk-2005",
-        "../../01_GraphDatasets/LAW/LAW-webbase-2001",
-        "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
-        "../../01_GraphDatasets/GAP/GAP-road",
-        "../../01_GraphDatasets/GAP/GAP-twitter",
-        "../../01_GraphDatasets/GONG/GONG-gplus",
-        "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
-        "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
-        "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
-        "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
-        "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+        "../01_test_graphs/LAW/LAW-amazon-2008",
+        "../01_test_graphs/LAW/LAW-cnr-2000",
+        "../01_test_graphs/LAW/LAW-dblp-2010",
+        "../01_test_graphs/LAW/LAW-enron"
     };
+
+    // char *benchmarks_graphs[GRAPH_NUM] =
+    // {
+    //     "LAW-in-2004",
+    //     "LAW-it-2004",
+    //     "LAW-uk-2002",
+    //     "LAW-uk-2005",
+    //     "LAW-webbase-2001",
+    //     "KONECT-wikipedia_link_en",
+    //     "GAP-road",
+    //     "GAP-twitter",
+    //     "GONG-gplus",
+    //     "SNAP-cit-Patents",
+    //     "SNAP-com-Orkut",
+    //     "SNAP-soc-LiveJournal1",
+    //     "SNAP-soc-Pokec",
+    //     "SNAP-web-Google"
+    // };
+
+    // char *benchmarks_dir[GRAPH_NUM] =
+    // {
+    //     "../../01_GraphDatasets/LAW/LAW-in-2004",
+    //     "../../01_GraphDatasets/LAW/LAW-it-2004",
+    //     "../../01_GraphDatasets/LAW/LAW-uk-2002",
+    //     "../../01_GraphDatasets/LAW/LAW-uk-2005",
+    //     "../../01_GraphDatasets/LAW/LAW-webbase-2001",
+    //     "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
+    //     "../../01_GraphDatasets/GAP/GAP-road",
+    //     "../../01_GraphDatasets/GAP/GAP-twitter",
+    //     "../../01_GraphDatasets/GONG/GONG-gplus",
+    //     "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
+    //     "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
+    //     "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
+    //     "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
+    //     "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+    // };
 
     char *reorder_labels[MODE_NUM] =
     {
@@ -190,7 +187,6 @@ main (int argc, char **argv)
 
     void *graph = NULL;
 
-    numThreads =  arguments.numThreads;
 
     struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
 

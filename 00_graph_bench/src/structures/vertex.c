@@ -100,7 +100,17 @@ void partitionEdgeListOffsetStartEnd(struct GraphCSR *graph, struct EdgeList *so
 
     uint32_t i;
     uint32_t j;
-    uint32_t P = numThreads;
+    uint32_t P = 1;
+
+    #pragma omp parallel default(none) shared(P)
+    {
+        uint32_t t_id = omp_get_thread_num();
+
+        if(t_id == 0)
+        {
+            P = omp_get_num_threads();
+        }
+    }
 
     for(i = 0 ; i < P ; i++)
     {
@@ -197,12 +207,24 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
     uint32_t i;
     uint32_t vertex_id;
     // uint32_t vertex_id_dest;
-    uint32_t P = numThreads;
+    uint32_t P = 1;
     struct Vertex *vertices;
     struct EdgeList *sorted_edges_array;
 
-    uint32_t *offset_start_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
-    uint32_t *offset_end_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
+    uint32_t *offset_start_arr = NULL;
+    uint32_t *offset_end_arr = NULL;
+
+    #pragma omp parallel default(none) shared(P,offset_start_arr,offset_end_arr)
+    {
+        uint32_t t_id = omp_get_thread_num();
+
+        if(t_id == 0)
+        {
+            P = omp_get_num_threads();
+            offset_start_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
+            offset_end_arr = (uint32_t *) my_malloc( P * sizeof(uint32_t));
+        }
+    }
 
     // for(vertex_id = 0; vertex_id < graph->num_vertices; vertex_id++){
 
@@ -232,16 +254,15 @@ struct GraphCSR *mapVerticesWithInOutDegree (struct GraphCSR *graph, uint8_t inv
     partitionEdgeListOffsetStartEnd(graph, sorted_edges_array, offset_start_arr, offset_end_arr);
 
 
-    uint32_t t_id = 0;
     uint32_t offset_start = 0;
     uint32_t offset_end = 0;
 
 
 
-    #pragma omp parallel default(none) private(i,vertex_id) shared(inverse,graph,vertices,sorted_edges_array,offset_start_arr,offset_end_arr) firstprivate(t_id, offset_end,offset_start)
+    #pragma omp parallel default(none) private(i,vertex_id) shared(inverse,graph,vertices,sorted_edges_array,offset_start_arr,offset_end_arr) firstprivate( offset_end,offset_start)
     {
 
-        t_id = omp_get_thread_num();
+        uint32_t t_id = omp_get_thread_num();
 
         offset_start = offset_start_arr[t_id];
         offset_end = offset_end_arr[t_id];

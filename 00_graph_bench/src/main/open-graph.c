@@ -33,11 +33,8 @@
 #include "cache.h"
 #endif
 
-int numThreads;
-mt19937state *mt19937var;
-
 const char *argp_program_version =
-    "OpenGraphSim v3.0";
+    "OpenGraphSim v4.0";
 const char *argp_program_bug_address =
     "<atmughra@ncsu.edu>|<atmughrabi@gmail.com>";
 /* Program documentation. */
@@ -267,10 +264,6 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int
 main (int argc, char **argv)
 {
-
-    mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
-
     struct Arguments *arguments = (struct Arguments *)my_malloc(sizeof(struct Arguments));
     /* Default values. */
 
@@ -315,9 +308,6 @@ main (int argc, char **argv)
     void *graph = NULL;
     argp_parse (&argp, argc, argv, 0, 0, arguments);
 
-    numThreads =  omp_get_max_threads();
-
-
     if(arguments->dflag)
         arguments->sort = 1;
 
@@ -327,9 +317,7 @@ main (int argc, char **argv)
     }
     else
     {
-        numThreads =  arguments->pre_numThreads;
         graph = generateGraphDataStructure(arguments);
-        numThreads =  arguments->algo_numThreads;
         runGraphAlgorithms(arguments, graph);
         freeGraphDataStructure(graph, arguments->datastructure);
     }

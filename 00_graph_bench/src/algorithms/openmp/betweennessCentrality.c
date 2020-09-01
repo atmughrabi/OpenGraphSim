@@ -181,7 +181,7 @@ void freeBetweennessCentralityStats(struct BetweennessCentralityStats *stats)
 // ***************                  Auxiliary functions                          **************
 // ********************************************************************************************
 
-uint32_t generateRandomRootBetweennessCentrality(struct GraphCSR *graph)
+uint32_t generateRandomRootBetweennessCentrality(mt19937state *mt19937var, struct GraphCSR *graph)
 {
 
     uint32_t root = 0;
@@ -400,6 +400,7 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(struct A
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
 
+
     printf(" -----------------------------------------------------\n");
     printf("| %-51s | \n", "Starting Brandes Betweenness Centrality");
     printf(" -----------------------------------------------------\n");
@@ -435,7 +436,7 @@ struct BetweennessCentralityStats *betweennessCentralityBrandesGraphCSR(struct A
 
     for(stats->iteration = 0 ; stats->iteration  < arguments->iterations ; stats->iteration++)
     {
-        s = generateRandomRootBetweennessCentrality(graph);
+        s = generateRandomRootBetweennessCentrality(&(arguments->mt19937var), graph);
         Start(timer_inner);
         clearBetweennessCentralityStats(stats);
 

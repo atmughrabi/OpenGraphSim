@@ -229,11 +229,11 @@ struct SPMVStats *SPMVPullRowGraphGrid( struct Arguments *arguments, struct Grap
         Start(timer_inner);
 
         uint32_t i;
-        // #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+        // #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)  // iterate over partitions rowwise
         {
             uint32_t j;
-            #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+            #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
             for (j = 0; j < totalPartitions; ++j)
             {
                 uint32_t k;
@@ -321,11 +321,11 @@ struct SPMVStats *SPMVPushColumnGraphGrid( struct Arguments *arguments, struct G
         Start(timer_inner);
 
         uint32_t j;
-        #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
         for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
         {
             uint32_t i;
-            // #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
             for (i = 0; i < totalPartitions; ++i)
             {
                 uint32_t k;
@@ -420,11 +420,11 @@ struct SPMVStats *SPMVPullRowFixedPointGraphGrid( struct Arguments *arguments, s
         Start(timer_inner);
 
         uint32_t i;
-        // #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+        // #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)  // iterate over partitions rowwise
         {
             uint32_t j;
-            #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+            #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
             for (j = 0; j < totalPartitions; ++j)
             {
                 uint32_t k;
@@ -529,11 +529,11 @@ struct SPMVStats *SPMVPushColumnFixedPointGraphGrid( struct Arguments *arguments
         Start(timer_inner);
 
         uint32_t j;
-        #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
         for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
         {
             uint32_t i;
-            // #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
             for (i = 0; i < totalPartitions; ++i)
             {
                 uint32_t k;

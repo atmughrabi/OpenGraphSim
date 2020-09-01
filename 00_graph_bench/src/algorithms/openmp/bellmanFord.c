@@ -366,7 +366,7 @@ void bellmanFordPrintStatsDetails(struct BellmanFordStats *stats)
 
 // used with Bannister, M. J.; Eppstein, D. (2012). Randomized speedup of the Bellman–Ford algorithm
 
-void durstenfeldShuffle(uint32_t *vertices, uint32_t size)
+void durstenfeldShuffle(mt19937state *mt19937var, uint32_t *vertices, uint32_t size)
 {
 
     uint32_t v;
@@ -772,7 +772,7 @@ struct BellmanFordStats *bellmanFordGraphCSR(struct Arguments *arguments, struct
 
     struct BellmanFordStats *stats = NULL;
     arguments->source = graph->sorted_edges_array->label_array[arguments->source];
-    
+
     switch (arguments->pushpull)
     {
     case 0: // pull
@@ -836,7 +836,7 @@ struct BellmanFordStats *bellmanFordDataDrivenPullGraphCSR(struct Arguments *arg
     sorted_edges_array = graph->sorted_edges_array;
 #endif
 
-    
+
 
     Start(timer);
 
@@ -1195,7 +1195,7 @@ struct BellmanFordStats *bellmanFordRandomizedDataDrivenPushGraphCSR(struct Argu
 
     //randomize iteratiing accross verticess
 
-    durstenfeldShuffle(vertices, graph->num_vertices);
+    durstenfeldShuffle(&(arguments->mt19937var), vertices, graph->num_vertices);
 
     setBit(bitmapNext, arguments->source);
     bitmapNext->numSetBits = 1;

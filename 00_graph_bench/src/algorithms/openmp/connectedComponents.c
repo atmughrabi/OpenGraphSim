@@ -299,13 +299,12 @@ void addSample(uint32_t id)
 
 }
 
-uint32_t sampleFrequentNode(uint32_t num_vertices, uint32_t num_samples, uint32_t *components)
+uint32_t sampleFrequentNode(mt19937state *mt19937var, uint32_t num_vertices, uint32_t num_samples, uint32_t *components)
 {
 
     Word_t *PValue;
     Word_t   Index;
     uint32_t i;
-    initializeMersenneState (mt19937var, 27491095);
     for (i = 0; i < num_samples; i++)
     {
         uint32_t n = generateRandInt(mt19937var) % num_vertices;
@@ -567,7 +566,7 @@ struct CCStats *connectedComponentsAfforestGraphCSR( struct Arguments *arguments
     printf("| %-21s | %-27s | \n", "Sampling Components", "");
     printf(" -----------------------------------------------------\n");
     Start(timer_inner);
-    uint32_t sampleComp = sampleFrequentNode(graph->num_vertices, num_samples,  stats->components);
+    uint32_t sampleComp = sampleFrequentNode(&(arguments->mt19937var), graph->num_vertices, num_samples,  stats->components);
     Stop(timer_inner);
     printf("| Most freq ID: %-7u | %-27f | \n", sampleComp, Seconds(timer_inner));
 
@@ -919,11 +918,11 @@ struct CCStats *connectedComponentsShiloachVishkinGraphGrid( struct Arguments *a
         change = 0;
         stats->iterations++;
 
-        #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)
         {
             uint32_t j;
-            // #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
             for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
             {
                 uint32_t k;
@@ -1016,11 +1015,11 @@ struct CCStats *connectedComponentsAfforestGraphGrid( struct Arguments *argument
     for(r = 0; r < stats->neighbor_rounds; r++)
     {
         Start(timer_inner);
-        #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)
         {
             uint32_t j;
-            // #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
             for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
             {
                 uint32_t k;
@@ -1068,7 +1067,7 @@ struct CCStats *connectedComponentsAfforestGraphGrid( struct Arguments *argument
     printf("| %-21s | %-27s | \n", "Sampling Components", "");
     printf(" -----------------------------------------------------\n");
     Start(timer_inner);
-    uint32_t sampleComp = sampleFrequentNode(graph->num_vertices, num_samples,  stats->components);
+    uint32_t sampleComp = sampleFrequentNode(&(arguments->mt19937var), graph->num_vertices, num_samples, stats->components);
     Stop(timer_inner);
     printf("| Most freq ID: %-7u | %-27f | \n", sampleComp, Seconds(timer_inner));
 
@@ -1077,11 +1076,11 @@ struct CCStats *connectedComponentsAfforestGraphGrid( struct Arguments *argument
     printf(" -----------------------------------------------------\n");
     Start(timer_inner);
 #if DIRECTED
-    #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+    #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
     for (i = 0; i < totalPartitions; ++i)
     {
         uint32_t j;
-        // #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+        // #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
         for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
         {
             uint32_t k;
@@ -1114,11 +1113,11 @@ struct CCStats *connectedComponentsAfforestGraphGrid( struct Arguments *argument
         }
     }
 #else
-    #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+    #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
     for (i = 0; i < totalPartitions; ++i)
     {
         uint32_t j;
-        // #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+        // #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
         for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
         {
             uint32_t k;
@@ -1206,11 +1205,11 @@ struct CCStats *connectedComponentsWeaklyGraphGrid(struct Arguments *arguments, 
         stats->iterations++;
 
         uint32_t i;
-        #pragma omp parallel for private(i) schedule (dynamic,numThreads)
+        #pragma omp parallel for private(i) schedule (dynamic,arguments->algo_numThreads)
         for (i = 0; i < totalPartitions; ++i)
         {
             uint32_t j;
-            // #pragma omp parallel for private(j) schedule (dynamic,numThreads)
+            // #pragma omp parallel for private(j) schedule (dynamic,arguments->algo_numThreads)
             for (j = 0; j < totalPartitions; ++j)  // iterate over partitions colwise
             {
                 uint32_t k;
@@ -1448,7 +1447,7 @@ struct CCStats *connectedComponentsAfforestGraphAdjArrayList(struct Arguments *a
     printf("| %-21s | %-27s | \n", "Sampling Components", "");
     printf(" -----------------------------------------------------\n");
     Start(timer_inner);
-    uint32_t sampleComp = sampleFrequentNode(graph->num_vertices, num_samples,  stats->components);
+    uint32_t sampleComp = sampleFrequentNode(&(arguments->mt19937var), graph->num_vertices, num_samples,  stats->components);
     Stop(timer_inner);
     printf("| Most freq ID: %-7u | %-27f | \n", sampleComp, Seconds(timer_inner));
 
@@ -1809,7 +1808,7 @@ struct CCStats *connectedComponentsAfforestGraphAdjLinkedList(struct Arguments *
     printf("| %-21s | %-27s | \n", "Sampling Components", "");
     printf(" -----------------------------------------------------\n");
     Start(timer_inner);
-    uint32_t sampleComp = sampleFrequentNode(graph->num_vertices, num_samples,  stats->components);
+    uint32_t sampleComp = sampleFrequentNode(&(arguments->mt19937var), graph->num_vertices, num_samples,  stats->components);
     Stop(timer_inner);
     printf("| Most freq ID: %-7u | %-27f | \n", sampleComp, Seconds(timer_inner));
 

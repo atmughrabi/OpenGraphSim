@@ -24,9 +24,6 @@
 #include "timer.h"
 #include "cache.h"
 
-int numThreads;
-mt19937state *mt19937var;
-
 #define NUM_TRACES 5
 
 
