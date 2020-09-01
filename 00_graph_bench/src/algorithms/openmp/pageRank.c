@@ -1197,7 +1197,7 @@ struct PageRankStats *pageRankPushGraphCSR(struct Arguments *arguments, struct G
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -1384,7 +1384,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(struct Arguments *argu
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             degree = vertices->out_degree[v];
@@ -1563,7 +1563,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(struct Arguments *argu
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             degree = vertices->out_degree[v];
@@ -1739,7 +1739,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(struct Arguments *argu
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             degree = vertices->out_degree[v];
@@ -1916,7 +1916,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(struct Arguments *argum
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             degree = vertices->out_degree[v];
@@ -2082,7 +2082,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) schedule(dynamic, 1024) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause)
+        #pragma omp parallel for default(none) schedule(dynamic, 1024) private(v) shared(stats,graph,pageRanksNext,riDividedOnDiClause) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint32_t degree = graph->vertices->out_degree[v];
@@ -2265,7 +2265,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint64_t nodeIncomingPR = 0;
@@ -2448,7 +2448,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint64_t nodeIncomingPR = 0;
@@ -2630,7 +2630,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(struct Arguments *arguments,
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for reduction(+ : error_total,activeVertices) private(v,j,u,degree,edge_idx) schedule(dynamic, 1024)
+        #pragma omp parallel for private(v,j,u,degree,edge_idx) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             uint64_t nodeIncomingPR = 0;
@@ -2804,7 +2804,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(struct Arguments *arguments, str
         int iter = stats->iterations;
         SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) private(v) shared(stats,rDivD_params,riDividedOnDiClause_quant,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) private(v) shared(stats,rDivD_params,riDividedOnDiClause_quant,graph,pageRanksNext,riDividedOnDiClause) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
 
@@ -2997,7 +2997,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) shared(arguments,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024)
+        #pragma omp parallel for default(none) shared(arguments,riDividedOnDiClause,sorted_edges_array,vertices,workListCurr,workListNext,stats,graph) private(v) reduction(+:activeVertices,error_total) schedule(dynamic, 1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3207,7 +3207,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(struct Arguments *arguments
         SimMarker(1, iter);
 #endif
 
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
@@ -3420,7 +3420,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(struct Arguments *argum
         int iter = stats->iterations;
         SimMarker(1, iter);
 #endif
-        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024)
+        #pragma omp parallel for default(none) private(edge_idx,degree,v,j,u) shared(stats,vertices,sorted_edges_array,arguments,graph,workListCurr,workListNext,aResiduals) reduction(+:error_total,activeVertices) schedule(dynamic,1024) num_threads(arguments->ker_numThreads)
         for(v = 0; v < graph->num_vertices; v++)
         {
             if(workListCurr[v])
