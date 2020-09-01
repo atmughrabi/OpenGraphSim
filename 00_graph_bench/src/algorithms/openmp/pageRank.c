@@ -442,7 +442,7 @@ struct PageRankStats *pageRankPullRowGraphGrid(struct Arguments *arguments, stru
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -577,7 +577,7 @@ struct PageRankStats *pageRankPullRowFixedPointGraphGrid(struct Arguments *argum
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -718,7 +718,7 @@ struct PageRankStats *pageRankPushColumnGraphGrid(struct Arguments *arguments, s
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -853,7 +853,7 @@ struct PageRankStats *pageRankPushColumnFixedPointGraphGrid(struct Arguments *ar
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1099,7 +1099,7 @@ struct PageRankStats *pageRankPullGraphCSR(struct Arguments *arguments, struct G
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1266,7 +1266,7 @@ struct PageRankStats *pageRankPushGraphCSR(struct Arguments *arguments, struct G
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1447,7 +1447,7 @@ struct PageRankStats *pageRankPullFixedPoint64BitGraphCSR(struct Arguments *argu
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1626,7 +1626,7 @@ struct PageRankStats *pageRankPullFixedPoint32BitGraphCSR(struct Arguments *argu
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1801,7 +1801,7 @@ struct PageRankStats *pageRankPullFixedPoint16BitGraphCSR(struct Arguments *argu
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -1978,7 +1978,7 @@ struct PageRankStats *pageRankPullFixedPoint8BitGraphCSR(struct Arguments *argum
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2146,7 +2146,7 @@ struct PageRankStats *pageRankPushFixedPointGraphCSR(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2329,7 +2329,7 @@ struct PageRankStats *pageRankPullQuant32BitGraphCSR(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2512,7 +2512,7 @@ struct PageRankStats *pageRankPullQuant16BitGraphCSR(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2696,7 +2696,7 @@ struct PageRankStats *pageRankPullQuant8BitGraphCSR(struct Arguments *arguments,
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -2869,7 +2869,7 @@ struct PageRankStats *pageRankPushQuantGraphCSR(struct Arguments *arguments, str
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -3081,7 +3081,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphCSR(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3286,7 +3286,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphCSR(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3514,7 +3514,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphCSR(struct Arguments *argum
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3709,7 +3709,7 @@ struct PageRankStats *pageRankPullGraphAdjArrayList(struct Arguments *arguments,
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -3865,7 +3865,7 @@ struct PageRankStats *pageRankPushGraphAdjArrayList(struct Arguments *arguments,
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4000,7 +4000,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjArrayList(struct Arguments *
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4155,7 +4155,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjArrayList(struct Arguments *
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4317,7 +4317,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjArrayList(struct Arguments *
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4476,7 +4476,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjArrayList(struct Arguments *
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4658,7 +4658,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjArrayList(struct Argumen
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4833,7 +4833,7 @@ struct PageRankStats *pageRankPullGraphAdjLinkedList(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -4991,7 +4991,7 @@ struct PageRankStats *pageRankPushGraphAdjLinkedList(struct Arguments *arguments
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5127,7 +5127,7 @@ struct PageRankStats *pageRankPullFixedPointGraphAdjLinkedList(struct Arguments 
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5281,7 +5281,7 @@ struct PageRankStats *pageRankPushFixedPointGraphAdjLinkedList(struct Arguments 
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5449,7 +5449,7 @@ struct PageRankStats *pageRankDataDrivenPullGraphAdjLinkedList(struct Arguments 
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5623,7 +5623,7 @@ struct PageRankStats *pageRankDataDrivenPushGraphAdjLinkedList(struct Arguments 
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");
@@ -5810,7 +5810,7 @@ struct PageRankStats *pageRankDataDrivenPullPushGraphAdjLinkedList(struct Argume
     stats->time_total = Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
-    printf("| %-10s | %-8s | %-15s | %-9s | \n", "arguments->Iterations", "PR Sum", "Error", "Time (S)");
+    printf("| %-10s | %-8s | %-15s | %-9s | \n", "Iterations", "PR Sum", "Error", "Time (S)");
     printf(" -----------------------------------------------------\n");
     printf("| %-10u | %-8lf | %-15.13lf | %-9f | \n", stats->iterations, sum, error_total, stats->time_total);
     printf(" -----------------------------------------------------\n");

@@ -198,10 +198,7 @@ struct DoubleTaggedCache *newDoubleTaggedCache(uint32_t l1_size, uint32_t l1_ass
 
     cache->accel_graph_mask = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
     cache->accel_graph_grasp = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
-    cache->ref_cache    = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY1, numPropertyRegions);
-    cache->ref2_cache   = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY2, numPropertyRegions);
-    cache->ref3_cache   = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY3, numPropertyRegions);
-    cache->ref4_cache   = newCache( l1_size, l1_assoc, blocksize, num_vertices, POLICY4, numPropertyRegions);
+    cache->ref_cache    = newCache( l1_size, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
 
     return cache;
 }
@@ -211,9 +208,6 @@ void initDoubleTaggedCacheRegion(struct DoubleTaggedCache *cache, struct Propert
     initAccelGraphCacheRegion     (cache->accel_graph_mask, propertyMetaData);
     initAccelGraphCacheRegion     (cache->accel_graph_grasp, propertyMetaData);
     initialzeCachePropertyRegions (cache->ref_cache, propertyMetaData, cache->ref_cache->size);
-    initialzeCachePropertyRegions (cache->ref2_cache, propertyMetaData, cache->ref2_cache->size);
-    initialzeCachePropertyRegions (cache->ref3_cache, propertyMetaData, cache->ref3_cache->size);
-    initialzeCachePropertyRegions (cache->ref4_cache, propertyMetaData, cache->ref4_cache->size);
 }
 
 void freeDoubleTaggedCache(struct DoubleTaggedCache *cache)
@@ -223,9 +217,6 @@ void freeDoubleTaggedCache(struct DoubleTaggedCache *cache)
         freeAccelGraphCache(cache->accel_graph_mask);
         freeAccelGraphCache(cache->accel_graph_grasp);
         freeCache(cache->ref_cache);
-        freeCache(cache->ref2_cache);
-        freeCache(cache->ref3_cache);
-        freeCache(cache->ref4_cache);
         free(cache);
     }
 }
@@ -1736,9 +1727,6 @@ void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t add
     AccessAccelGraphExpress(cache->accel_graph_mask, addr, op, node, value);
     AccessAccelGraphGRASP(cache->accel_graph_grasp, addr, op, node, value);
     Access(cache->ref_cache, addr, op, node, value);
-    Access(cache->ref2_cache, addr, op, node, value);
-    Access(cache->ref3_cache, addr, op, node, value);
-    Access(cache->ref4_cache, addr, op, node, value);
 }
 
 void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
@@ -1891,9 +1879,6 @@ void setDoubleTaggedCacheThresholdDegreeAvg(struct DoubleTaggedCache *cache, uin
         setAccelGraphCacheThresholdDegreeAvg(cache->accel_graph_mask, degrees);
         setAccelGraphCacheThresholdDegreeAvg(cache->accel_graph_grasp, degrees);
         setCacheThresholdDegreeAvg(cache->ref_cache, degrees);
-        setCacheThresholdDegreeAvg(cache->ref2_cache, degrees);
-        setCacheThresholdDegreeAvg(cache->ref3_cache, degrees);
-        setCacheThresholdDegreeAvg(cache->ref4_cache, degrees);
     }
 }
 
@@ -2547,21 +2532,13 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
     printf("\n======================================================================\n");
     printf("\n===================== cache Stats (ref_cache Stats)  =================\n");
     printStatsGraphCache(cache->ref_cache, in_degree, out_degree);
-    printf("\n===================== cache Stats (ref2_cache Stats)  =================\n");
-    printStatsGraphCache(cache->ref2_cache, in_degree, out_degree);
-    printf("\n===================== cache Stats (ref3_cache Stats)  =================\n");
-    printStatsGraphCache(cache->ref3_cache, in_degree, out_degree);
-    printf("\n===================== cache Stats (ref4_cache Stats)  =================\n");
-    printStatsGraphCache(cache->ref4_cache, in_degree, out_degree);
+
 }
 
 
 void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf)
 {
     printStatsCacheToFile(cache->ref_cache, fname_perf);
-    printStatsCacheToFile(cache->ref2_cache, fname_perf);
-    printStatsCacheToFile(cache->ref3_cache, fname_perf);
-    printStatsCacheToFile(cache->ref4_cache, fname_perf);
 }
 
 void printStats(struct Cache *cache)

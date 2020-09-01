@@ -211,8 +211,9 @@ main (int argc, char **argv)
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
                 arguments.fnamel = label_dir;
 
-                arguments.lmode =  lmode[j];
-                arguments.lmode_l2 = lmode_l2[k];
+                arguments.lmode = 10; // base is random order
+                arguments.lmode_l2 =  lmode[j];
+                arguments.lmode_l3 = lmode_l2[k];
                 arguments.mmode = mmode[k];
 
                 printf("\n%u %u %u %s %s\n", arguments.lmode, arguments.lmode_l2, arguments.mmode, reorder_labels[j], unified_perf_file);
