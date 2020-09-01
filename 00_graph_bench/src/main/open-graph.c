@@ -268,6 +268,9 @@ int
 main (int argc, char **argv)
 {
 
+    mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
+    initializeMersenneState (mt19937var, 27491095);
+
     struct Arguments *arguments = (struct Arguments *)my_malloc(sizeof(struct Arguments));
     /* Default values. */
 
@@ -318,12 +321,6 @@ main (int argc, char **argv)
     if(arguments->dflag)
         arguments->sort = 1;
 
-    struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
-
-    mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
-
-
     if(arguments->xflag) // if stats flag is on collect stats or serialize your graph
     {
         writeSerializedGraphDataStructure(arguments);
@@ -338,7 +335,6 @@ main (int argc, char **argv)
     }
 
     free(arguments);
-    free(timer);
     exit (0);
 }
 

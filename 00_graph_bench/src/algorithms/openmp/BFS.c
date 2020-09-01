@@ -382,7 +382,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(struct Arguments *arguments, str
 
     struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
 
     struct ArrayQueue **localFrontierQueues = (struct ArrayQueue **) my_malloc( P * sizeof(struct ArrayQueue *));
 
@@ -502,7 +502,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(struct Arguments *
     struct Bitmap *bitmapCurr = newBitmap(graph->num_vertices);
     struct Bitmap *bitmapNext = newBitmap(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
     uint32_t mu = graph->num_edges; // number of edges to check from sharedFrontierQueue
     uint32_t mf = graph->vertices->out_degree[arguments->source]; // number of edges from unexplored verticies
     uint32_t nf = 0; // number of vertices in sharedFrontierQueue
@@ -1160,7 +1160,7 @@ struct BFSStats *breadthFirstSearchRowGraphGrid(struct Arguments *arguments, str
     struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
 
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
 
 
 
@@ -1262,7 +1262,7 @@ struct BFSStats *breadthFirstSearchColumnGraphGrid(struct Arguments *arguments, 
     struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
 
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
 
 
 
@@ -1959,7 +1959,7 @@ struct BFSStats *breadthFirstSearchPushGraphAdjArrayList(struct Arguments *argum
 
     struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
 
     struct ArrayQueue **localFrontierQueues = (struct ArrayQueue **) my_malloc( P * sizeof(struct ArrayQueue *));
 
@@ -2061,7 +2061,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphAdjArrayList(struct Ar
     struct Bitmap *bitmapCurr = newBitmap(graph->num_vertices);
     struct Bitmap *bitmapNext = newBitmap(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
     uint32_t mu = graph->num_edges; // number of edges to check from sharedFrontierQueue
     uint32_t mf = graph->vertices[arguments->source].out_degree; // number of edges from unexplored verticies
     uint32_t nf = 0; // number of vertices in sharedFrontierQueue
@@ -2460,7 +2460,7 @@ struct BFSStats *breadthFirstSearchPushGraphAdjLinkedList(struct Arguments *argu
 
     struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
     struct ArrayQueue **localFrontierQueues = (struct ArrayQueue **) my_malloc( P * sizeof(struct ArrayQueue *));
 
 
@@ -2561,7 +2561,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphAdjLinkedList(struct A
     struct Bitmap *bitmapCurr = newBitmap(graph->num_vertices);
     struct Bitmap *bitmapNext = newBitmap(graph->num_vertices);
 
-    uint32_t P = numThreads;
+    uint32_t P = arguments->algo_numThreads;
     uint32_t mu = graph->num_edges; // number of edges to check from sharedFrontierQueue
     uint32_t mf = graph->vertices[arguments->source].out_degree; // number of edges from unexplored verticies
     uint32_t nf = 0; // number of vertices in sharedFrontierQueue

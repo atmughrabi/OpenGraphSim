@@ -173,7 +173,9 @@ main (int argc, char **argv)
     arguments.symmetric = 0;
     arguments.weighted = 0;
     arguments.delta = 1;
-    arguments.numThreads = omp_get_max_threads();
+    arguments.pre_numThreads = 4;
+    arguments.algo_numThreads = 4;
+    arguments.ker_numThreads = 4;
     arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
@@ -194,10 +196,6 @@ main (int argc, char **argv)
 
     mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
     initializeMersenneState (mt19937var, 27491095);
-
-    omp_set_nested(1);
-    omp_set_num_threads(numThreads);
-
 
     printf("*-----------------------------------------------------*\n");
     printf("| %-20s %-30u | \n", "Number of Threads :", numThreads);
