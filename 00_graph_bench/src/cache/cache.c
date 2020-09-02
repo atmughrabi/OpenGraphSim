@@ -2012,6 +2012,14 @@ void initialzeCachePropertyRegions (struct Cache *cache, struct PropertyMetaData
 // ***************               Stats output                                    **************
 // ********************************************************************************************
 
+float getMissRate(struct Cache *cache)
+{
+    float missRate = (double)((getWM(cache) + getRM(cache)) * 100) / (getReads(cache) + getWrites(cache)); //calculate miss rate
+    missRate       = roundf(missRate * 100) / 100;
+
+    return missRate;
+}
+
 void printStatsCache(struct Cache *cache)
 {
     float missRate = (double)((getWM(cache) + getRM(cache)) * 100) / (getReads(cache) + getWrites(cache)); //calculate miss rate

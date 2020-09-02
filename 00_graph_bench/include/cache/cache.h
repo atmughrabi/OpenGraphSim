@@ -197,6 +197,7 @@ struct DoubleTaggedCache
 void initCache(struct Cache *cache, int s, int a, int b, int p);
 void initCacheLine(struct CacheLine *cacheLine);
 
+float getMissRate(struct Cache *cache);
 uint64_t getTag(struct CacheLine *cacheLine);
 uint64_t getAddr(struct CacheLine *cacheLine);
 uint8_t getFlags(struct CacheLine *cacheLine);

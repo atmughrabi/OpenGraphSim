@@ -63,17 +63,17 @@ main (int argc, char **argv)
     char graph_dir[1024];
     char label_dir[1024];
     char unified_perf_file[1024];
-    char express_perf_file[1024];
-    char grasp_perf_file[1024];
+    // char express_perf_file[1024];
+    // char grasp_perf_file[1024];
 
     uint32_t cache_size[CACHE_CONFIGS] = {32768, 65536, 131072, 262144, 524288,  1048576, 2097152, 4194304, 8388608, 16777216,  33554432,   67108864};
     uint32_t Associativity[CACHE_CONFIGS] = {4,  4, 4, 8,  8,  16, 16, 16, 16, 32, 32, 32};
     uint32_t Block_size[CACHE_CONFIGS] = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     uint32_t policy[CACHE_POLICY] = {PLRU_POLICY, SRRIP_POLICY, GRASP_POLICY, MASK_POLICY};
-    uint32_t PLRU_stats[GRAPH_NUM][ORDER_CONFIG]  = {0};
-    uint32_t SSRIP_stats[GRAPH_NUM][ORDER_CONFIG] = {0};
-    uint32_t GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
-    uint32_t EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
+    float PLRU_stats[GRAPH_NUM][ORDER_CONFIG]  = {0};
+    float SSRIP_stats[GRAPH_NUM][ORDER_CONFIG] = {0};
+    float GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
+    float EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 4, 11, 11, 0, 11, 11};
     uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0};
     uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
@@ -195,6 +195,7 @@ main (int argc, char **argv)
     uint32_t i = 0;
     uint32_t j = 0;
     uint32_t k = 0;
+    uint32_t kk = 0;
     void *ref_data;
 
     for( k = 0; k < CACHE_CONFIGS ; k++)
@@ -207,12 +208,12 @@ main (int argc, char **argv)
         for ( i = 0; i < GRAPH_NUM; ++i)
         {
             printf("graph %s\n", benchmarks_dir[i]);
-            sprintf(unified_perf_file, "%s/%s_algo%u_cache%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
+            sprintf(unified_perf_file, "%s/%s_algo%u_cache%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size / 1024, "perf");
             // sprintf(express_perf_file, "%s/%s_algo%u_cache%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
             // sprintf(grasp_perf_file, "%s/%s_algo%u_cache%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
 
             arguments.policey   = policy[0];
-            for (j = 0; j < TOTAL_CONFIG; ++j)
+            for (j = 0; j < ORDER_CONFIG; ++j)
             {
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
@@ -227,52 +228,129 @@ main (int argc, char **argv)
                 graph = generateGraphDataStructure(&arguments);
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+
+                PLRU_stats[i][j] = getMissRate(ref_stats_tmp->cache->ref_cache);
+
+                // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+
+                freeGraphStatsGeneral(ref_stats_tmp, arguments.algorithm);
                 freeGraphDataStructure(graph, arguments.datastructure);
             }
+
+            arguments.policey   = policy[1];
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+                arguments.lmode = 10; // base is random order
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+
+                graph = generateGraphDataStructure(&arguments);
+                ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+
+                SSRIP_stats[i][j] = getMissRate(ref_stats_tmp->cache->ref_cache);
+
+                // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+
+                freeGraphStatsGeneral(ref_stats_tmp, arguments.algorithm);
+                freeGraphDataStructure(graph, arguments.datastructure);
+            }
+
+            arguments.policey   = policy[2];
+            for (kk = 0, j = ORDER_CONFIG; j < ORDER_CONFIG + MODE_NUM; ++j, ++kk)
+            {
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+                arguments.lmode = 10; // base is random order
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+
+                graph = generateGraphDataStructure(&arguments);
+                ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+
+                GRASP_stats[i][kk] = getMissRate(ref_stats_tmp->cache->ref_cache);
+
+                // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+
+                freeGraphStatsGeneral(ref_stats_tmp, arguments.algorithm);
+                freeGraphDataStructure(graph, arguments.datastructure);
+            }
+
+            arguments.policey   = policy[3];
+            for (kk = 0, j = (ORDER_CONFIG + MODE_NUM); j < (ORDER_CONFIG + MODE_NUM + MODE_NUM); ++j, ++kk)
+            {
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+                arguments.lmode = 10; // base is random order
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+
+                graph = generateGraphDataStructure(&arguments);
+                ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+
+                EXPRESS_stats[i][kk] = getMissRate(ref_stats_tmp->cache->ref_cache);
+
+                // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+
+                freeGraphStatsGeneral(ref_stats_tmp, arguments.algorithm);
+                freeGraphDataStructure(graph, arguments.datastructure);
+            }
+
+            // print out stats to file
+            FILE *fptr1;
+            fptr1 = fopen(unified_perf_file, "a+");
+            fprintf(fptr1, " -----------------------------------------------------\n");
+            for ( i = 0; i < GRAPH_NUM; ++i)
+            {
+                for (j = 0; j < ORDER_CONFIG; ++j)
+                {
+                    fprintf(fptr1, "%-14f ",  PLRU_stats[i][j]);
+                }
+                fprintf(fptr1, " \n");
+                for (j = 0; j < ORDER_CONFIG; ++j)
+                {
+                    fprintf(fptr1, "%-14f ",  SSRIP_stats[i][j]);
+                }
+                fprintf(fptr1, " \n");
+            }
+            fprintf(fptr1, " -----------------------------------------------------\n");
+            for ( i = 0; i < GRAPH_NUM; ++i)
+            {
+                for (j = 0; j < MODE_NUM; ++j)
+                {
+                    fprintf(fptr1, "%-14f ",  GRASP_stats[i][j]);
+                }
+                fprintf(fptr1, " \n");
+            }
+            fprintf(fptr1, " -----------------------------------------------------\n");
+            for ( i = 0; i < GRAPH_NUM; ++i)
+            {
+                for (j = 0; j < MODE_NUM; ++j)
+                {
+                    fprintf(fptr1, "%-14f ",  EXPRESS_stats[i][j]);
+                }
+                fprintf(fptr1, " \n");
+            }
+            fprintf(fptr1, " -----------------------------------------------------\n");
+            fclose(fptr1);
         }
     }
-
-
-    // for ( i = 0; i < GRAPH_NUM; ++i)
-    // {
-    //     printf("Begin tests for %s\n", benchmarks_dir[i]);
-    //     for (j = 0; j < MODE_NUM; ++j)
-    //     {
-    //         for (k = 0; k < MODE_NUM; ++k)
-    //         {
-    //             sprintf(unified_perf_file, "%s/%s_algo%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-    //             sprintf(express_perf_file, "%s/%s_algo%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-    //             sprintf(grasp_perf_file, "%s/%s_algo%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-
-    //             sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
-    //             arguments.fnameb = graph_dir;
-    //             sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-    //             arguments.fnamel = label_dir;
-
-    //             arguments.lmode = 10; // base is random order
-    //             arguments.lmode_l2 =  lmode_l2[j];
-    //             arguments.lmode_l3 = lmode_l3[k];
-    //             arguments.mmode = mmode[k];
-
-    //             printf("\n%u %u %u %s %s\n", arguments.lmode, arguments.lmode_l2, arguments.mmode, reorder_labels[j], unified_perf_file);
-
-    //             graph = generateGraphDataStructure(&arguments);
-
-    //             arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
-    //             ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-    //             struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-
-    //             printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
-    //             printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_mask, express_perf_file);
-    //             printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_grasp, grasp_perf_file);
-    //             freeGraphStatsGeneral(ref_data, arguments.algorithm);
-
-    //             freeGraphDataStructure(graph, arguments.datastructure);
-    //         }
-    //     }
-    // }
-
     exit (0);
 }
 
