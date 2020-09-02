@@ -75,8 +75,8 @@ main (int argc, char **argv)
     float GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
     float EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
-    uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0 , 4 , 0 , 4 , 4, 4 , 4 , 0, 0 , 0 };
-    uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0 , 0 , 0 , 0 , 0, 0 , 0 , 1, 1 , 1 };
+    uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0 };
+    uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };
 
     char *config_labels[TOTAL_CONFIG] =
     {
@@ -240,7 +240,7 @@ main (int argc, char **argv)
                 arguments.mmode = mmode[j];
                 arguments.fnameb = graph_dir;
                 arguments.fnamel = label_dir;
-                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
 
                 graph = generateGraphDataStructure(&arguments);
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
@@ -265,7 +265,7 @@ main (int argc, char **argv)
                 arguments.mmode = mmode[j];
                 arguments.fnameb = graph_dir;
                 arguments.fnamel = label_dir;
-                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
 
                 graph = generateGraphDataStructure(&arguments);
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
@@ -290,7 +290,7 @@ main (int argc, char **argv)
                 arguments.mmode = mmode[j];
                 arguments.fnameb = graph_dir;
                 arguments.fnamel = label_dir;
-                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
 
                 graph = generateGraphDataStructure(&arguments);
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
@@ -315,7 +315,7 @@ main (int argc, char **argv)
                 arguments.mmode = mmode[j];
                 arguments.fnameb = graph_dir;
                 arguments.fnamel = label_dir;
-                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
 
                 graph = generateGraphDataStructure(&arguments);
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
@@ -337,6 +337,15 @@ main (int argc, char **argv)
         fprintf(fptr1, " -----------------------------------------------------\n");
         fprintf(fptr1, " CacheSize : %u KB \n", cache_size[k] / 1024 );
         fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "%-25s ",  " ");
+        fprintf(fptr1, "%-25s ",  " ");
+        for (j = 0; j < ORDER_CONFIG; ++j)
+        {
+            fprintf(fptr1, "%-14s ",  config_labels[j]);
+        }
+        printf(fptr1, " \n");
+
         for ( i = 0; i < GRAPH_NUM; ++i)
         {
             fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
@@ -355,6 +364,14 @@ main (int argc, char **argv)
             fprintf(fptr1, " \n");
         }
         fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "%-25s ",  "GRASP");
+        for (j = (ORDER_CONFIG); j < (ORDER_CONFIG + MODE_NUM); ++j)
+        {
+            fprintf(fptr1, "%-14s ",  config_labels[j]);
+        }
+        printf(fptr1, " \n");
+
         for ( i = 0; i < GRAPH_NUM; ++i)
         {
             fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
@@ -365,6 +382,14 @@ main (int argc, char **argv)
             fprintf(fptr1, " \n");
         }
         fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "%-25s ",  "EXPRESS");
+        for (j = (ORDER_CONFIG + MODE_NUM); j < (ORDER_CONFIG + MODE_NUM + MODE_NUM); ++j)
+        {
+            fprintf(fptr1, "%-14s ",  config_labels[j]);
+        }
+        printf(fptr1, " \n");
+
         for ( i = 0; i < GRAPH_NUM; ++i)
         {
             fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
