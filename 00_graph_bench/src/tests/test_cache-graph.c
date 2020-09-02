@@ -74,11 +74,27 @@ main (int argc, char **argv)
     float SSRIP_stats[GRAPH_NUM][ORDER_CONFIG] = {0};
     float GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
     float EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
-    uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 4, 11, 11, 0, 11, 11};
-    uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0};
-    uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
+    uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
+    uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0 , 4 , 0 , 4 , 4, 4 , 4 , 0, 0 , 0 };
+    uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0 , 0 , 0 , 0 , 0, 0 , 0 , 1, 1 , 1 };
 
-    char *reorder_labels[ORDER_CONFIG + MODE_NUM + MODE_NUM] =
+    char *config_labels[TOTAL_CONFIG] =
+    {
+        "Rand-Order",
+        "DBG",
+        "Rabbit",
+        "Rabbit+DBG",
+        "Gorder",
+        "Gorder+DBG",
+        "DBG",
+        "Rabbit+DBG",
+        "Gorder+DBG",
+        "MASK",
+        "Rabbit+MASK",
+        "Gorder+MASK"
+    };
+
+    char *reorder_labels[TOTAL_CONFIG] =
     {
         "NO.labels",
         "NO.labels",
@@ -198,17 +214,18 @@ main (int argc, char **argv)
     uint32_t kk = 0;
     void *ref_data;
 
+    sprintf(unified_perf_file, "%s/results_algo%u_cache.unified.%s", "./cache-results", arguments.algorithm, "perf");
+
     for( k = 0; k < CACHE_CONFIGS ; k++)
     {
         arguments.l1_size   = cache_size[k];
         arguments.l1_assoc  = Associativity[k];
         arguments.blocksize = Block_size[k];
 
-
         for ( i = 0; i < GRAPH_NUM; ++i)
         {
             printf("graph %s\n", benchmarks_dir[i]);
-            sprintf(unified_perf_file, "%s/%s_algo%u_cache%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size / 1024, "perf");
+
             // sprintf(express_perf_file, "%s/%s_algo%u_cache%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
             // sprintf(grasp_perf_file, "%s/%s_algo%u_cache%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
 
@@ -217,7 +234,7 @@ main (int argc, char **argv)
             {
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-                arguments.lmode = 10; // base is random order
+                arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
                 arguments.lmode_l3 = lmode_l3[j];
                 arguments.mmode = mmode[j];
@@ -242,7 +259,7 @@ main (int argc, char **argv)
             {
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-                arguments.lmode = 10; // base is random order
+                arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
                 arguments.lmode_l3 = lmode_l3[j];
                 arguments.mmode = mmode[j];
@@ -267,7 +284,7 @@ main (int argc, char **argv)
             {
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-                arguments.lmode = 10; // base is random order
+                arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
                 arguments.lmode_l3 = lmode_l3[j];
                 arguments.mmode = mmode[j];
@@ -292,7 +309,7 @@ main (int argc, char **argv)
             {
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-                arguments.lmode = 10; // base is random order
+                arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
                 arguments.lmode_l3 = lmode_l3[j];
                 arguments.mmode = mmode[j];
@@ -312,44 +329,53 @@ main (int argc, char **argv)
                 freeGraphDataStructure(graph, arguments.datastructure);
             }
 
-            // print out stats to file
-            FILE *fptr1;
-            fptr1 = fopen(unified_perf_file, "a+");
-            fprintf(fptr1, " -----------------------------------------------------\n");
-            for ( i = 0; i < GRAPH_NUM; ++i)
-            {
-                for (j = 0; j < ORDER_CONFIG; ++j)
-                {
-                    fprintf(fptr1, "%-14f ",  PLRU_stats[i][j]);
-                }
-                fprintf(fptr1, " \n");
-                for (j = 0; j < ORDER_CONFIG; ++j)
-                {
-                    fprintf(fptr1, "%-14f ",  SSRIP_stats[i][j]);
-                }
-                fprintf(fptr1, " \n");
-            }
-            fprintf(fptr1, " -----------------------------------------------------\n");
-            for ( i = 0; i < GRAPH_NUM; ++i)
-            {
-                for (j = 0; j < MODE_NUM; ++j)
-                {
-                    fprintf(fptr1, "%-14f ",  GRASP_stats[i][j]);
-                }
-                fprintf(fptr1, " \n");
-            }
-            fprintf(fptr1, " -----------------------------------------------------\n");
-            for ( i = 0; i < GRAPH_NUM; ++i)
-            {
-                for (j = 0; j < MODE_NUM; ++j)
-                {
-                    fprintf(fptr1, "%-14f ",  EXPRESS_stats[i][j]);
-                }
-                fprintf(fptr1, " \n");
-            }
-            fprintf(fptr1, " -----------------------------------------------------\n");
-            fclose(fptr1);
+
         }
+        // print out stats to file each graph processed
+        FILE *fptr1;
+        fptr1 = fopen(unified_perf_file, "a+");
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " CacheSize : %u KB \n", cache_size[k] / 1024 );
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
+            fprintf(fptr1, "%-25s ",  "PLRU");
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f ",  PLRU_stats[i][j]);
+            }
+            fprintf(fptr1, " \n");
+            fprintf(fptr1, "%-25s ",  " ");
+            fprintf(fptr1, "%-25s ",  "SSRIP");
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f ",  SSRIP_stats[i][j]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
+            for (j = 0; j < MODE_NUM; ++j)
+            {
+                fprintf(fptr1, "%-14f ",  GRASP_stats[i][j]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
+            for (j = 0; j < MODE_NUM; ++j)
+            {
+                fprintf(fptr1, "%-14f ",  EXPRESS_stats[i][j]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fclose(fptr1);
     }
     exit (0);
 }
