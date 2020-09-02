@@ -309,7 +309,7 @@ run-cache: app-cache
 sweep-cache: MODE         = -DCACHE_HARNESS -DCACHE_HARNESS_META
 sweep-cache: INTEGRATION  = openmp
 sweep-cache: test-cache
-	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS) >> $(APP_DIR)/cache-results/full_results.perf
+	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-cachesim -f $(FILE_BIN) $(ARGS)
 
 # http://snipersim.org/w/Multiple_regions_of_interest
 .PHONY: run-sniper

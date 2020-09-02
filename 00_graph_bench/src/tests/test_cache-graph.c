@@ -44,13 +44,18 @@
 #include "connectedComponents.h"
 #include "triangleCount.h"
 
-#ifdef CACHE_HARNESS
 #include "cache.h"
-#endif
 
 #include "graphTest.h"
-#define GRAPH_NUM 5
+#define GRAPH_NUM 4
+
+#define CACHE_CONFIGS 12
+#define CACHE_POLICY 4
 #define MODE_NUM 3
+#define ORDER_CONFIG 6
+#define TOTAL_CONFIG (MODE_NUM+MODE_NUM+ORDER_CONFIG)
+
+
 
 int
 main (int argc, char **argv)
@@ -60,6 +65,35 @@ main (int argc, char **argv)
     char unified_perf_file[1024];
     char express_perf_file[1024];
     char grasp_perf_file[1024];
+
+    uint32_t cache_size[CACHE_CONFIGS] = {32768, 65536, 131072, 262144, 524288,  1048576, 2097152, 4194304, 8388608, 16777216,  33554432,   67108864};
+    uint32_t Associativity[CACHE_CONFIGS] = {4,  4, 4, 8,  8,  16, 16, 16, 16, 32, 32, 32};
+    uint32_t Block_size[CACHE_CONFIGS] = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    uint32_t policy[CACHE_POLICY] = {PLRU_POLICY, SRRIP_POLICY, GRASP_POLICY, MASK_POLICY};
+    uint32_t PLRU_stats[GRAPH_NUM][ORDER_CONFIG]  = {0};
+    uint32_t SSRIP_stats[GRAPH_NUM][ORDER_CONFIG] = {0};
+    uint32_t GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
+    uint32_t EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
+    uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 4, 11, 11, 0, 11, 11};
+    uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0};
+    uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
+
+    char *reorder_labels[ORDER_CONFIG + MODE_NUM + MODE_NUM] =
+    {
+        "NO.labels",
+        "NO.labels",
+        "graph_Rabbit.labels",
+        "graph_Rabbit.labels",
+        "graph_Gorder.labels",
+        "graph_Gorder.labels",
+        "NO.labels",
+        "graph_Rabbit.labels",
+        "graph_Gorder.labels",
+        "NO.labels",
+        "graph_Rabbit.labels",
+        "graph_Gorder.labels"
+    };
+
 
     char *benchmarks_graphs[GRAPH_NUM] =
     {
@@ -113,36 +147,6 @@ main (int argc, char **argv)
     //     "../../01_GraphDatasets/SNAP/SNAP-web-Google"
     // };
 
-    char *reorder_labels[MODE_NUM] =
-    {
-        "NO.labels",
-        "graph_Rabbit.labels",
-        "graph_Gorder.labels"
-    };
-
-
-    uint32_t lmode[MODE_NUM] =
-    {
-        0,
-        11,
-        11
-    };
-
-    uint32_t lmode_l2[MODE_NUM] =
-    {
-        0,
-        4,
-        0
-    };
-
-    uint32_t mmode[MODE_NUM] =
-    {
-        0,
-        0,
-        1
-    };
-
-
     struct Arguments arguments;
     /* Default values. */
 
@@ -181,12 +185,10 @@ main (int argc, char **argv)
     arguments.lmode_l3 = 0;
     arguments.mmode = 0;
 
-#ifdef CACHE_HARNESS_META
     arguments.l1_size   = L1_SIZE;
     arguments.l1_assoc  = L1_ASSOC;
     arguments.blocksize = BLOCKSIZE;
     arguments.policey   = LRU_POLICY;
-#endif
 
     void *graph = NULL;
 
@@ -195,44 +197,81 @@ main (int argc, char **argv)
     uint32_t k = 0;
     void *ref_data;
 
-    for ( i = 0; i < GRAPH_NUM; ++i)
+    for( k = 0; k < CACHE_CONFIGS ; k++)
     {
-        printf("Begin tests for %s\n", benchmarks_dir[i]);
-        for (j = 0; j < MODE_NUM; ++j)
+        arguments.l1_size   = cache_size[k];
+        arguments.l1_assoc  = Associativity[k];
+        arguments.blocksize = Block_size[k];
+
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
         {
-            for (k = 0; k < MODE_NUM; ++k)
+            printf("graph %s\n", benchmarks_dir[i]);
+            sprintf(unified_perf_file, "%s/%s_algo%u_cache%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
+            // sprintf(express_perf_file, "%s/%s_algo%u_cache%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
+            // sprintf(grasp_perf_file, "%s/%s_algo%u_cache%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, arguments.l1_size, "perf");
+
+            arguments.policey   = policy[0];
+            for (j = 0; j < TOTAL_CONFIG; ++j)
             {
-                sprintf(unified_perf_file, "%s/%s_algo%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-                sprintf(express_perf_file, "%s/%s_algo%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-                sprintf(grasp_perf_file, "%s/%s_algo%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
-
                 sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
-                arguments.fnameb = graph_dir;
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
-                arguments.fnamel = label_dir;
-
                 arguments.lmode = 10; // base is random order
-                arguments.lmode_l2 =  lmode[j];
-                arguments.lmode_l3 = lmode_l2[k];
-                arguments.mmode = mmode[k];
-
-                printf("\n%u %u %u %s %s\n", arguments.lmode, arguments.lmode_l2, arguments.mmode, reorder_labels[j], unified_perf_file);
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u \n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024);
 
                 graph = generateGraphDataStructure(&arguments);
-
-                arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                 ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
                 struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-
                 printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
-                printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_mask, express_perf_file);
-                printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_grasp, grasp_perf_file);
-                freeGraphStatsGeneral(ref_data, arguments.algorithm);
-
                 freeGraphDataStructure(graph, arguments.datastructure);
             }
         }
     }
+
+
+    // for ( i = 0; i < GRAPH_NUM; ++i)
+    // {
+    //     printf("Begin tests for %s\n", benchmarks_dir[i]);
+    //     for (j = 0; j < MODE_NUM; ++j)
+    //     {
+    //         for (k = 0; k < MODE_NUM; ++k)
+    //         {
+    //             sprintf(unified_perf_file, "%s/%s_algo%u.unified.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+    //             sprintf(express_perf_file, "%s/%s_algo%u.express.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+    //             sprintf(grasp_perf_file, "%s/%s_algo%u.grasp.%s", "./cache-results", benchmarks_graphs[i], arguments.algorithm, "perf");
+
+    //             sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+    //             arguments.fnameb = graph_dir;
+    //             sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+    //             arguments.fnamel = label_dir;
+
+    //             arguments.lmode = 10; // base is random order
+    //             arguments.lmode_l2 =  lmode_l2[j];
+    //             arguments.lmode_l3 = lmode_l3[k];
+    //             arguments.mmode = mmode[k];
+
+    //             printf("\n%u %u %u %s %s\n", arguments.lmode, arguments.lmode_l2, arguments.mmode, reorder_labels[j], unified_perf_file);
+
+    //             graph = generateGraphDataStructure(&arguments);
+
+    //             arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
+    //             ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+    //             struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+
+    //             printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+    //             printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_mask, express_perf_file);
+    //             printStatsAccelGraphCachetoFile(ref_stats_tmp->cache->accel_graph_grasp, grasp_perf_file);
+    //             freeGraphStatsGeneral(ref_data, arguments.algorithm);
+
+    //             freeGraphDataStructure(graph, arguments.datastructure);
+    //         }
+    //     }
+    // }
 
     exit (0);
 }

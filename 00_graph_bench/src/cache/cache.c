@@ -1724,8 +1724,8 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
 
 void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
 {
-    AccessAccelGraphExpress(cache->accel_graph_mask, addr, op, node, value);
-    AccessAccelGraphGRASP(cache->accel_graph_grasp, addr, op, node, value);
+    // AccessAccelGraphExpress(cache->accel_graph_mask, addr, op, node, value);
+    // AccessAccelGraphGRASP(cache->accel_graph_grasp, addr, op, node, value);
     Access(cache->ref_cache, addr, op, node, value);
 }
 
@@ -2525,11 +2525,11 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
     // printf("| %-21s | %-27.2f | \n", "MissRate Improved(%)", missRate_perf);
     // printf(" -----------------------------------------------------\n");
 
-    printf("\n======================================================================\n");
-    printStatsAccelGraphCache(cache->accel_graph_grasp, in_degree, out_degree);
-    printf("\n======================================================================\n");
-    printStatsAccelGraphCache(cache->accel_graph_mask, in_degree, out_degree);
-    printf("\n======================================================================\n");
+    // printf("\n======================================================================\n");
+    // printStatsAccelGraphCache(cache->accel_graph_grasp, in_degree, out_degree);
+    // printf("\n======================================================================\n");
+    // printStatsAccelGraphCache(cache->accel_graph_mask, in_degree, out_degree);
+    // printf("\n======================================================================\n");
     printf("\n===================== cache Stats (ref_cache Stats)  =================\n");
     printStatsGraphCache(cache->ref_cache, in_degree, out_degree);
 

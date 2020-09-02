@@ -82,12 +82,14 @@ void writeSerializedGraphDataStructure(struct Arguments *arguments)  // for now 
         Start(timer);
         struct EdgeList *edgeList = readEdgeListsbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted);  // read edglist from binary file
 
-
         if(arguments->lmode)
             edgeList = reorderGraphProcess(edgeList, arguments);
 
-        // add another layer of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
         arguments->lmode = arguments->lmode_l2;
+        if(arguments->lmode)
+            edgeList = reorderGraphProcess(edgeList, arguments);
+
+        arguments->lmode = arguments->lmode_l3;
         if(arguments->lmode)
             edgeList = reorderGraphProcess(edgeList, arguments);
 

@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+#define CACHE_UNIFIED
+#define CACHE_CAPI_GRASP
+#define CACHE_CAPI_MASK
+
+#define CACHE_MODEL CACHE_UNIFIED
+
 // Policy TYPES
 #define LRU_POLICY     0
 #define LFU_POLICY     1
@@ -185,9 +191,6 @@ struct DoubleTaggedCache
     struct AccelGraphCache *accel_graph_mask;// psl_cache
     struct AccelGraphCache *accel_graph_grasp;// psl_cache
     struct Cache *ref_cache; // PLRU
-    struct Cache *ref2_cache; // psl_cache
-    struct Cache *ref3_cache; // psl_cache
-    struct Cache *ref4_cache; // psl_cache
 };
 
 ///cacheline helper functions
