@@ -337,14 +337,14 @@ sweep-convert: app-openmp
 		do                                  												\
 			if [ -e $${graph_dir}/graph.bin ]; then											\
 				echo "convert $${graph_dir}/graph.bin";									    \
-				./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c 0 -f $${graph_dir}/graph.bin -z 1 -l 10;\
+				./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c 0 -f $${graph_dir}/graph.bin -z 1 -l 10 -L 10 -O 10;\
 				mv $${graph_dir}/graph.bin.txt $${graph_dir}/graph.rand;                    \
 				mv $${graph_dir}/graph_Gorder.labels $${graph_dir}/graph_Gorder.org.labels; \
 				mv $${graph_dir}/graph_Rabbit.labels $${graph_dir}/graph_Rabbit.org.labels; \
-				../06_Gorder/Gorder graph.rand ;                  							\
-				../05_rabbit_order/demo/reorder graph.rand ;      							\
-				mv graph_Gorder.labels $${graph_dir}/graph_Gorder.rand.labels;\
-				mv graph_Rabbit.labels $${graph_dir}/graph_Rabbit.rand.labels;\
+				../../06_Gorder/Gorder $${graph_dir}/graph.rand ;                  							\
+				../../05_rabbit_order/demo/reorder $${graph_dir}/graph.rand ;      							\
+				mv $${graph_dir}/graph_Gorder.labels $${graph_dir}/graph_Gorder.rand.labels; \
+				mv graph_Rabbit.labels $${graph_dir}/graph_Rabbit.rand.labels; \
 				./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c 1 -f $${graph_dir}/graph.rand -z 0 ;\
 				rm $${graph_dir}/graph.rand;                                                \
 			fi; 																			\

@@ -7,7 +7,7 @@ APP                         ?= open-graph
 # test name needs to match the file name test/test_accel-graph.c
 # export APP_TEST           ?=  test_open-graph
 # export APP_TEST           ?=  test_grasp-cache
-export APP_TEST           ?=  test_cache-graph
+export APP_TEST           ?=  sweep_cache-graph
 
 # dirs Root app
 export APP_DIR              ?= .

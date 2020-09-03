@@ -98,16 +98,16 @@ main (int argc, char **argv)
     {
         "NO.labels",
         "NO.labels",
-        "graph_Rabbit.labels",
-        "graph_Rabbit.labels",
-        "graph_Gorder.labels",
-        "graph_Gorder.labels",
+        "graph_Rabbit.rand.labels",
+        "graph_Rabbit.rand.labels",
+        "graph_Gorder.rand.labels",
+        "graph_Gorder.rand.labels",
         "NO.labels",
-        "graph_Rabbit.labels",
-        "graph_Gorder.labels",
+        "graph_Rabbit.rand.labels",
+        "graph_Gorder.rand.labels",
         "NO.labels",
-        "graph_Rabbit.labels",
-        "graph_Gorder.labels"
+        "graph_Rabbit.rand.labels",
+        "graph_Gorder.rand.labels"
     };
 
 
@@ -129,15 +129,15 @@ main (int argc, char **argv)
 
     char *benchmarks_graphs[GRAPH_NUM] =
     {
+        "GAP-road",
+        "GAP-twitter",
+        "GONG-gplus",
+        "KONECT-wikipedia_link_en",
         "LAW-in-2004",
         "LAW-it-2004",
         "LAW-uk-2002",
         "LAW-uk-2005",
         "LAW-webbase-2001",
-        "KONECT-wikipedia_link_en",
-        "GAP-road",
-        "GAP-twitter",
-        "GONG-gplus",
         "SNAP-cit-Patents",
         "SNAP-com-Orkut",
         "SNAP-soc-LiveJournal1",
@@ -147,15 +147,15 @@ main (int argc, char **argv)
 
     char *benchmarks_dir[GRAPH_NUM] =
     {
+        "../../01_GraphDatasets/GAP/GAP-road",
+        "../../01_GraphDatasets/GAP/GAP-twitter",
+        "../../01_GraphDatasets/GONG/GONG-gplus",
+        "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
         "../../01_GraphDatasets/LAW/LAW-in-2004",
         "../../01_GraphDatasets/LAW/LAW-it-2004",
         "../../01_GraphDatasets/LAW/LAW-uk-2002",
         "../../01_GraphDatasets/LAW/LAW-uk-2005",
         "../../01_GraphDatasets/LAW/LAW-webbase-2001",
-        "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
-        "../../01_GraphDatasets/GAP/GAP-road",
-        "../../01_GraphDatasets/GAP/GAP-twitter",
-        "../../01_GraphDatasets/GONG/GONG-gplus",
         "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
         "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
         "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
@@ -188,7 +188,7 @@ main (int argc, char **argv)
     arguments.algo_numThreads = omp_get_max_threads();
     arguments.ker_numThreads = 1;
 
-    arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.bin";
+    arguments.fnameb = "../01_test_graphs/LAW/LAW-enron/graph.rand.bin";
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
@@ -232,7 +232,7 @@ main (int argc, char **argv)
             arguments.policey   = policy[0];
             for (j = 0; j < ORDER_CONFIG; ++j)
             {
-                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
                 arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
@@ -257,7 +257,7 @@ main (int argc, char **argv)
             arguments.policey   = policy[1];
             for (j = 0; j < ORDER_CONFIG; ++j)
             {
-                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
                 arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
@@ -282,7 +282,7 @@ main (int argc, char **argv)
             arguments.policey   = policy[2];
             for (kk = 0, j = ORDER_CONFIG; j < ORDER_CONFIG + MODE_NUM; ++j, ++kk)
             {
-                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
                 arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
@@ -307,7 +307,7 @@ main (int argc, char **argv)
             arguments.policey   = policy[3];
             for (kk = 0, j = (ORDER_CONFIG + MODE_NUM); j < (ORDER_CONFIG + MODE_NUM + MODE_NUM); ++j, ++kk)
             {
-                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.bin");
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
                 sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
                 arguments.lmode = 0; // base is random order
                 arguments.lmode_l2 =  lmode_l2[j];
