@@ -382,27 +382,27 @@ benchmarking suite for various graph processing algorithms using pure C.
 # Tasks TODO:
 
 - [ ] Finish graph algorithms suite Simple Trace Cache
-  - [ ] BFS   (Breadth First Search)
-  - [ ] PR    (Page-Rank)
+  - [x] BFS   (Breadth First Search)
+  - [x] PR    (Page-Rank)
   - [ ] DFS   (Depth First Search)
   - [ ] IA    (Incremental Aggregation) BUGGY*
   - [ ] SSSP  (BellmanFord)
   - [ ] SSSP  (Delta Stepping)
-  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
-  - [ ] CC    (Connected Components)
+  - [x] SPMV  (Sparse Matrix Vector Multiplication)
+  - [x] CC    (Connected Components)
   - [ ] TC    (Triangle Counting)
   - [ ] BC    (Betweenness Centrality)
-- [ ] Finish graph algorithms suite Sniper
-  - [ ] BFS   (Breadth First Search)
-  - [ ] PR    (Page-Rank)
-  - [ ] DFS   (Depth First Search)
+- [x] Finish graph algorithms suite Sniper
+  - [x] BFS   (Breadth First Search)
+  - [x] PR    (Page-Rank)
+  - [x] DFS   (Depth First Search)
   - [ ] IA    (Incremental Aggregation) BUGGY*
-  - [ ] SSSP  (BellmanFord)
-  - [ ] SSSP  (Delta Stepping)
-  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
-  - [ ] CC    (Connected Components)
-  - [ ] TC    (Triangle Counting)
-  - [ ] BC    (Betweenness Centrality)
+  - [x] SSSP  (BellmanFord)
+  - [x] SSSP  (Delta Stepping)
+  - [x] SPMV  (Sparse Matrix Vector Multiplication)
+  - [x] CC    (Connected Components)
+  - [x] TC    (Triangle Counting)
+  - [x] BC    (Betweenness Centrality)
 - [ ] Finish graph algorithms suite GEM5
   - [ ] BFS   (Breadth First Search)
   - [ ] PR    (Page-Rank)

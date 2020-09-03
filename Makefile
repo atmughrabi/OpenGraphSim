@@ -115,7 +115,7 @@ export PULL_PUSH 		?= 0
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 10
-export REORDER_LAYER2   ?= 4
+export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 export DATA_STRUCTURES  ?= 0
 export ALGORITHMS 		?= 1
@@ -131,7 +131,7 @@ export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
 export FILE_FORMAT		?= 1
-export CONVERT_FORMAT 	?= 1
+export CONVERT_FORMAT 	?= 0
 
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
@@ -188,6 +188,14 @@ run-openmp:
 .PHONY: convert
 convert:
 	$(MAKE) convert $(MAKE_ARGS)
+
+.PHONY: sweep-convert
+sweep-convert:
+	$(MAKE) sweep-convert $(MAKE_ARGS)
+
+.PHONY: echo-dir
+echo-dir: 
+	$(MAKE) echo-dir $(MAKE_ARGS)
 
 .PHONY: convert-w
 convert-w:

@@ -328,6 +328,29 @@ convert: INTEGRATION = openmp
 convert: app-openmp
 	./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c $(CONVERT_FORMAT) -f $(FILE_BIN) -z $(FILE_FORMAT)
 
+.PHONY: sweep-convert
+sweep-convert: INTEGRATION = openmp
+sweep-convert: app-openmp
+	@for dir in ${BENCHMARKS_DIR}/*;      													\
+	do                                      												\
+		for graph_dir in $${dir}/*;               											\
+		do                                  												\
+			if [ -e $${graph_dir}/graph.bin ]; then											\
+				echo "convert $${graph_dir}/graph.bin";									    \
+				./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c 0 -f $${graph_dir}/graph.bin -z 1 -l 10;\
+				mv $${graph_dir}/graph.bin.txt $${graph_dir}/graph.rand;                    \
+				mv $${graph_dir}/graph_Gorder.labels $${graph_dir}/graph_Gorder.org.labels; \
+				mv $${graph_dir}/graph_Rabbit.labels $${graph_dir}/graph_Rabbit.org.labels; \
+				../06_Gorder/Gorder graph.rand ;                  							\
+				../05_rabbit_order/demo/reorder graph.rand ;      							\
+				mv graph_Gorder.labels $${graph_dir}/graph_Gorder.rand.labels;\
+				mv graph_Rabbit.labels $${graph_dir}/graph_Rabbit.rand.labels;\
+				./$(APP_DIR)/$(BIN_DIR)/$(APP)-openmp  -x -c 1 -f $${graph_dir}/graph.rand -z 0 ;\
+				rm $${graph_dir}/graph.rand;                                                \
+			fi; 																			\
+		done                                												\
+	done
+
 .PHONY: convert-w
 convert-w: INTEGRATION = openmp
 convert-w: app-openmp
