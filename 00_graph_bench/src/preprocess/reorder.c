@@ -980,16 +980,22 @@ struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *a
     printf(" -----------------------------------------------------\n");
     Start(timer);
 
+    uint32_t cache_size = (32768 >> 2);
+
+#ifdef CACHE_HARNESS_META
+    cache_size = (arguments->l1_size >> 2);
+#endif
+
     switch(arguments->lmode)
     {
     case 1  :
     case 2  :
     case 3  :
     case 4 :
-        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode);// degree
+        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode, cache_size); // degree
         break;
     default :
-        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode);// out-degree
+        edgeList = maskGraphProcessDegree( edgeList, arguments->mmode, cache_size); // out-degree
     }
 
     Stop(timer);
@@ -1006,7 +1012,7 @@ struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *a
     return edgeList;
 }
 
-struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmode)
+struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmode, uint32_t cache_size)
 {
 
     // UINT32_MAX
@@ -1055,7 +1061,7 @@ struct EdgeList *maskGraphProcessDegree( struct EdgeList *edgeList, uint32_t mmo
 
     degrees = maskGraphProcessGenerateInOutDegrees(degrees, edgeList, mmode);
 
-    edgeList = maskGraphProcessGenerateMaskArray(edgeList, degrees, thresholds, num_buckets, mmode);
+    edgeList = maskGraphProcessGenerateMaskArray(edgeList, degrees, thresholds, num_buckets, mmode, cache_size);
 
     free(thresholds);
     free(degrees);
@@ -1111,7 +1117,7 @@ uint32_t *maskGraphProcessGenerateInOutDegrees(uint32_t *degrees, struct EdgeLis
     return degrees;
 }
 
-struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, uint32_t *degrees, uint32_t *thresholds, uint32_t num_buckets, uint32_t mmode)
+struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, uint32_t *degrees, uint32_t *thresholds, uint32_t num_buckets, uint32_t mmode, uint32_t cache_size)
 {
 
     uint32_t i = 0;
@@ -1134,10 +1140,22 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
     struct Timer *timer      = (struct Timer *) malloc(sizeof(struct Timer));
     uint32_t *cache_regions  = (uint32_t *) my_malloc(num_masks * sizeof(uint32_t));
 
-    cache_regions[0] = ACCELGRAPH_CACHE_UINT; // VERTEX_VALUE_HOT_U32
-    cache_regions[1] = ACCELGRAPH_CACHE_UINT; // VERTEX_CACHE_WARM_U32
-    cache_regions[2] = ACCELGRAPH_CACHE_UINT; // VERTEX_VALUE_LUKEWARM_U32
-    cache_regions[3] = UINT32_MAX;            // VERTEX_CACHE_COLD_U32
+    int diff = (int)edgeList->num_vertices - (int)cache_size;
+
+    if(diff < (2 * (int)cache_size))
+    {
+        cache_regions[0] = edgeList->num_vertices / 3; // VERTEX_VALUE_HOT_U32
+        cache_regions[1] = edgeList->num_vertices / 3; // VERTEX_CACHE_WARM_U32
+        cache_regions[2] = edgeList->num_vertices / 3; // VERTEX_VALUE_LUKEWARM_U32
+    }
+    else
+    {
+        cache_regions[0] = cache_size; // VERTEX_VALUE_HOT_U32
+        cache_regions[1] = cache_size; // VERTEX_CACHE_WARM_U32
+        cache_regions[2] = cache_size; // VERTEX_VALUE_LUKEWARM_U32
+    }
+
+    cache_regions[3] = UINT32_MAX; // VERTEX_CACHE_COLD_U32
 
     #pragma omp parallel for
     for (i = 0; i < edgeList->num_vertices; ++i)

@@ -17,9 +17,6 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
 // ***************                  AccelGraph label-Masking                     **************
 // ********************************************************************************************
 
-#define ACCELGRAPH_CACHE_BYTES (PSL_L1_SIZE + WARM_L1_SIZE + HOT_L1_SIZE)
-#define ACCELGRAPH_CACHE_UINT (ACCELGRAPH_CACHE_BYTES >> 2)
-
 #define VERTEX_VALUE_MASK_U32 0xC0000000
 #define VERTEX_CACHE_MASK_U32 0x3FFFFFFF
 
@@ -32,9 +29,9 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
 #define EXTRACT_MASK(num)	((uint32_t) (num) & VERTEX_VALUE_MASK_U32)
 
 struct EdgeList *maskGraphProcess(struct EdgeList *edgeList, struct Arguments *arguments);
-struct EdgeList *maskGraphProcessDegree(struct EdgeList *edgeList, uint32_t mmode);
+struct EdgeList *maskGraphProcessDegree(struct EdgeList *edgeList, uint32_t mmode, uint32_t cache_size);
 uint32_t *maskGraphProcessGenerateInOutDegrees( uint32_t *degrees, struct EdgeList *edgeList, uint32_t mmode);
-struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, uint32_t *degrees, uint32_t *thresholds, uint32_t num_buckets, uint32_t mmode);
+struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, uint32_t *degrees, uint32_t *thresholds, uint32_t num_buckets, uint32_t mmode, uint32_t cache_size);
 struct EdgeList *maskEdgeList(struct EdgeList *edgeList, uint32_t *mask_array);
 
 // ********************************************************************************************
