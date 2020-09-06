@@ -3,12 +3,6 @@
 
 #include <stdint.h>
 
-#define CACHE_UNIFIED
-#define CACHE_CAPI_GRASP
-#define CACHE_CAPI_MASK
-
-#define CACHE_MODEL CACHE_UNIFIED
-
 // Policy TYPES
 #define LRU_POLICY     0
 #define LFU_POLICY     1
@@ -18,7 +12,8 @@
 #define PLRU_POLICY    5
 #define GRASPXP_POLICY 6
 #define MASK_POLICY    7
-
+#define MASK_CAPI_POLICY     8
+#define GRASP_CAPI_POLICY    9
 
 //CAPI PSL CACHE default CONFIGS
 
@@ -188,8 +183,8 @@ struct AccelGraphCache
 
 struct DoubleTaggedCache
 {
-    struct AccelGraphCache *accel_graph_mask;// psl_cache
-    struct AccelGraphCache *accel_graph_grasp;// psl_cache
+    uint32_t policy;
+    struct AccelGraphCache *capi_cache;// psl_cache
     struct Cache *ref_cache; // PLRU
 };
 
@@ -198,6 +193,8 @@ void initCache(struct Cache *cache, int s, int a, int b, int p);
 void initCacheLine(struct CacheLine *cacheLine);
 
 float getMissRate(struct Cache *cache);
+float getCAPIMissRate(struct Cache *cache);
+
 uint64_t getTag(struct CacheLine *cacheLine);
 uint64_t getAddr(struct CacheLine *cacheLine);
 uint8_t getFlags(struct CacheLine *cacheLine);

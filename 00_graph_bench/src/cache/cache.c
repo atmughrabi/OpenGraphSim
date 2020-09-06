@@ -196,17 +196,16 @@ struct DoubleTaggedCache *newDoubleTaggedCache(uint32_t l1_size, uint32_t l1_ass
 {
     struct DoubleTaggedCache *cache = (struct DoubleTaggedCache *) my_malloc(sizeof(struct DoubleTaggedCache));
 
-    cache->accel_graph_mask = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
-    cache->accel_graph_grasp = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
-    cache->ref_cache    = newCache( l1_size, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
+    cache->policy = policy;
+    cache->capi_cache = newAccelGraphCache(l1_size, l1_assoc, PSL_BLOCKSIZE, num_vertices, PSL_POLICY, numPropertyRegions);
+    cache->ref_cache  = newCache( l1_size, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
 
     return cache;
 }
 
 void initDoubleTaggedCacheRegion(struct DoubleTaggedCache *cache, struct PropertyMetaData *propertyMetaData)
 {
-    initAccelGraphCacheRegion     (cache->accel_graph_mask, propertyMetaData);
-    initAccelGraphCacheRegion     (cache->accel_graph_grasp, propertyMetaData);
+    initAccelGraphCacheRegion     (cache->capi_cache, propertyMetaData);
     initialzeCachePropertyRegions (cache->ref_cache, propertyMetaData, cache->ref_cache->size);
 }
 
@@ -214,8 +213,7 @@ void freeDoubleTaggedCache(struct DoubleTaggedCache *cache)
 {
     if(cache)
     {
-        freeAccelGraphCache(cache->accel_graph_mask);
-        freeAccelGraphCache(cache->accel_graph_grasp);
+        freeAccelGraphCache(cache->capi_cache);
         freeCache(cache->ref_cache);
         free(cache);
     }
@@ -1724,9 +1722,17 @@ void Access(struct Cache *cache, uint64_t addr, unsigned char op, uint32_t node,
 
 void AccessDoubleTaggedCacheUInt32(struct DoubleTaggedCache *cache, uint64_t addr, unsigned char op, uint32_t node, uint32_t value)
 {
-    // AccessAccelGraphExpress(cache->accel_graph_mask, addr, op, node, value);
-    // AccessAccelGraphGRASP(cache->accel_graph_grasp, addr, op, node, value);
-    Access(cache->ref_cache, addr, op, node, value);
+    switch(cache->policy)
+    {
+    case MASK_CAPI_POLICY:
+        AccessAccelGraphExpress(cache->capi_cache, addr, op, node, value);
+        break;
+    case GRASP_CAPI_POLICY:
+        AccessAccelGraphGRASP(cache->capi_cache, addr, op, node, value);
+        break;
+    default :
+        Access(cache->ref_cache, addr, op, node, value);
+    }
 }
 
 void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr, unsigned char op, uint32_t node, uint32_t mask)
@@ -1876,8 +1882,7 @@ void setDoubleTaggedCacheThresholdDegreeAvg(struct DoubleTaggedCache *cache, uin
 {
     if(cache->ref_cache->numVertices)
     {
-        setAccelGraphCacheThresholdDegreeAvg(cache->accel_graph_mask, degrees);
-        setAccelGraphCacheThresholdDegreeAvg(cache->accel_graph_grasp, degrees);
+        setAccelGraphCacheThresholdDegreeAvg(cache->capi_cache, degrees);
         setCacheThresholdDegreeAvg(cache->ref_cache, degrees);
     }
 }
@@ -2533,20 +2538,34 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
     // printf("| %-21s | %-27.2f | \n", "MissRate Improved(%)", missRate_perf);
     // printf(" -----------------------------------------------------\n");
 
-    // printf("\n======================================================================\n");
-    // printStatsAccelGraphCache(cache->accel_graph_grasp, in_degree, out_degree);
-    // printf("\n======================================================================\n");
-    // printStatsAccelGraphCache(cache->accel_graph_mask, in_degree, out_degree);
-    // printf("\n======================================================================\n");
-    printf("\n===================== cache Stats (ref_cache Stats)  =================\n");
-    printStatsGraphCache(cache->ref_cache, in_degree, out_degree);
+    printf("\n======================================================================\n");
+    switch(cache->policy)
+    {
+    case MASK_CAPI_POLICY:
+    case GRASP_CAPI_POLICY:
+        printStatsAccelGraphCache(cache->capi_cache, in_degree, out_degree);
+        break;
+    default :
+        printStatsGraphCache(cache->ref_cache, in_degree, out_degree);
+        break;
+    }
+    printf("\n======================================================================\n");
 
 }
 
 
 void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf)
 {
-    printStatsCacheToFile(cache->ref_cache, fname_perf);
+    switch(cache->policy)
+    {
+    case MASK_CAPI_POLICY:
+    case GRASP_CAPI_POLICY:
+        printStatsAccelGraphCachetoFile(cache->ref_cache, fname_perf);
+        break;
+    default :
+        printStatsCacheToFile(cache->ref_cache, fname_perf);
+        break;
+    }
 }
 
 void printStats(struct Cache *cache)
