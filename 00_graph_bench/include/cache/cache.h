@@ -41,11 +41,13 @@
 // #define POLICY LRU_POLICY
 // #define POLICY SRRIP_POLICY
 // #define POLICY LFU_POLICY
-#define POLICY GRASP_POLICY
+// #define POLICY GRASP_POLICY
 // #define POLICY PIN_POLICY
 // #define POLICY PLRU_POLICY
 // #define POLICY GRASPXP_POLICY
 // #define POLICY MASK_POLICY
+#define POLICY MASK_CAPI_POLICY
+// #define POLICY GRASP_CAPI_POLICY
 
 #define BLOCKSIZE   64
 #define L1_SIZE     1048576
@@ -193,7 +195,7 @@ void initCache(struct Cache *cache, int s, int a, int b, int p);
 void initCacheLine(struct CacheLine *cacheLine);
 
 float getMissRate(struct Cache *cache);
-float getCAPIMissRate(struct Cache *cache);
+float getCAPIMissRate(struct AccelGraphCache *cache);
 
 uint64_t getTag(struct CacheLine *cacheLine);
 uint64_t getAddr(struct CacheLine *cacheLine);

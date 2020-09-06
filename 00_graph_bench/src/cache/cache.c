@@ -2168,6 +2168,29 @@ void printStatsCacheToFile(struct Cache *cache, char *fname_perf)
 }
 
 
+float getCAPIMissRate(struct AccelGraphCache *cache)
+{
+    uint64_t readsHits_hot    = getReads(cache->hot_cache)  - getRM(cache->hot_cache);
+    uint64_t readsHits_warm   = getReads(cache->warm_cache) - getRM(cache->warm_cache);
+
+    uint64_t readsMisses_cold = getRM(cache->cold_cache);
+
+    uint64_t writesHits_hot   = getWrites(cache->hot_cache)  - getWM(cache->hot_cache);
+    uint64_t writesHits_warm  = getWrites(cache->warm_cache) - getWM(cache->warm_cache);
+
+    uint64_t writesMisses_cold = getWM(cache->cold_cache);
+
+    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+
+    uint64_t ReadWrite_total   = getReads(cache->cold_cache) + getWrites(cache->cold_cache) + ReadWriteHotCold_total;
+    uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
+
+    float missRate = (double)(ReadWriteMisses_total * 100) / (ReadWrite_total); //calculate miss rate
+    missRate       = roundf(missRate * 100) / 100;
+
+    return missRate;
+}
+
 void printStatsAccelGraphCachetoFile(struct AccelGraphCache *cache, char *fname_perf)
 {
     //rounding miss rate
@@ -2539,6 +2562,47 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
     // printf(" -----------------------------------------------------\n");
 
     printf("\n======================================================================\n");
+
+    printf(" -----------------------------------------------------\n");
+
+    switch(cache->policy)
+    {
+    case LRU_POLICY:
+        printf("| %-51s | \n", "LRU_POLICY");
+        break;
+    case LFU_POLICY:
+        printf("| %-51s | \n", "LFU_POLICY");
+        break;
+    case GRASP_POLICY:
+        printf("| %-51s | \n", "GRASP_POLICY");
+        break;
+    case SRRIP_POLICY:
+        printf("| %-51s | \n", "SRRIP_POLICY");
+        break;
+    case PIN_POLICY:
+        printf("| %-51s | \n", "PIN_POLICY");
+        break;
+    case PLRU_POLICY:
+        printf("| %-51s | \n", "PLRU_POLICY");
+        break;
+    case GRASPXP_POLICY:
+        printf("| %-51s | \n", "GRASPXP_POLICY");
+        break;
+    case MASK_POLICY:
+        printf("| %-51s | \n", "MASK_POLICY");
+        break;
+    case MASK_CAPI_POLICY:
+        printf("| %-51s | \n", "MASK_CAPI_POLICY");
+        break;
+    case GRASP_CAPI_POLICY:
+        printf("| %-51s | \n", "GRASP_CAPI_POLICY");
+        break;
+    default :
+        printf("| %-51s | \n", "LRU_POLICY");
+    }
+
+    printf(" -----------------------------------------------------\n");
+
     switch(cache->policy)
     {
     case MASK_CAPI_POLICY:
@@ -2556,11 +2620,53 @@ void printStatsDoubleTaggedCache(struct DoubleTaggedCache *cache, uint32_t *in_d
 
 void printStatsDoubleTaggedCacheToFile(struct DoubleTaggedCache *cache, char *fname_perf)
 {
+    FILE *fptr1;
+    fptr1 = fopen(fname_perf, "a+");
+    fprintf(fptr1, " -----------------------------------------------------\n");
+
+    switch(cache->policy)
+    {
+    case LRU_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "LRU_POLICY");
+        break;
+    case LFU_POLICY:
+        printf("| %-51s | \n", "LFU_POLICY");
+        break;
+    case GRASP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "GRASP_POLICY");
+        break;
+    case SRRIP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "SRRIP_POLICY");
+        break;
+    case PIN_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "PIN_POLICY");
+        break;
+    case PLRU_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "PLRU_POLICY");
+        break;
+    case GRASPXP_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "GRASPXP_POLICY");
+        break;
+    case MASK_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "MASK_POLICY");
+        break;
+    case MASK_CAPI_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "MASK_CAPI_POLICY");
+        break;
+    case GRASP_CAPI_POLICY:
+        fprintf(fptr1, "| %-51s | \n", "GRASP_CAPI_POLICY");
+        break;
+    default :
+        fprintf(fptr1, "| %-51s | \n", "LRU_POLICY");
+    }
+
+    fprintf(fptr1, " -----------------------------------------------------\n");
+    fclose(fptr1);
     switch(cache->policy)
     {
     case MASK_CAPI_POLICY:
     case GRASP_CAPI_POLICY:
-        printStatsAccelGraphCachetoFile(cache->ref_cache, fname_perf);
+        printStatsAccelGraphCachetoFile(cache->capi_cache, fname_perf);
         break;
     default :
         printStatsCacheToFile(cache->ref_cache, fname_perf);

@@ -137,7 +137,7 @@ export CONVERT_FORMAT 	?= 0
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 0
+export MASK_MODE 		?= 1
 
 ##################################################
 
