@@ -5,10 +5,10 @@
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-# export APP_TEST           ?=  test_open-graph-match
+export APP_TEST             ?=  test_open-graph-match
 # export APP_TEST           ?=  test_grasp-cache-original
 # export APP_TEST           ?=  sweep_unified-cache-graph
-export APP_TEST           ?=  sweep_capi-cache-graph
+# export APP_TEST           ?=  sweep_capi-cache-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -54,15 +54,15 @@ export MAIN_DIR		  	= main
 #########################################################
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
-# export GRAPH_SUIT ?= TEST
-export GRAPH_SUIT ?= LAW
+export GRAPH_SUIT ?= TEST
+# export GRAPH_SUIT ?= LAW
 # export GRAPH_SUIT ?= GAP
 # export GRAPH_SUIT ?= SNAP
 # export GRAPH_SUIT ?= KONECT
 # export GRAPH_SUIT ?= GONG
 
 # TEST # small test graphs
-# export GRAPH_NAME ?= test
+export GRAPH_NAME ?= test
 # export GRAPH_NAME ?= v51_e1021
 # export GRAPH_NAME ?= v300_e2730
 
@@ -88,7 +88,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -100,8 +100,8 @@ export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-webbase-2001
 
 # export FILE_BIN_TYPE ?= graph
-export FILE_BIN_TYPE ?= graph.bin
-# export FILE_BIN_TYPE ?= graph.wbin
+# export FILE_BIN_TYPE ?= graph.bin
+export FILE_BIN_TYPE ?= graph.wbin
 
 export FILE_LABEL_TYPE ?= graph_Gorder.labels
 # export FILE_LABEL_TYPE ?= graph_Rabbit.labels
@@ -115,11 +115,11 @@ export PULL_PUSH 		?= 0
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
-export REORDER_LAYER1 	?= 10
+export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 export DATA_STRUCTURES  ?= 0
-export ALGORITHMS 		?= 1
+export ALGORITHMS 		?= 0
 
 export ROOT 			?= 46022
 export TOLERANCE 		?= 1e-8
@@ -127,7 +127,7 @@ export DELTA			?= 800
 
 export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
-export NUM_THREADS_KER  ?= 1
+export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
 export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 1
 
@@ -150,7 +150,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #########################################################
 #                RUN  ARGUMENTS                         #
 #########################################################
-export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA)
+export ARGS ?= -w -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA)
 ##################################################
 ##################################################
 

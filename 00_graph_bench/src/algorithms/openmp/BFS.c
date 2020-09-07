@@ -180,7 +180,7 @@ struct BFSStats *breadthFirstSearchGraphCSR(struct Arguments *arguments, struct 
 {
 
     struct BFSStats *stats = NULL;
-    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
 
     switch (arguments->pushpull)
     {
@@ -225,14 +225,6 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(struct Arguments *arguments, str
 
     struct BFSStats *stats = newBFSStatsGraphCSR(graph);
 
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting BFS PULL/BU (SOURCE NODE)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", arguments->source);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
-    printf(" -----------------------------------------------------\n");
-
     if(arguments->source > graph->num_vertices)
     {
         printf(" -----------------------------------------------------\n");
@@ -240,6 +232,16 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(struct Arguments *arguments, str
         printf(" -----------------------------------------------------\n");
         return stats;
     }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS PULL/BU (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
@@ -348,14 +350,6 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(struct Arguments *arguments, str
 
     struct BFSStats *stats = newBFSStatsGraphCSR(graph);
 
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting BFS PUSH/TD (SOURCE NODE)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", arguments->source);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
-    printf(" -----------------------------------------------------\n");
-
     if(arguments->source > graph->num_vertices)
     {
         printf(" -----------------------------------------------------\n");
@@ -363,6 +357,16 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(struct Arguments *arguments, str
         printf(" -----------------------------------------------------\n");
         return stats;
     }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS PUSH/TD (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
 
 #ifdef CACHE_HARNESS_META
     stats->numPropertyRegions = 1;
@@ -479,13 +483,6 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(struct Arguments *
 
     struct BFSStats *stats = newBFSStatsGraphCSR(graph);
 
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting BFS PUSH/PULL(SOURCE NODE)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", arguments->source);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
-    printf(" -----------------------------------------------------\n");
 
     if(arguments->source > graph->num_vertices)
     {
@@ -494,6 +491,18 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(struct Arguments *
         printf(" -----------------------------------------------------\n");
         return stats;
     }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS PUSH/PULL(SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
+
+
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
@@ -822,13 +831,7 @@ struct BFSStats *breadthFirstSearchPushBitmapGraphCSR(struct Arguments *argument
 
     struct BFSStats *stats = newBFSStatsGraphCSR(graph);
 
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting BFS PUSH/Bitmap (SOURCE NODE)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", arguments->source);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
-    printf(" -----------------------------------------------------\n");
+
 
     if(arguments->source > graph->num_vertices)
     {
@@ -837,6 +840,16 @@ struct BFSStats *breadthFirstSearchPushBitmapGraphCSR(struct Arguments *argument
         printf(" -----------------------------------------------------\n");
         return stats;
     }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS PUSH/Bitmap (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
@@ -908,14 +921,6 @@ struct BFSStats *breadthFirstSearchPushDirectionOptimizedBitmapGraphCSR(struct A
 
     struct BFSStats *stats = newBFSStatsGraphCSR(graph);
 
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51s | \n", "Starting BFS PUSH/PULL Bitmap (SOURCE NODE)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-51u | \n", arguments->source);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
-    printf(" -----------------------------------------------------\n");
-
     if(arguments->source > graph->num_vertices)
     {
         printf(" -----------------------------------------------------\n");
@@ -923,6 +928,16 @@ struct BFSStats *breadthFirstSearchPushDirectionOptimizedBitmapGraphCSR(struct A
         printf(" -----------------------------------------------------\n");
         return stats;
     }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS PUSH/PULL Bitmap (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
 
     struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
     struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));

@@ -247,6 +247,91 @@ struct GraphCSR *graphCSRPreProcessingStep (struct Arguments *arguments)
 
 }
 
+struct GraphCSR *graphCSRPreProcessingStepDualOrder (struct Arguments *arguments)
+{
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+
+    Start(timer);
+    struct EdgeList *edgeList = readEdgeListsbin(arguments->fnameb, 0, arguments->symmetric, arguments->weighted); // read edglist from binary file
+    Stop(timer);
+    // edgeListPrint(edgeList);
+    graphCSRPrintMessageWithtime("Read Edge List From File (Seconds)", Seconds(timer));
+
+    edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+
+    if(arguments->dflag)
+    {
+        Start(timer);
+        edgeList = removeDulpicatesSelfLoopEdges(edgeList);
+        Stop(timer);
+        graphCSRPrintMessageWithtime("Removing duplicate edges (Seconds)", Seconds(timer));
+    }
+
+    if(arguments->lmode)
+    {
+        edgeList = reorderGraphProcess(edgeList, arguments);
+        edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+    }
+
+
+#if DIRECTED
+    struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 1);
+#else
+    struct GraphCSR *graphCSR = graphCSRNew(edgeList->num_vertices, edgeList->num_edges, 0);
+#endif
+
+    // edgeListPrint(edgeList);
+    Start(timer);
+    graphCSR = graphCSRAssignEdgeList (graphCSR, edgeList, 0);
+    Stop(timer);
+
+    graphCSRPrintMessageWithtime("Mappign Vertices to CSR (Seconds)", Seconds(timer));
+
+#if DIRECTED
+    Start(timer);
+    struct EdgeList *inverse_edgeList = readEdgeListsMem(edgeList, 1, 0, 0); // read edglist from memory since we pre loaded it
+    Stop(timer);
+
+    graphCSRPrintMessageWithtime("Read Inverse Edge List From Memory (Seconds)", Seconds(timer));
+
+    inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
+
+    // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
+    arguments->lmode = arguments->lmode_l2 + 1;
+    if(arguments->lmode)
+    {
+        inverse_edgeList = reorderGraphProcess(inverse_edgeList, arguments);
+        inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
+    }
+    arguments->lmode = arguments->lmode_l2 - 1;
+    
+    Start(timer);
+    graphCSR = graphCSRAssignEdgeList (graphCSR, inverse_edgeList, 1);
+    Stop(timer);
+    graphCSRPrintMessageWithtime("Process In/Out degrees of Inverse Nodes (Seconds)", Seconds(timer));
+#endif
+
+
+    // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
+    arguments->lmode = arguments->lmode_l2;
+    if(arguments->lmode)
+    {
+        edgeList = reorderGraphProcess(edgeList, arguments);
+        edgeList = sortRunAlgorithms(edgeList, arguments->sort);
+    }
+
+
+    graphCSRPrint(graphCSR);
+
+
+    free(timer);
+
+    return graphCSR;
+
+
+}
+
 void writeToBinFileGraphCSR (const char *fname, struct GraphCSR *graphCSR)
 {
 

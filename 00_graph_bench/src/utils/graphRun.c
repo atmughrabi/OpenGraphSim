@@ -287,13 +287,19 @@ void *generateGraphDataStructure(struct Arguments *arguments)
             break;
         case 3: // Adj Array List
             Start(timer);
-            graph = (void *)graphAdjArrayListPreProcessingStep ( arguments);
+            graph = (void *)graphAdjArrayListPreProcessingStep (arguments);
             Stop(timer);
             generateGraphPrintMessageWithtime("GraphAdjArrayList Preprocessing Step Time (Seconds)", Seconds(timer));
             break;
+        case 6: // CSR
+            Start(timer);
+            graph = (void *)graphCSRPreProcessingStepDualOrder(arguments);
+            Stop(timer);
+            generateGraphPrintMessageWithtime("GraphCSR DO Preprocessing Step Time (Seconds)", Seconds(timer));
+            break;
         default:// CSR
             Start(timer);
-            graph = (void *)graphCSRPreProcessingStep ( arguments);
+            graph = (void *)graphCSRPreProcessingStep (arguments);
             Stop(timer);
             generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
 

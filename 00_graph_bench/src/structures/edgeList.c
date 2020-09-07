@@ -120,6 +120,7 @@ struct EdgeList *newEdgeList( uint32_t num_edges)
 
     newEdgeList->mask_array = NULL;
     newEdgeList->label_array = NULL;
+    newEdgeList->inverse_label_array = NULL;
     newEdgeList->num_edges = num_edges;
     newEdgeList->num_vertices = 0;
     newEdgeList->avg_degree = 0;
@@ -195,17 +196,18 @@ struct EdgeList *removeDulpicatesSelfLoopEdges( struct EdgeList *edgeList)
 
     tempEdgeList->mask_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
     tempEdgeList->label_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
+    tempEdgeList->inverse_label_array = (uint32_t *) my_malloc(tempEdgeList->num_vertices * sizeof(uint32_t));
 
     #pragma omp parallel for
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         tempEdgeList->mask_array[i] = edgeList->mask_array[i] ;
         tempEdgeList->label_array[i] =  edgeList->label_array[i];
+        tempEdgeList->inverse_label_array[i] =  edgeList->inverse_label_array[i];
     }
 
     freeEdgeList(edgeList);
     return tempEdgeList;
-
 }
 
 void freeEdgeList( struct EdgeList *edgeList)
@@ -222,6 +224,8 @@ void freeEdgeList( struct EdgeList *edgeList)
             free(edgeList->mask_array);
         if(edgeList->label_array)
             free(edgeList->label_array);
+        if(edgeList->inverse_label_array)
+            free(edgeList->inverse_label_array);
 
 #if WEIGHTED
         if(edgeList->edges_array_weight)
@@ -567,12 +571,14 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
 
     edgeList->mask_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
     edgeList->label_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
+    edgeList->inverse_label_array = (uint32_t *) my_malloc(edgeList->num_vertices * sizeof(uint32_t));
 
     #pragma omp parallel for
     for (i = 0; i < edgeList->num_vertices; ++i)
     {
         edgeList->mask_array[i] = 0;
         edgeList->label_array[i] = i;
+        edgeList->inverse_label_array[i] = i;
     }
 
     munmap(buf_addr, fs.st_size);
