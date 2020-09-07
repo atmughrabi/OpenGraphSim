@@ -345,88 +345,121 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
         case 0:  // BFS
         {
             struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeBFSStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeBFSStats(stats);
+            }
         }
         break;
         case 1: // pagerank
         {
             struct PageRankStats *stats = runPageRankAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-
-            if(arguments->Sflag) // output page rank error statistics
+            if(stats)
             {
-                arguments->pushpull = 0;
-                struct PageRankStats *ref_stats = runPageRankAlgorithm(arguments, graph);
-                collectStatsPageRank(arguments, ref_stats, stats, trials);
-                freePageRankStats(ref_stats);
-            }
+                time_total += stats->time_total;
 
-            freePageRankStats(stats);
+                if(arguments->Sflag) // output page rank error statistics
+                {
+                    arguments->pushpull = 0;
+                    struct PageRankStats *ref_stats = runPageRankAlgorithm(arguments, graph);
+                    collectStatsPageRank(arguments, ref_stats, stats, trials);
+                    freePageRankStats(ref_stats);
+                }
+
+                freePageRankStats(stats);
+            }
         }
         break;
         case 2: // SSSP-Delta
         {
             struct SSSPStats *stats = runSSSPAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeSSSPStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeSSSPStats(stats);
+            }
         }
         break;
         case 3: // SSSP-Bellmanford
         {
             struct BellmanFordStats *stats = runBellmanFordAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeBellmanFordStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeBellmanFordStats(stats);
+            }
         }
         break;
         case 4: // DFS
         {
             struct DFSStats *stats = runDepthFirstSearchAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeDFSStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeDFSStats(stats);
+            }
         }
         break;
         case 5: // SPMV
         {
             struct SPMVStats *stats = runSPMVAlgorithm(graph,  arguments);
-            time_total += stats->time_total;
-            freeSPMVStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeSPMVStats(stats);
+            }
         }
         break;
         case 6: // Connected Components
         {
             struct CCStats *stats = runConnectedComponentsAlgorithm(graph,  arguments);
-            time_total += stats->time_total;
-            freeCCStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeCCStats(stats);
+            }
         }
         break;
         case 7: // Betweenness Centrality
         {
             struct BetweennessCentralityStats *stats = runBetweennessCentralityAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeBetweennessCentralityStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeBetweennessCentralityStats(stats);
+            }
         }
         break;
         case 8: // Triangle Counting
         {
             struct TCStats *stats = runTriangleCountAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeTCStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeTCStats(stats);
+            }
         }
         break;
         case 9: // incremental Aggregation
         {
             struct IncrementalAggregationStats *stats = runIncrementalAggregationAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeIncrementalAggregationStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeIncrementalAggregationStats(stats);
+            }
         }
         break;
 
         default: // BFS
         {
             struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
-            time_total += stats->time_total;
-            freeBFSStats(stats);
+            if(stats)
+            {
+                time_total += stats->time_total;
+                freeBFSStats(stats);
+            }
         }
         break;
         }
@@ -901,23 +934,23 @@ struct BetweennessCentralityStats *runBetweennessCentralityAlgorithm(struct Argu
     case 1: // Grid
     case 5:
         // graphGrid = (struct GraphGrid *)graph;
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
         break;
 
     case 2: // Adj Linked List
         // graphAdjLinkedList = (struct GraphAdjLinkedList *)graph;
 
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
         break;
 
     case 3: // Adj Array List
         // graphAdjArrayList = (struct GraphAdjArrayList *)graph;
 
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
         break;
 
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("Betweenness Centrality NOT YET IMPLEMENTED", 0);
         break;
 
     default:// CSR
@@ -927,8 +960,11 @@ struct BetweennessCentralityStats *runBetweennessCentralityAlgorithm(struct Argu
     }
 
     // if you want to output pageranks and rankins sorted use this
-    stats->realRanks = radixSortEdgesByPageRank (stats->betweennessCentrality, stats->realRanks, stats->num_vertices);
-    printRanksBetweennessCentralityStats(stats);
+    if(stats)
+    {
+        stats->realRanks = radixSortEdgesByPageRank (stats->betweennessCentrality, stats->realRanks, stats->num_vertices);
+        printRanksBetweennessCentralityStats(stats);
+    }
     return stats;
 
 }
@@ -985,7 +1021,11 @@ struct PageRankStats *runPageRankAlgorithm(struct Arguments *arguments, void *gr
 
 
     // if you want to output pageranks and rankins sorted use this
-    stats->realRanks = radixSortEdgesByPageRank (stats->pageRanks, stats->realRanks, stats->num_vertices);
+    if(stats)
+    {
+        stats->realRanks = radixSortEdgesByPageRank (stats->pageRanks, stats->realRanks, stats->num_vertices);
+    }
+
     return stats;
 
 
@@ -1066,23 +1106,23 @@ struct SSSPStats *runSSSPAlgorithm(struct Arguments *arguments, void *graph)
     case 1: // Grid
     case 5:
         // graphGrid = (struct GraphGrid *)graph;
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
         break;
 
     case 2: // Adj Linked List
         // graphAdjLinkedList = (struct GraphAdjLinkedList *)graph;
 
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
         break;
 
     case 3: // Adj Array List
         // graphAdjArrayList = (struct GraphAdjArrayList *)graph;
 
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
         break;
 
     case 6: // CSR
-        generateGraphPrintMessageWithtime("NOT YET IMPLEMENTED", 0);
+        generateGraphPrintMessageWithtime("SSSP NOT YET IMPLEMENTED", 0);
         break;
 
     default:// CSR
