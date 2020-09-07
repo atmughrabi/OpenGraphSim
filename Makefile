@@ -111,17 +111,17 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 0
+export PULL_PUSH 		?= 2
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 0
-export REORDER_LAYER2   ?= 0
+export REORDER_LAYER2   ?= 4
 export REORDER_LAYER3   ?= 0
-export DATA_STRUCTURES  ?= 0
+export DATA_STRUCTURES  ?= 6
 export ALGORITHMS 		?= 0
 
-export ROOT 			?= 46022
+export ROOT 			?= 8
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 

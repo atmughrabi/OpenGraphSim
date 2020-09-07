@@ -91,22 +91,22 @@ main (int argc, char **argv)
     void *ref_data;
     void *cmp_data;
 
-    for(arguments.algorithm = 0 ; arguments.algorithm < 9; arguments.algorithm++)
+    for(arguments.algorithm = 0 ; arguments.algorithm < 10; arguments.algorithm++)
     {
-        for(arguments.datastructure = 0 ; arguments.datastructure < 4; arguments.datastructure++)
+        for(arguments.datastructure = 0 ; arguments.datastructure < 7; arguments.datastructure++)
         {
 
-            if(arguments.algorithm == 7)  // Triangle counting depends on order
+            if(arguments.algorithm == 8)  // Triangle counting depends on order
             {
 
                 arguments.sort = 1;
-                arguments.lmode = 2;
+                // arguments.lmode = 2;
             }
-            if(arguments.algorithm == 8)  // Incremental aggregation order
+            if(arguments.algorithm == 9)  // Incremental aggregation order
             {
 
                 arguments.sort = 1;
-                arguments.lmode = 2;
+                // arguments.lmode = 2;
             }
 
             graph = generateGraphDataStructure(&arguments);

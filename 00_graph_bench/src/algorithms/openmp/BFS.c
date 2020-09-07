@@ -1094,6 +1094,639 @@ uint32_t topDownStepUsingBitmapsGraphCSR(struct GraphCSR *graph, struct ArrayQue
 }
 
 
+// ********************************************************************************************
+// ***************                  CSR DataStructure DualOrder                  **************
+// ********************************************************************************************
+struct BFSStats *breadthFirstSearchGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph)
+{
+
+    struct BFSStats *stats = NULL;
+
+    switch (arguments->pushpull)
+    {
+    case 0: // pull
+        stats = breadthFirstSearchPullGraphCSRDualOrder(arguments, graph);
+        break;
+    case 1: // push
+        stats = breadthFirstSearchPushGraphCSRDualOrder(arguments, graph);
+        break;
+    case 2: // pull/push
+        stats = breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(arguments, graph);
+        break;
+    default:// push
+        stats = breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(arguments, graph);
+        break;
+    }
+
+
+    return stats;
+
+}
+
+// breadth-first-search(graph, arguments->source)
+//  sharedFrontierQueue ← {arguments->source}
+//  next ← {}
+//  parents ← [-1,-1,. . . -1]
+//      while sharedFrontierQueue 6= {} do
+//          top-down-step(graph, sharedFrontierQueue, next, parents)
+//          sharedFrontierQueue ← next
+//          next ← {}
+//      end while
+//  return parents
+
+struct BFSStats *breadthFirstSearchPullGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph)
+{
+
+    struct BFSStats *stats = newBFSStatsGraphCSR(graph);
+
+    if(arguments->source > graph->num_vertices)
+    {
+        printf(" -----------------------------------------------------\n");
+        printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
+        printf(" -----------------------------------------------------\n");
+        return stats;
+    }
+
+#if DIRECTED
+    arguments->source = graph->inverse_sorted_edges_array->label_array[arguments->source];
+#else
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+#endif
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS DualOrder PULL/BU (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
+
+    struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
+
+    uint32_t nf = 0; // number of vertices in sharedFrontierQueue
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 2;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->parents[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
+    stats->propertyMetaData[0].data_type_size = sizeof(int);
+
+    stats->propertyMetaData[1].base_address = (uint64_t) & (sharedFrontierQueue->q_bitmap->bitarray[0]);
+    stats->propertyMetaData[1].size = sharedFrontierQueue->q_bitmap->real_size * sizeof(uint32_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint32_t);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
+    Start(timer_inner);
+    setBit(sharedFrontierQueue->q_bitmap_next, arguments->source);
+    sharedFrontierQueue->q_bitmap_next->numSetBits = 1;
+    stats->parents[arguments->source] = arguments->source;
+
+    swapBitmaps(&sharedFrontierQueue->q_bitmap, &sharedFrontierQueue->q_bitmap_next);
+    clearBitmap(sharedFrontierQueue->q_bitmap_next);
+    Stop(timer_inner);
+    stats->time_total +=  Seconds(timer_inner);
+
+    printf("| BU %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
+
+    Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
+    while (sharedFrontierQueue->q_bitmap->numSetBits)
+    {
+
+        Start(timer_inner);
+#ifdef SNIPER_HARNESS
+        int iter = nf;
+        SimMarker(1, iter);
+#endif
+        nf = bottomUpStepGraphCSRDualOrder(graph, sharedFrontierQueue->q_bitmap, sharedFrontierQueue->q_bitmap_next, stats);
+#ifdef SNIPER_HARNESS
+        SimMarker(2, iter);
+#endif
+        sharedFrontierQueue->q_bitmap_next->numSetBits = nf;
+        swapBitmaps(&sharedFrontierQueue->q_bitmap, &sharedFrontierQueue->q_bitmap_next);
+        clearBitmap(sharedFrontierQueue->q_bitmap_next);
+        Stop(timer_inner);
+
+        //stats
+        stats->time_total +=  Seconds(timer_inner);
+        stats->processed_nodes += nf;
+        printf("| BU %-12u | %-15u | %-15f | \n", stats->iteration++, nf, Seconds(timer_inner));
+
+    } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
+    Stop(timer);
+    stats->time_total =  Seconds(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
+    printf(" -----------------------------------------------------\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+
+    freeArrayQueue(sharedFrontierQueue);
+    free(timer);
+    free(timer_inner);
+
+    return stats;
+}
+
+// breadth-first-search(graph, arguments->source)
+//  sharedFrontierQueue ← {arguments->source}
+//  next ← {}
+//  parents ← [-1,-1,. . . -1]
+//      while sharedFrontierQueue 6= {} do
+//          top-down-step(graph, sharedFrontierQueue, next, parents)
+//          sharedFrontierQueue ← next
+//          next ← {}
+//      end while
+//  return parents
+
+struct BFSStats *breadthFirstSearchPushGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph)
+{
+
+    struct BFSStats *stats = newBFSStatsGraphCSR(graph);
+
+    if(arguments->source > graph->num_vertices)
+    {
+        printf(" -----------------------------------------------------\n");
+        printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
+        printf(" -----------------------------------------------------\n");
+        return stats;
+    }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS DualOrder PUSH/TD (SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 1;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->parents[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
+    stats->propertyMetaData[0].data_type_size = sizeof(int);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
+
+    struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
+
+    uint32_t P = arguments->algo_numThreads;
+
+    struct ArrayQueue **localFrontierQueues = (struct ArrayQueue **) my_malloc( P * sizeof(struct ArrayQueue *));
+
+
+    uint32_t i;
+    for(i = 0 ; i < P ; i++)
+    {
+        localFrontierQueues[i] = newArrayQueue(graph->num_vertices);
+
+    }
+
+    Start(timer_inner);
+    enArrayQueue(sharedFrontierQueue, arguments->source);
+    // setBit(sharedFrontierQueue->q_bitmap,arguments->source);
+    stats->parents[arguments->source] = arguments->source;
+    Stop(timer_inner);
+    stats->time_total +=  Seconds(timer_inner);
+    // graph->vertices[arguments->source].visited = 1;
+
+
+    printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
+
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
+    Start(timer);
+    while(!isEmptyArrayQueue(sharedFrontierQueue))  // start while
+    {
+
+        Start(timer_inner);
+#ifdef SNIPER_HARNESS
+        int iter_2 = sharedFrontierQueue->tail - sharedFrontierQueue->head;
+        SimMarker(3, iter_2);
+#endif
+        topDownStepGraphCSRDualOrder(graph, sharedFrontierQueue, localFrontierQueues, stats);
+#ifdef SNIPER_HARNESS
+        SimMarker(4, iter_2);
+#endif
+        slideWindowArrayQueue(sharedFrontierQueue);
+        Stop(timer_inner);
+
+        //stats collection
+        stats->time_total +=  Seconds(timer_inner);
+        stats->processed_nodes += sharedFrontierQueue->tail - sharedFrontierQueue->head;
+        printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, sharedFrontierQueue->tail - sharedFrontierQueue->head, Seconds(timer_inner));
+
+    } // end while
+    Stop(timer);
+    stats->time_total =  Seconds(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
+    printf(" -----------------------------------------------------\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+
+    for(i = 0 ; i < P ; i++)
+    {
+        freeArrayQueue(localFrontierQueues[i]);
+    }
+    free(localFrontierQueues);
+    freeArrayQueue(sharedFrontierQueue);
+    free(timer);
+    free(timer_inner);
+
+
+    return stats;
+}
+
+// breadth-first-search(graph, arguments->source)
+//  sharedFrontierQueue ← {arguments->source}
+//  next ← {}
+//  parents ← [-1,-1,. . . -1]
+//      while sharedFrontierQueue 6= {} do
+//          top-down-step(graph, sharedFrontierQueue, next, parents)
+//          sharedFrontierQueue ← next
+//          next ← {}
+//      end while
+//  return parents
+
+struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph)
+{
+
+    struct BFSStats *stats = newBFSStatsGraphCSR(graph);
+
+
+    if(arguments->source > graph->num_vertices)
+    {
+        printf(" -----------------------------------------------------\n");
+        printf("| %-51s | \n", "ERROR!! CHECK SOURCE RANGE");
+        printf(" -----------------------------------------------------\n");
+        return stats;
+    }
+
+    arguments->source = graph->sorted_edges_array->label_array[arguments->source];
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51s | \n", "Starting BFS DualOrder PUSH/PULL(SOURCE NODE)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-51u | \n", arguments->source);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15s | %-15s | \n", "Iteration", "Nodes", "Time (Seconds)");
+    printf(" -----------------------------------------------------\n");
+
+
+
+    struct Timer *timer = (struct Timer *) malloc(sizeof(struct Timer));
+    struct Timer *timer_inner = (struct Timer *) malloc(sizeof(struct Timer));
+
+    struct ArrayQueue *sharedFrontierQueue = newArrayQueue(graph->num_vertices);
+    struct Bitmap *bitmapCurr = newBitmap(graph->num_vertices);
+    struct Bitmap *bitmapNext = newBitmap(graph->num_vertices);
+
+    uint32_t P = arguments->algo_numThreads;
+    uint32_t mu = graph->num_edges; // number of edges to check from sharedFrontierQueue
+    uint32_t mf = graph->vertices->out_degree[arguments->source]; // number of edges from unexplored verticies
+    uint32_t nf = 0; // number of vertices in sharedFrontierQueue
+    uint32_t nf_prev = 0; // number of vertices in sharedFrontierQueue
+    uint32_t n = graph->num_vertices; // number of nodes
+    uint32_t alpha = 15;
+    uint32_t beta = 18;
+
+#ifdef CACHE_HARNESS_META
+    stats->numPropertyRegions = 2;
+    stats->propertyMetaData = (struct PropertyMetaData *) my_malloc(stats->numPropertyRegions * sizeof(struct PropertyMetaData));
+    stats->cache = newDoubleTaggedCache(arguments->l1_size,  arguments->l1_assoc,  arguments->blocksize, graph->num_vertices, arguments->policey, stats->numPropertyRegions);
+
+    stats->propertyMetaData[0].base_address = (uint64_t) & (stats->parents[0]);
+    stats->propertyMetaData[0].size = graph->num_vertices * sizeof(int);
+    stats->propertyMetaData[0].data_type_size = sizeof(int);
+
+    stats->propertyMetaData[1].base_address = (uint64_t) & (bitmapNext->bitarray[0]);
+    stats->propertyMetaData[1].size = sharedFrontierQueue->q_bitmap->real_size * sizeof(uint32_t);
+    stats->propertyMetaData[1].data_type_size = sizeof(uint32_t);
+
+    initDoubleTaggedCacheRegion(stats->cache, stats->propertyMetaData);
+    setDoubleTaggedCacheThresholdDegreeAvg(stats->cache, graph->vertices->out_degree);
+#endif
+
+    struct ArrayQueue **localFrontierQueues = (struct ArrayQueue **) my_malloc( P * sizeof(struct ArrayQueue *));
+
+
+    uint32_t i;
+    for(i = 0 ; i < P ; i++)
+    {
+        localFrontierQueues[i] = newArrayQueue(graph->num_vertices);
+
+    }
+
+
+
+    Start(timer_inner);
+    enArrayQueue(sharedFrontierQueue, arguments->source);
+    // setBit(sharedFrontierQueue->q_bitmap,arguments->source);
+    stats->parents[arguments->source] = arguments->source;
+    Stop(timer_inner);
+    stats->time_total +=  Seconds(timer_inner);
+    // graph->vertices[arguments->source].visited = 1;
+
+
+    printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, ++stats->processed_nodes, Seconds(timer_inner));
+
+    Start(timer);
+
+#ifdef SNIPER_HARNESS
+    SimRoiStart();
+#endif
+
+    while(!isEmptyArrayQueue(sharedFrontierQueue))  // start while
+    {
+
+        if(mf > (mu / alpha))
+        {
+
+            Start(timer_inner);
+            arrayQueueToBitmap(sharedFrontierQueue, bitmapCurr);
+            nf = sizeArrayQueue(sharedFrontierQueue);
+            Stop(timer_inner);
+            printf("| E  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
+
+            do
+            {
+                Start(timer_inner);
+                nf_prev = nf;
+
+#ifdef SNIPER_HARNESS
+                int iter = nf_prev;
+                SimMarker(1, iter);
+#endif
+                nf = bottomUpStepGraphCSRDualOrder(graph, bitmapCurr, bitmapNext, stats);
+#ifdef SNIPER_HARNESS
+                SimMarker(2, iter);
+#endif
+                swapBitmaps(&bitmapCurr, &bitmapNext);
+                clearBitmap(bitmapNext);
+                Stop(timer_inner);
+
+                //stats collection
+                stats->time_total +=  Seconds(timer_inner);
+                stats->processed_nodes += nf;
+                printf("| BU %-12u | %-15u | %-15f | \n", stats->iteration++, nf, Seconds(timer_inner));
+
+            }
+            while(( nf > nf_prev) ||  // growing;
+                    ( nf > (n / beta)));
+
+            Start(timer_inner);
+            bitmapToArrayQueue(bitmapCurr, sharedFrontierQueue, localFrontierQueues);
+            Stop(timer_inner);
+            printf("| C  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
+
+            mf = 1;
+
+        }
+        else
+        {
+
+            Start(timer_inner);
+            mu -= mf;
+#ifdef SNIPER_HARNESS
+            int iter_2 = mf;
+            SimMarker(3, iter_2);
+#endif
+            mf = topDownStepGraphCSRDualOrder(graph, sharedFrontierQueue, localFrontierQueues, stats);
+#ifdef SNIPER_HARNESS
+            SimMarker(4, iter_2);
+#endif
+            slideWindowArrayQueue(sharedFrontierQueue);
+            Stop(timer_inner);
+
+            //stats collection
+            stats->time_total +=  Seconds(timer_inner);
+            stats->processed_nodes += sharedFrontierQueue->tail - sharedFrontierQueue->head;
+            printf("| TD %-12u | %-15u | %-15f | \n", stats->iteration++, sharedFrontierQueue->tail - sharedFrontierQueue->head, Seconds(timer_inner));
+
+        }
+
+
+
+    } // end while
+
+#ifdef SNIPER_HARNESS
+    SimRoiEnd();
+#endif
+
+    Stop(timer);
+    stats->time_total =  Seconds(timer);
+
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
+    printf(" -----------------------------------------------------\n");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+
+    for(i = 0 ; i < P ; i++)
+    {
+        freeArrayQueue(localFrontierQueues[i]);
+    }
+    free(localFrontierQueues);
+    freeArrayQueue(sharedFrontierQueue);
+    freeBitmap(bitmapNext);
+    freeBitmap(bitmapCurr);
+    free(timer);
+    free(timer_inner);
+
+#ifdef CACHE_HARNESS
+    printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
+#endif
+
+    return stats;
+}
+
+
+// top-down-step(graph, sharedFrontierQueue, next, parents)
+//  for v ∈ sharedFrontierQueue do
+//      for u ∈ neighbors[v] do
+//          if parents[u] = -1 then
+//              parents[u] ← v
+//              next ← next ∪ {u}
+//          end if
+//      end for
+//  end for
+
+uint32_t topDownStepGraphCSRDualOrder(struct GraphCSR *graph, struct ArrayQueue *sharedFrontierQueue, struct ArrayQueue **localFrontierQueues, struct BFSStats *stats)
+{
+
+
+
+    uint32_t v;
+    uint32_t u;
+    uint32_t i;
+    uint32_t j;
+    uint32_t edge_idx;
+    uint32_t mf = 0;
+
+
+    #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf)
+    {
+        uint32_t t_id = omp_get_thread_num();
+        struct ArrayQueue *localFrontierQueue = localFrontierQueues[t_id];
+
+
+        #pragma omp for reduction(+:mf) schedule(auto)
+        for(i = sharedFrontierQueue->head ; i < sharedFrontierQueue->tail; i++)
+        {
+            v = sharedFrontierQueue->queue[i];
+            edge_idx = graph->vertices->edges_idx[v];
+
+            for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
+            {
+
+                u = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[j]);
+                int u_parent = stats->parents[u];
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->parents[u]), 'r', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
+                if(u_parent < 0 )
+                {
+#ifdef CACHE_HARNESS
+                    AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (stats->parents[u]), 'w', u, EXTRACT_MASK(graph->sorted_edges_array->edges_array_dest[j]));
+#endif
+                    if(__sync_bool_compare_and_swap(&stats->parents[u], u_parent, v))
+                    {
+                        enArrayQueue(localFrontierQueue, u);
+                        mf +=  -(u_parent);
+                        stats->distances[u] = stats->distances[v] + 1;
+                    }
+                }
+            }
+
+        }
+
+        flushArrayQueueToShared(localFrontierQueue, sharedFrontierQueue);
+    }
+
+    return mf;
+}
+
+
+// bottom-up-step(graph, sharedFrontierQueue, next, parents) //pull
+//  for v ∈ vertices do
+//      if parents[v] = -1 then
+//          for u ∈ neighbors[v] do
+//              if u ∈ sharedFrontierQueue then
+//              parents[v] ← u
+//              next ← next ∪ {v}
+//              break
+//              end if
+//          end for
+//      end if
+//  end for
+
+uint32_t bottomUpStepGraphCSRDualOrder(struct GraphCSR *graph, struct Bitmap *bitmapCurr, struct Bitmap *bitmapNext, struct BFSStats *stats)
+{
+
+
+    uint32_t v;
+    uint32_t u;
+    uint32_t j;
+    uint32_t edge_idx;
+    uint32_t out_degree;
+    struct Vertex *vertices = NULL;
+    uint32_t *sorted_edges_array = NULL;
+
+    // uint32_t processed_nodes = bitmapCurr->numSetBits;
+    uint32_t nf = 0; // number of vertices in sharedFrontierQueue
+    // stats->processed_nodes += processed_nodes;
+
+#if DIRECTED
+    vertices = graph->inverse_vertices;
+    sorted_edges_array = graph->inverse_sorted_edges_array->edges_array_dest;
+#else
+    vertices = graph->vertices;
+    sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
+#endif
+
+    #pragma omp parallel for default(none) private(j,u,v,out_degree,edge_idx) shared(stats,bitmapCurr,bitmapNext,graph,vertices,sorted_edges_array) reduction(+:nf) schedule(dynamic, 1024)
+    for(v = 0 ; v < graph->num_vertices ; v++)
+    {
+        out_degree = vertices->out_degree[v];
+        if(stats->parents[v] < 0)  // optmization
+        {
+            edge_idx = vertices->edges_idx[v];
+
+            for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
+            {
+                u = EXTRACT_VALUE(sorted_edges_array[j]);
+#ifdef CACHE_HARNESS
+                AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
+#endif
+                if(getBit(bitmapCurr, u))
+                {
+                    stats->parents[v] = u;
+                    //we are not considering distance array as it is not implemented in AccelGraph
+                    stats->distances[v] = stats->distances[u] + 1;
+                    setBitAtomic(bitmapNext, v);
+                    // #ifdef CACHE_HARNESS
+                    //                     AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (stats->parents[v]), 'w', v, stats->parents[v]);
+                    //                     AccessDoubleTaggedCacheFloat(stats->cache, (uint64_t) & (bitmapNext->bitarray[word_offset(v)]), 'w', v, (bitmapNext->bitarray[word_offset(v)]));
+                    // #endif
+                    nf++;
+                    break;
+                }
+            }
+
+        }
+
+    }
+    return nf;
+}
 
 // ********************************************************************************************
 // ***************                  GRID DataStructure                           **************

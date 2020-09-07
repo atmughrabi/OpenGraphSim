@@ -622,7 +622,17 @@ struct EdgeList *readEdgeListsMem( struct EdgeList *edgeListmem,  uint8_t invers
         {
             edgeList->label_array[i] = edgeListmem->label_array[i];
         }
+    }
 
+    if(edgeListmem->inverse_label_array)
+    {
+        edgeList->inverse_label_array = (uint32_t *) my_malloc(num_vertices * sizeof(uint32_t));
+
+        #pragma omp parallel for
+        for ( i = 0; i < num_vertices; ++i)
+        {
+            edgeList->inverse_label_array[i] = edgeListmem->inverse_label_array[i];
+        }
     }
 
     #pragma omp parallel for private(src,dest)
@@ -736,6 +746,13 @@ void edgeListPrint(struct EdgeList *edgeList)
     printf("average degree     (D) : %u \n", edgeList->avg_degree);
 
     uint32_t i;
+
+
+    for(i = 0; i < edgeList->num_vertices; i++)
+    {
+        printf("label %-2u->%-2u - %-2u->%-2u \n",  i, edgeList->label_array[i], i, edgeList->inverse_label_array[i] );
+    }
+
     for(i = 0; i < edgeList->num_edges; i++)
     {
 #if WEIGHTED

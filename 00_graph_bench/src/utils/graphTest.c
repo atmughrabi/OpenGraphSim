@@ -41,6 +41,7 @@
 #include "bellmanFord.h"
 #include "SSSP.h"
 #include "SPMV.h"
+#include "betweennessCentrality.h"
 #include "connectedComponents.h"
 #include "triangleCount.h"
 
@@ -190,14 +191,22 @@ uint32_t cmpGraphAlgorithmsTestStats(void *ref_stats, void *cmp_stats, uint32_t 
         missmatch = 0;
     }
     break;
-    case 7: // Triangle Count
+    case 7: // Betweenness Centrality
+    {
+        struct BetweennessCentralityStats *ref_stats_tmp = (struct BetweennessCentralityStats * )ref_stats;
+        struct BetweennessCentralityStats *cmp_stats_tmp = (struct BetweennessCentralityStats * )cmp_stats;
+        missmatch += compareDistanceArrays(ref_stats_tmp->distances, cmp_stats_tmp->distances, ref_stats_tmp->num_vertices, cmp_stats_tmp->num_vertices);
+        missmatch = 0;
+    }
+    break;
+    case 8: // Triangle Count
     {
         struct TCStats *ref_stats_tmp = (struct TCStats * )ref_stats;
         struct TCStats *cmp_stats_tmp = (struct TCStats * )cmp_stats;
         missmatch += (ref_stats_tmp->counts == cmp_stats_tmp->counts) ? 1 : 0;
     }
     break;
-    case 8: // incremental Aggregation file name root
+    case 9: // incremental Aggregation file name root
     {
         struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
         struct IncrementalAggregationStats *cmp_stats_tmp = (struct IncrementalAggregationStats * )cmp_stats;
@@ -259,12 +268,17 @@ void *runGraphAlgorithmsTest(struct Arguments *arguments, void *graph)
         ref_stats = runConnectedComponentsAlgorithm(arguments, graph);
     }
     break;
-    case 7: // Triangle Count
+    case 7: // Betweenness Centrality
+    {
+        ref_stats = runBetweennessCentralityAlgorithm(arguments, graph);
+    }
+    break;
+    case 8: // Triangle Count
     {
         ref_stats = runTriangleCountAlgorithm(arguments, graph);
     }
     break;
-    case 8: // incremental Aggregation
+    case 9: // incremental Aggregation
     {
         ref_stats = runIncrementalAggregationAlgorithm(arguments, graph);
     }

@@ -369,7 +369,7 @@ struct EdgeList *reorderGraphListDegree(struct EdgeList *edgeList, uint32_t *deg
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
         edgeList->label_array[v] = labels[edgeList->label_array[v]];
-        edgeList->inverse_label_array[edgeList->inverse_label_array[v]] = labels[v];
+        edgeList->inverse_label_array[v] = labels[v];
     }
 
     free(timer);
@@ -552,7 +552,7 @@ struct EdgeList *reorderGraphListDBG(struct EdgeList *edgeList, uint32_t *degree
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
         edgeList->label_array[v] = labels[edgeList->label_array[v]];
-        edgeList->inverse_label_array[edgeList->inverse_label_array[v]] = labels[v];
+        edgeList->inverse_label_array[v] = labels[v];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -762,7 +762,7 @@ struct EdgeList *reorderGraphListHUBSort(struct EdgeList *edgeList, uint32_t *de
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
         edgeList->label_array[v] = labels[edgeList->label_array[v]];
-        edgeList->inverse_label_array[edgeList->inverse_label_array[v]] = labels[v];
+        edgeList->inverse_label_array[v] = labels[v];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -954,7 +954,7 @@ struct EdgeList *reorderGraphListHUBCluster(struct EdgeList *edgeList, uint32_t 
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
         edgeList->label_array[v] = labels[edgeList->label_array[v]];
-        edgeList->inverse_label_array[edgeList->inverse_label_array[v]] = labels[v];
+        edgeList->inverse_label_array[v] = labels[v];
     }
 
     for (i = 0; i < (P * num_buckets); ++i)
@@ -1517,7 +1517,7 @@ struct EdgeList *relabelEdgeListFromFile(struct EdgeList *edgeList, const char *
     for (v = 0; v < edgeList->num_vertices; ++v)
     {
         edgeList->label_array[v] = labels[edgeList->label_array[v]];
-        edgeList->inverse_label_array[edgeList->inverse_label_array[v]] = labels[v];
+        edgeList->inverse_label_array[v] = labels[v];
     }
 
     free(labels);

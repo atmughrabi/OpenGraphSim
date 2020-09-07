@@ -66,6 +66,19 @@ struct BFSStats *breadthFirstSearchPushDirectionOptimizedBitmapGraphCSR(struct A
 uint32_t topDownStepUsingBitmapsGraphCSR(struct GraphCSR *graph, struct ArrayQueue *sharedFrontierQueue, struct BFSStats *stats);
 
 // ********************************************************************************************
+// ***************					CSR DataStructure DualOrder				     **************
+// ********************************************************************************************
+
+struct BFSStats *breadthFirstSearchGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph);
+
+struct BFSStats *breadthFirstSearchPullGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph);
+struct BFSStats *breadthFirstSearchPushGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph);
+struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Arguments *arguments, struct GraphCSR *graph);
+
+uint32_t topDownStepGraphCSRDualOrder(struct GraphCSR *graph, struct ArrayQueue *sharedFrontierQueue,  struct ArrayQueue **localFrontierQueues, struct BFSStats *stats);
+uint32_t bottomUpStepGraphCSRDualOrder(struct GraphCSR *graph, struct Bitmap *bitmapCurr, struct Bitmap *bitmapNext, struct BFSStats *stats);
+
+// ********************************************************************************************
 // ***************					GRID DataStructure							 **************
 // ********************************************************************************************
 
