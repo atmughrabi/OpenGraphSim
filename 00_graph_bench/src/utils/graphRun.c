@@ -693,10 +693,12 @@ struct CCStats *runConnectedComponentsAlgorithm(struct Arguments *arguments, voi
     switch (arguments->datastructure)
     {
     case 0: // CSR
+    case 4: // CSR
         graphCSR = (struct GraphCSR *)graph;
         stats = connectedComponentsGraphCSR(arguments, graphCSR);
         break;
     case 1: // Grid
+    case 5: // Grid
         graphGrid = (struct GraphGrid *)graph;
         stats = connectedComponentsGraphGrid(arguments, graphGrid);
         break;
@@ -1227,7 +1229,7 @@ void freeGraphStatsGeneral(void *stats, uint32_t algorithm)
         freeIncrementalAggregationStats(freeStats);
     }
     break;
-    default:// BFS 
+    default:// BFS
     {
         struct BFSStats *freeStatsBFS = (struct BFSStats *)stats;
         freeBFSStats(freeStatsBFS);

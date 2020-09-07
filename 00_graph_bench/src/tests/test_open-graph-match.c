@@ -91,9 +91,9 @@ main (int argc, char **argv)
     void *ref_data;
     void *cmp_data;
 
-    for(arguments.algorithm = 0 ; arguments.algorithm < 10; arguments.algorithm++)
+    for(arguments.algorithm = 0 ; arguments.algorithm < 9; arguments.algorithm++)
     {
-        for(arguments.datastructure = 0 ; arguments.datastructure < 7; arguments.datastructure++)
+        for(arguments.datastructure = 0 ; arguments.datastructure < 4; arguments.datastructure++)
         {
 
             if(arguments.algorithm == 8)  // Triangle counting depends on order
