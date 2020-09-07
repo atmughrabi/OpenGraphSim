@@ -1617,14 +1617,14 @@ uint32_t topDownStepGraphCSRDualOrder(struct GraphCSR *graph, struct ArrayQueue 
     {
         uint32_t t_id = omp_get_thread_num();
         struct ArrayQueue *localFrontierQueue = localFrontierQueues[t_id];
-
-
+        
+        
         #pragma omp for reduction(+:mf) schedule(auto)
         for(i = sharedFrontierQueue->head ; i < sharedFrontierQueue->tail; i++)
         {
             v = sharedFrontierQueue->queue[i];
             edge_idx = graph->vertices->edges_idx[v];
-
+            
             for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
             {
 
