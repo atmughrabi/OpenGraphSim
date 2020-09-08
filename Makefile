@@ -15,8 +15,8 @@ export APP_DIR              ?= .
 
 
 # export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-export BENCHMARKS_DIR    	?= ../01_test_graphs
+export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+# export BENCHMARKS_DIR    	?= ../01_test_graphs
 # export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
 # export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
 
@@ -55,7 +55,7 @@ export MAIN_DIR		  	= main
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
 # export GRAPH_SUIT ?= TEST
-export GRAPH_SUIT ?= LAW
+# export GRAPH_SUIT ?= LAW
 # export GRAPH_SUIT ?= GAP
 # export GRAPH_SUIT ?= SNAP
 # export GRAPH_SUIT ?= KONECT
@@ -68,6 +68,7 @@ export GRAPH_SUIT ?= LAW
 
 # GONG # https://gonglab.pratt.duke.edu/google-dataset
 # export GRAPH_NAME ?= GONG-gplus
+export GRAPH_NAME ?= Gong-gplus
 
 # GAP # https://sparse.tamu.edu/MM/GAP/
 # export GRAPH_NAME ?= GAP-twitter
@@ -88,7 +89,7 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -116,7 +117,7 @@ export PULL_PUSH 		?= 2
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 0
-export REORDER_LAYER2   ?= 4
+export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 export DATA_STRUCTURES  ?= 6
 export ALGORITHMS 		?= 0
@@ -137,7 +138,7 @@ export NUM_ITERATIONS	?= 1
 export NUM_TRIALS 		?= 10
 
 export FILE_FORMAT		?= 1
-export CONVERT_FORMAT 	?= 0
+export CONVERT_FORMAT 	?= 1
 
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000

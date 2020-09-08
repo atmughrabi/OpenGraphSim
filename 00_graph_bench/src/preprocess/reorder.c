@@ -603,10 +603,10 @@ struct EdgeList *reorderGraphProcessHUBSort( uint32_t sort, struct EdgeList *edg
 
     switch(lmode)
     {
-    case 4  :
+    case 6  :
         printf("| %-51s | \n", "HUBSort OUT-DEGREE");
         break;
-    case 5  :
+    case 7  :
         printf("| %-51s | \n", "HUBSort IN-DEGREE");
         break;
     default :
@@ -819,10 +819,10 @@ struct EdgeList *reorderGraphProcessHUBCluster( uint32_t sort, struct EdgeList *
 
     switch(lmode)
     {
-    case 4  :
+    case 8  :
         printf("| %-51s | \n", "HUBCluster OUT-DEGREE");
         break;
-    case 5  :
+    case 9  :
         printf("| %-51s | \n", "HUBCluster IN-DEGREE");
         break;
     default :

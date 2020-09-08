@@ -294,10 +294,8 @@ struct GraphCSR *graphCSRPreProcessingStepDualOrder (struct Arguments *arguments
     arguments->lmode = arguments->lmode_l2;
     if(arguments->lmode)
     {
-        arguments->lmode = arguments->lmode_l2 + 1;
         inverse_edgeList = reorderGraphProcess(inverse_edgeList, arguments);
         inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
-        arguments->lmode = arguments->lmode - 1;
     }
     // edgeListPrint(inverse_edgeList);
 

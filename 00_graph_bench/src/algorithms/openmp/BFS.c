@@ -1550,7 +1550,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
             Start(timer_inner);
             arrayQueueToBitmapDualOrder(sharedFrontierQueue, bitmapCurr, graph->sorted_edges_array->inverse_label_array, graph->inverse_sorted_edges_array->label_array);
             syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
-            syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
+            // syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
             nf = sizeArrayQueue(sharedFrontierQueue);
             Stop(timer_inner);
             printf("| E  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
@@ -1583,7 +1583,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
 
             Start(timer_inner);
             syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
-            syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
+            // syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
             bitmapToArrayQueueDualOrder(bitmapCurr, sharedFrontierQueue, localFrontierQueues, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->inverse_label_array);
             Stop(timer_inner);
             printf("| C  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
