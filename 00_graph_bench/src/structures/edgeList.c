@@ -246,8 +246,7 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
     uint32_t size = 0, i;
     uint32_t src = 0, dest = 0;
     float weight = 1.0;
-    mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
+
 
 
     char *fname_txt = (char *) malloc((strlen(fname) + 10) * sizeof(char));
@@ -257,6 +256,8 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
 
 #if WEIGHTED
     fname_bin = strcat (fname_txt, ".wbin");
+    mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
+    initializeMersenneState (mt19937var, 27491095);
 #else
     fname_bin = strcat (fname_txt, ".bin");
 #endif
@@ -324,8 +325,11 @@ char *readEdgeListstxt(const char *fname, uint32_t weighted)
 
     fclose(pText);
     fclose(pBinary);
-
+    
+#if WEIGHTED
     free(mt19937var);
+#endif
+
     return fname_bin;
 }
 
@@ -339,12 +343,13 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
     uint32_t  *buf_pointer;
 #if WEIGHTED
     float    *buf_pointer_float;
+    mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
+    initializeMersenneState (mt19937var, 27491095);
 #endif
     uint32_t  src = 0, dest = 0;
     uint32_t offset = 0;
     uint32_t offset_size;
-    mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
+
 
     if (fd == -1)
     {
@@ -565,6 +570,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
 
 #if WEIGHTED
     edgeList->max_weight = max_weight;
+    free(mt19937var);
 #endif
     // printf("DONE Reading EdgeList from file %s \n", fname);
     // edgeListPrint(edgeList);
@@ -583,7 +589,7 @@ struct EdgeList *readEdgeListsbin(const char *fname, uint8_t inverse, uint32_t s
 
     munmap(buf_addr, fs.st_size);
     close(fd);
-    free(mt19937var);
+
     return edgeList;
 }
 

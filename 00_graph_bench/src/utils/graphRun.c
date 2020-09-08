@@ -486,13 +486,15 @@ uint32_t generateRandomRootGraphCSR(mt19937state *mt19937var, struct GraphCSR *g
 {
 
     uint32_t source = 0;
+    uint32_t source_temp = 0;
 
     while(1)
     {
         source = generateRandInt(mt19937var);
         if(source < graph->num_vertices)
         {
-            if(graph->vertices->out_degree[source] > 0)
+            source_temp = graph->sorted_edges_array->label_array[source];
+            if(graph->vertices->out_degree[source_temp] > 0)
                 break;
         }
     }
@@ -571,6 +573,7 @@ uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
     {
     case 0: // CSR
     case 4:
+    case 6:
         graphCSR = (struct GraphCSR *)graph;
         arguments->source = generateRandomRootGraphCSR(&(arguments->mt19937var), graphCSR);
         break;
@@ -589,11 +592,6 @@ uint32_t generateRandomRootGeneral(struct Arguments *arguments, void *graph)
     case 3: // Adj Array List
         graphAdjArrayList = (struct GraphAdjArrayList *)graph;
         arguments->source = generateRandomRootGraphAdjArrayList(&(arguments->mt19937var), graphAdjArrayList);
-        break;
-
-    case 6: // CSR
-        graphCSR = (struct GraphCSR *)graph;
-        arguments->source = generateRandomRootGraphCSR(&(arguments->mt19937var), graphCSR);
         break;
 
     default:// CSR

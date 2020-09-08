@@ -1303,8 +1303,7 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
     uint32_t src;
     uint32_t dest;
 
-    mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
-    initializeMersenneState (mt19937var, 27491095);
+
 
     if(lmode != 10)
     {
@@ -1354,14 +1353,17 @@ uint32_t *reorderGraphGenerateInOutDegrees(uint32_t *degrees, struct EdgeList *e
 
     if(lmode == 10)
     {
+        mt19937state *mt19937var = (mt19937state *) my_malloc(sizeof(mt19937state));
+        initializeMersenneState (mt19937var, 27491095);
         #pragma omp parallel for firstprivate(mt19937var)
         for (i = 0; i < edgeList->num_vertices; ++i)
         {
             degrees[i] = (generateRandInt(mt19937var) % edgeList->num_vertices) + omp_get_thread_num();
         }
+        free(mt19937var);
     }
 
-    free(mt19937var);
+
     return degrees;
 }
 

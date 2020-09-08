@@ -118,7 +118,7 @@ export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 4
 export REORDER_LAYER3   ?= 0
-export DATA_STRUCTURES  ?= 0
+export DATA_STRUCTURES  ?= 6
 export ALGORITHMS 		?= 0
 
 export ROOT 			?= 46022
