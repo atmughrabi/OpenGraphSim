@@ -111,30 +111,30 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #Direction
-export PULL_PUSH 		?= 1
+export PULL_PUSH 		?= 2
 
 #GRAPH RUN
 export SORT_TYPE		?= 1
 export REORDER_LAYER1 	?= 0
-export REORDER_LAYER2   ?= 0
+export REORDER_LAYER2   ?= 4
 export REORDER_LAYER3   ?= 0
-export DATA_STRUCTURES  ?= 1
-export ALGORITHMS 		?= 7
+export DATA_STRUCTURES  ?= 0
+export ALGORITHMS 		?= 0
 
-export ROOT 			?= 8
+export ROOT 			?= 46022
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
 
-# export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
-# export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
-# export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
+export NUM_THREADS_KER  ?= $(shell grep -c ^processor /proc/cpuinfo)
 
-export NUM_THREADS_PRE  ?= 1
-export NUM_THREADS_ALGO ?= 1
-export NUM_THREADS_KER  ?= 1
+# export NUM_THREADS_PRE  ?= 1
+# export NUM_THREADS_ALGO ?= 1
+# export NUM_THREADS_KER  ?= 1
 
 export NUM_ITERATIONS	?= 1
-export NUM_TRIALS 		?= 1
+export NUM_TRIALS 		?= 10
 
 export FILE_FORMAT		?= 1
 export CONVERT_FORMAT 	?= 0

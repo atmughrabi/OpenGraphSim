@@ -291,15 +291,14 @@ struct GraphCSR *graphCSRPreProcessingStepDualOrder (struct Arguments *arguments
     inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
 
     // add another layer 2 of reordering to test how DBG affect Gorder, or Gorder affect Rabbit order ...etc
-    arguments->lmode = arguments->lmode_l2 + 1;
+    arguments->lmode = arguments->lmode_l2;
     if(arguments->lmode)
     {
         arguments->lmode = arguments->lmode_l2 + 1;
         inverse_edgeList = reorderGraphProcess(inverse_edgeList, arguments);
         inverse_edgeList = sortRunAlgorithms(inverse_edgeList, arguments->sort);
+        arguments->lmode = arguments->lmode - 1;
     }
-    arguments->lmode = arguments->lmode - 1;
-
     // edgeListPrint(inverse_edgeList);
 
     Start(timer);

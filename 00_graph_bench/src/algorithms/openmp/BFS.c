@@ -50,7 +50,9 @@ struct BFSStats *newBFSStatsGraphCSR(struct GraphCSR *graph)
     struct BFSStats *stats = (struct BFSStats *) my_malloc(sizeof(struct BFSStats));
 
     stats->distances  = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
+    stats->distances_DualOrder  = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
     stats->parents = (int *) my_malloc(graph->num_vertices * sizeof(int));
+    stats->parents_DualOrder = (int *) my_malloc(graph->num_vertices * sizeof(int));
     stats->processed_nodes = 0;
     stats->iteration = 0;
     stats->num_vertices = graph->num_vertices;
@@ -61,10 +63,17 @@ struct BFSStats *newBFSStatsGraphCSR(struct GraphCSR *graph)
     for(vertex_id = 0; vertex_id < graph->num_vertices ; vertex_id++)
     {
         stats->distances[vertex_id] = 0;
+        stats->parents_DualOrder[vertex_id] = 0;
         if(graph->vertices->out_degree[vertex_id])
+        {
             stats->parents[vertex_id] = graph->vertices->out_degree[vertex_id] * (-1);
+            stats->parents_DualOrder[vertex_id] = graph->vertices->out_degree[vertex_id] * (-1);
+        }
         else
+        {
             stats->parents[vertex_id] = -1;
+            stats->parents_DualOrder[vertex_id] = -1;
+        }
     }
 
     return stats;
@@ -77,7 +86,8 @@ struct BFSStats *newBFSStatsGraphGrid(struct GraphGrid *graph)
     uint32_t vertex_id;
 
     struct BFSStats *stats = (struct BFSStats *) my_malloc(sizeof(struct BFSStats));
-
+    stats->distances_DualOrder = NULL;
+    stats->parents_DualOrder = NULL;
     stats->distances  = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
     stats->parents = (int *) my_malloc(graph->num_vertices * sizeof(int));
     stats->processed_nodes = 0;
@@ -101,7 +111,8 @@ struct BFSStats *newBFSStatsGraphAdjArrayList(struct GraphAdjArrayList *graph)
     uint32_t vertex_id;
 
     struct BFSStats *stats = (struct BFSStats *) my_malloc(sizeof(struct BFSStats));
-
+    stats->distances_DualOrder = NULL;
+    stats->parents_DualOrder = NULL;
     stats->distances  = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
     stats->parents = (int *) my_malloc(graph->num_vertices * sizeof(int));
     stats->processed_nodes = 0;
@@ -129,7 +140,8 @@ struct BFSStats *newBFSStatsGraphAdjLinkedList(struct GraphAdjLinkedList *graph)
     uint32_t vertex_id;
 
     struct BFSStats *stats = (struct BFSStats *) my_malloc(sizeof(struct BFSStats));
-
+    stats->distances_DualOrder = NULL;
+    stats->parents_DualOrder = NULL;
     stats->distances  = (uint32_t *) my_malloc(graph->num_vertices * sizeof(uint32_t));
     stats->parents = (int *) my_malloc(graph->num_vertices * sizeof(int));
     stats->processed_nodes = 0;
@@ -161,6 +173,10 @@ void freeBFSStats(struct BFSStats *stats)
             free(stats->distances);
         if(stats->parents)
             free(stats->parents);
+        if(stats->distances_DualOrder)
+            free(stats->distances_DualOrder);
+        if(stats->parents_DualOrder)
+            free(stats->parents_DualOrder);
 
 #ifdef CACHE_HARNESS_META
         freeDoubleTaggedCache(stats->cache);
@@ -170,6 +186,47 @@ void freeBFSStats(struct BFSStats *stats)
 
         free(stats);
     }
+
+}
+
+void syncDualOrderParentArrays(int *parents, int *parents_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices)
+{
+
+    uint32_t vertex_id;
+    uint32_t vertex_v;
+    uint32_t vertex_u;
+    int *parents_temp;
+    #pragma omp parallel for default(none) private(vertex_id,vertex_v,vertex_u) shared(parents,parents_DualOrder,labels,inv_labels,num_vertices)
+    for(vertex_id = 0; vertex_id < num_vertices ; vertex_id++)
+    {
+        vertex_v = labels[vertex_id];
+        vertex_u = inv_labels[vertex_id];
+        parents_DualOrder[vertex_u] = parents[vertex_v];
+    }
+
+    parents_temp = parents;
+    parents = parents_DualOrder;
+    parents_DualOrder = parents_temp;
+}
+
+void syncDualOrderDistancesArrays(uint32_t *distances, uint32_t *distances_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices)
+{
+
+    uint32_t vertex_id;
+    uint32_t vertex_v;
+    uint32_t vertex_u;
+    uint32_t *distances_temp;
+    #pragma omp parallel for default(none) private(vertex_id,vertex_v,vertex_u) shared(distances,distances_DualOrder,labels,inv_labels,num_vertices)
+    for(vertex_id = 0; vertex_id < num_vertices ; vertex_id++)
+    {
+        vertex_v = labels[vertex_id];
+        vertex_u = inv_labels[vertex_id];
+        distances_DualOrder[vertex_u] = distances[vertex_v];
+    }
+
+    distances_temp = distances;
+    distances = distances_DualOrder;
+    distances_DualOrder = distances_temp;
 
 }
 
@@ -1491,7 +1548,9 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
         {
 
             Start(timer_inner);
-            arrayQueueToBitmap(sharedFrontierQueue, bitmapCurr);
+            arrayQueueToBitmapDualOrder(sharedFrontierQueue, bitmapCurr, graph->sorted_edges_array->inverse_label_array, graph->inverse_sorted_edges_array->label_array);
+            syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
+            syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
             nf = sizeArrayQueue(sharedFrontierQueue);
             Stop(timer_inner);
             printf("| E  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
@@ -1523,7 +1582,9 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
                     ( nf > (n / beta)));
 
             Start(timer_inner);
-            bitmapToArrayQueue(bitmapCurr, sharedFrontierQueue, localFrontierQueues);
+            syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
+            syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
+            bitmapToArrayQueueDualOrder(bitmapCurr, sharedFrontierQueue, localFrontierQueues, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->inverse_label_array);
             Stop(timer_inner);
             printf("| C  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
 
@@ -1617,14 +1678,14 @@ uint32_t topDownStepGraphCSRDualOrder(struct GraphCSR *graph, struct ArrayQueue 
     {
         uint32_t t_id = omp_get_thread_num();
         struct ArrayQueue *localFrontierQueue = localFrontierQueues[t_id];
-        
-        
+
+
         #pragma omp for reduction(+:mf) schedule(auto)
         for(i = sharedFrontierQueue->head ; i < sharedFrontierQueue->tail; i++)
         {
             v = sharedFrontierQueue->queue[i];
             edge_idx = graph->vertices->edges_idx[v];
-            
+
             for(j = edge_idx ; j < (edge_idx + graph->vertices->out_degree[v]) ; j++)
             {
 

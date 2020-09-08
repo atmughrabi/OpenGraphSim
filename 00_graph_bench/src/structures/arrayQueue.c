@@ -306,6 +306,30 @@ void arrayQueueToBitmap(struct ArrayQueue *q, struct Bitmap *b)
 
 }
 
+void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_t *labels, uint32_t *inv_labels)
+{
+
+    uint32_t v;
+    uint32_t i;
+    uint32_t inv_v;
+    uint32_t inv_u;
+
+    #pragma omp parallel for default(none) shared(q,b,labels,inv_labels) private(v,i,inv_u,inv_v)
+    for(i = q->head ; i < q->tail; i++)
+    {
+        v = q->queue[i];
+        inv_v = labels[v];
+        inv_u = inv_labels[inv_v];
+        setBitAtomic(b, inv_u);
+    }
+
+    // b->numSetBits = q->q_bitmap->numSetBits;
+    q->head = q->tail;
+    q->tail_next = q->tail;
+
+
+}
+
 void bitmapToArrayQueue(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues)
 {
 
@@ -322,6 +346,38 @@ void bitmapToArrayQueue(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueu
             if(getBit(b, i))
             {
                 localFrontierQueue->queue[localFrontierQueue->tail] = i;
+                localFrontierQueue->tail++;
+            }
+
+        }
+
+        flushArrayQueueToShared(localFrontierQueue, q);
+
+    }
+
+    slideWindowArrayQueue(q);
+
+}
+
+void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues, uint32_t *labels, uint32_t *inv_labels)
+{
+
+    #pragma omp parallel default(none) shared(b,localFrontierQueues,q,labels,inv_labels)
+    {
+        uint32_t i;
+        uint32_t inv_v;
+        uint32_t inv_u;
+        uint32_t t_id = omp_get_thread_num();
+        struct ArrayQueue *localFrontierQueue = localFrontierQueues[t_id];
+
+        #pragma omp for
+        for(i = 0 ; i < (b->size); i++)
+        {
+            if(getBit(b, i))
+            {
+                inv_v = inv_labels[i];
+                inv_u = labels[inv_v];
+                localFrontierQueue->queue[localFrontierQueue->tail] = inv_u;
                 localFrontierQueue->tail++;
             }
 

@@ -24,6 +24,8 @@ struct BFSStats
 {
     uint32_t *distances;
     int *parents;
+    uint32_t *distances_DualOrder;
+    int *parents_DualOrder;
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     uint32_t iteration;
@@ -133,5 +135,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphAdjLinkedList(struct A
 
 uint32_t bottomUpStepGraphAdjLinkedList(struct GraphAdjLinkedList *graph, struct Bitmap *bitmapCurr, struct Bitmap *bitmapNext, struct BFSStats *stats);
 uint32_t topDownStepGraphAdjLinkedList(struct GraphAdjLinkedList *graph, struct ArrayQueue *sharedFrontierQueue,  struct ArrayQueue **localFrontierQueues, struct BFSStats *stats);
+void syncDualOrderParentArrays(int *parents, int *parents_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices);
+void syncDualOrderDistancesArrays(uint32_t *distances, uint32_t *distances_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices);
 
 #endif
