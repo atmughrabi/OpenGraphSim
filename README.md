@@ -179,6 +179,17 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
 ```console
 open@graph:~OpenGraphSim$ make clean; make run-sniper
 ```
+2. Simulation results are output to `0_graph_bench/sniper-results`
+3. To clean simulation stats
+```console
+open@graph:~OpenGraphSim$ make clean-stats
+```
+
+* You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(SniperSim)](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator) to pass the correct values.
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| SNIPER_ARGS  | arguments passed to sniper |
 
 ## gem5 Simulator
 1. Coming soon
