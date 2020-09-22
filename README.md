@@ -34,10 +34,8 @@ OpenGraphSim is coded using C giving the researcher full flexibility with modify
 
 ## Dependencies
 
-
-
-### OpenMP
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+### OpenMP
 
 1. Judy Arrays
 ```console
@@ -78,9 +76,9 @@ No setup needed, cache simulator is included within the code. And highlighted in
   //Simple Cache function calls
 #endif
 ```
- 
-### The Sniper Multi-Core Simulator 
+
 [<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+### The Sniper Multi-Core Simulator 
 
 Sniper simulator is needed within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
 
@@ -109,17 +107,17 @@ open@graph:~OpenGraphSim/00_graph_bench/sniper$ make
 open@graph:~OpenGraphSim/00_graph_bench/sniper$ cd ../..
 open@graph:~OpenGraphSim$ make run-sniper
 ```
-https://www.gem5.org/
+
+[<img src="./02_slides/fig/gem5_logo.png" height="100" align="right" >](https://www.gem5.org/)
 ### gem5 simulator
-[<img src="./02_slides/fig/gem5_logo.png" height="80" align="right" >](https://www.gem5.org/)
 
 1. Coming soon
 
 
 # Running OpenGraphSim 
 
-## Initial compilation for the Graph framework with OpenMP
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+## Initial compilation for the Graph framework with OpenMP
 
 1. The default compilation is `openmp` mode:
 ```console
@@ -179,8 +177,9 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
 #endif
 ```
 
-## The Sniper Multi-Core Simulator
 [<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+## The Sniper Multi-Core Simulator
+
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for sniper:
 ```console
@@ -198,8 +197,8 @@ open@graph:~OpenGraphSim$ make clean-stats
 | :--- | :--- |
 | SNIPER_ARGS  | arguments passed to sniper simulator |
 
+[<img src="./02_slides/fig/gem5_logo.png" height="100" align="right" >](https://www.gem5.org/)
 ## gem5 Simulator
-[<img src="./02_slides/fig/gem5_logo.png" height="80" align="right" >](https://www.gem5.org/)
 
 1. Coming soon
 
