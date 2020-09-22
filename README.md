@@ -3,7 +3,7 @@
 
 # OpenGraphSim Benchmark Suite
 
-## Graph Processing Framework with OpenMP
+## Graph Processing Framework with SniperSIM/GEM5/OpenMP
 
 ## Overview
 
@@ -43,7 +43,8 @@ open@graph:~$ sudo apt-get install libjudy-dev
 ```console
 open@graph:~$ sudo apt-get install libomp-dev
 ```
-## Setting up the source code
+
+#### Setting up the source code
 
 1. Clone OpenGraphSim.
 ```console
@@ -59,6 +60,7 @@ open@graph:~OpenGraphSim$ make
 ```
 
 ### Simple Trace Cache simulator
+
 ```C
 #ifdef CACHE_HARNESS_META
   //Simple Cache function calls
@@ -66,6 +68,7 @@ open@graph:~OpenGraphSim$ make
 ```
 
 ###Sniper simulator
+
 ```C
 #ifdef SNIPER_HARNESS
   //Sniper ROI function call
