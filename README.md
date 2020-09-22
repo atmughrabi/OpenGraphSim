@@ -34,23 +34,6 @@ OpenGraphSim is coded using C giving the researcher full flexibility with modify
 
 ## Dependencies
 
-### Simple Trace Cache simulator
-```C
-#ifdef CACHE_HARNESS_META
-  //Simple Cache function calls
-#endif
-```
-
-####Sniper simulator
-```C
-#ifdef SNIPER_HARNESS
-  //Sniper ROI function call
-#endif
-```
-
-### gem5 simulator
-1. Coming soon
-
 ### OpenMP
 1. Judy Arrays
 ```console
@@ -74,6 +57,24 @@ open@graph:~$ cd OpenGraphSim/
 ```console
 open@graph:~OpenGraphSim$ make
 ```
+
+### Simple Trace Cache simulator
+```C
+#ifdef CACHE_HARNESS_META
+  //Simple Cache function calls
+#endif
+```
+
+###Sniper simulator
+```C
+#ifdef SNIPER_HARNESS
+  //Sniper ROI function call
+#endif
+```
+
+### gem5 simulator
+1. Coming soon
+
 
 # Running OpenGraphSim 
 
