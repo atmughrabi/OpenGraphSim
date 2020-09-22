@@ -132,7 +132,7 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
-| <td colspan=2>*Graph Files Directory* |
+| *Graph Files Directory* |
 | FILE_BIN  | graph edge-list location |
 | FILE_LABEL  | graph edge-list reorder list | 
 | *Graph Structures PreProcessing* |
