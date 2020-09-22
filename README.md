@@ -1,16 +1,16 @@
 [![Build Status](https://travis-ci.com/atmughrabi/OpenGraphSim.svg?branch=master)](https://travis-ci.com/atmughrabi/OpenGraphSim)
-[<p align="center"><img src="./02_slides/fig/logo.png" width="650" ></p>](#opengraph-Sim-benchmark-suite)
+[<p align="center"><img src="./02_slides/fig/logo.png" width="650" ></p>](#OpenGraphSim-benchmark-suite)
 
-# OpenGraph-Sim Benchmark Suite
+# OpenGraphSim Benchmark Suite
 
 ## Graph Processing Framework with OpenMP
 
 ## Overview
 
-![End-to-End Evaluation](./02_slides/fig/theme.png "OpenGraph-Sim")
+![End-to-End Evaluation](./02_slides/fig/theme.png "OpenGraphSim")
 
-OpenGraph-Sim builds on OpenGraph by integrating it with simulators like SNIPER/GEM5. It is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraph-Sim has been developed on Ubuntu 20.04, with PowerPC/Intel architecture taken into account.
-OpenGraph-Sim is coded using C giving the researcher full flexibility with modifying data structures and other algorithmic optimizations.
+OpenGraphSim builds on OpenGraph by integrating it with simulators like SNIPER/GEM5. It is an open source graph processing framework, designed as a modular benchmarking suite for graph processing algorithms. It provides an end to end evaluation infrastructure which includes the preprocessing stage (forming the graph structure) and the graph algorithm. The OpenMP part of OpenGraphSim has been developed on Ubuntu 20.04, with PowerPC/Intel architecture taken into account.
+OpenGraphSim is coded using C giving the researcher full flexibility with modifying data structures and other algorithmic optimizations.
 
 * Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
   * Preprocessing two steps (third one is optional) :
@@ -28,14 +28,25 @@ OpenGraph-Sim is coded using C giving the researcher full flexibility with modif
        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
 
 <!-- ## Details -->
-<!-- ### OpenGraph-Sim Supported Algorithms -->
+<!-- ### OpenGraphSim Supported Algorithms -->
 
 # Installation
 
 ## Dependencies
 
-### Sniper simulator
-1. Coming soon
+### Simple Trace Cache simulator
+```C
+#ifdef CACHE_HARNESS_META
+  //Simple Cache function calls
+#endif
+```
+
+####Sniper simulator
+```C
+#ifdef SNIPER_HARNESS
+  //Sniper ROI function call
+#endif
+```
 
 ### gem5 simulator
 1. Coming soon
@@ -51,20 +62,20 @@ open@graph:~$ sudo apt-get install libomp-dev
 ```
 ## Setting up the source code
 
-1. Clone OpenGraph-Sim.
+1. Clone OpenGraphSim.
 ```console
-open@graph:~$ git clone https://github.com/atmughrabi/OpenGraph-Sim.git
+open@graph:~$ git clone https://github.com/atmughrabi/OpenGraphSim.git
 ```
-2. From the home directory go to the OpenGraph-Sim directory:
+2. From the home directory go to the OpenGraphSim directory:
 ```console
-open@graph:~$ cd OpenGraph-Sim/
+open@graph:~$ cd OpenGraphSim/
 ```
 3. Make the source code
 ```console
-open@graph:~OpenGraph-Sim$ make
+open@graph:~OpenGraphSim$ make
 ```
 
-# Running OpenGraph-Sim 
+# Running OpenGraphSim 
 
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
@@ -72,22 +83,22 @@ open@graph:~OpenGraph-Sim$ make
 
 1. (Optional) From the root directory go to the graph benchmark directory:
 ```console
-open@graph:~OpenGraph-Sim$ cd 00_graph_bench/
+open@graph:~OpenGraphSim$ cd 00_graph_bench/
 ```
 2. The default compilation is `openmp` mode:
 ```console
-open@graph:~OpenGraph-Sim/00_graph_bench$ make
+open@graph:~OpenGraphSim/00_graph_bench$ make
 ```
-3. From the root directory you can modify the Makefile with the [(parameters)](#opengraph-Sim-options) you need for OpenMP:
+3. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for OpenMP:
 ```console
-open@graph:~OpenGraph-Sim/00_graph_bench$ make run
+open@graph:~OpenGraphSim/00_graph_bench$ make run
 ```
 * OR
 ```console
-open@graph:~OpenGraph-Sim/00_graph_bench$ make run-openmp
+open@graph:~OpenGraphSim/00_graph_bench$ make run-openmp
 ```
 
-# Running OpenGraph-Sim Simulation mode
+# Running OpenGraphSim Simulation mode
 
 ## Simple trace-driven Cache 
 1. Coming soon
@@ -131,11 +142,11 @@ open@graph:~OpenGraph-Sim/00_graph_bench$ make run-openmp
 * NOTE: you can read the file from text format without the convert step. By adding `--graph-file-format 0` to the argument list. The default is `1` assuming it is binary. please check `--help` for better explanation.
 * `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
 ```console
-open@graph:~OpenGraph-Sim/00_graph_bench$ make convert
+open@graph:~OpenGraphSim/00_graph_bench$ make convert
 ```
 * OR
 ```console
-open@graph:~OpenGraph-Sim/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+open@graph:~OpenGraphSim/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
 * OUTPUT: (weighted binary edge-list)
@@ -153,7 +164,7 @@ open@graph:~OpenGraph-Sim/00_graph_bench$ ./bin/open-graph-openmp  --generate-we
 ```
 
 # Graph Structure Preprocessing:
-OpenGraph-Sim can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
+OpenGraphSim can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
 
 ## Regular unsorted Edge-list as input.
 
@@ -172,163 +183,153 @@ OpenGraph-Sim can handle multiple representations of the graph structure in memo
 <p align="center"><img src="./02_slides/fig/datastructures/linkedlist.png" width="600" ></p>
 
 
-# OpenGraph-Sim Options
+# OpenGraphSim Options
 
 ```
 Usage: open-graph-openmp [OPTION...]
             -f <graph file> -d [data structure] -a [algorithm] -r [root] -n
             [num threads] [-h -c -s -w]
 
-OpenGraph-Sim is an open source graph processing framework, it is designed to be a
+OpenGraphSim is an open source graph processing framework, it is designed to be a
 benchmarking suite for various graph processing algorithms using pure C.
 
-  -a, --algorithm=[DEFAULT:0]
-                                                                                       
-                             [0]-BFS, 
-                             [1]-Page-Rank, 
-                             [2]-SSSP-DeltaStepping,
-                             [3]-SSSP-BellmanFord, 
-                             [4]-DFS,
-                             [5]-SPMV,
+   -a, --algorithm=[DEFAULT:[0]-BFS]
+                             [0]-BFS, [1]-Page-rank, [2]-SSSP-DeltaStepping,
+                             [3]-SSSP-BellmanFord, [4]-DFS,[5]-SPMV,
                              [6]-Connected-Components,
-                             [7]-Betweenness-Centrality, 
-                             [8]-Triangle Counting,
+                             [7]-Betweenness-Centrality, [8]-Triangle Counting,
                              [9-BUGGY]-IncrementalAggregation.
 
-  -b, --delta=[DELTA:1]
-                                                          
-                             SSSP Delta value [Default:1].
+  -b, --delta=[DEFAULT:1]    SSSP Delta value [Default:1].
 
-  -c, --convert-format=[TEXT|BIN|CSR:1]
-                                                          
+  -c, --convert-format=[DEFAULT:[1]-binary-edgeList]
                              [serialize flag must be on --serialize to write]
                              Serialize graph text format (edge list format) to
                              binary graph file on load example:-f <graph file>
                              -c this is specifically useful if you have Graph
                              CSR/Grid structure and want to save in a binary
                              file format to skip the preprocessing step for
-                             future runs. 
-                             [0]-text edgeList 
-                             [1]-binary edgeList
-                             [2]-graphCSR binary
+                             future runs. [0]-text-edgeList [1]-binary-edgeList
+                             [2]-graphCSR-binary.
 
-  -d, --data-structure=[DEFAULT:0]
-                                                          
-                             [0]-CSR, 
-                             [1]-Grid, 
-                             [2]-AdjLinkedList, 
-                             [3]-AdjArrayList 
-                             [4]-CSR bitmap frontiers.
-                             [5]-Grid bitmap frontiers.
+  -d, --data-structure=[DEFAULT:[0]-CSR]
+                             [0]-CSR, [1]-Grid, [2]-Adj LinkedList, [3]-Adj
+                             ArrayList [4-5] same order bitmap frontiers.
 
   -e, --tolerance=[EPSILON:0.0001]
-                                                          
                              Tolerance value of for page rank
                              [default:0.0001].
 
-  -f, --graph-file=<FILE>
-                                                          
-                             Edge list represents the graph binary format to
+  -f, --graph-file=<FILE>    Edge list represents the graph binary format to
                              run the algorithm textual format change
                              graph-file-format.
 
-  -g, --bin-size=[SIZE:512]
-                                                          
-                             You bin vertices's histogram according to this
+  -F, --labels-file=<FILE>   Read and reorder vertex labels from a text file,
+                             Specify the file name for the new graph reorder,
+                             generated from Gorder, Rabbit-order, etc.
+  -g, --bin-size=[SIZE:512]  You bin vertices's histogram according to this
                              parameter, if you have a large graph you want to
                              illustrate.
 
   -i, --num-iterations=[DEFAULT:20]
-                                                          
                              Number of iterations for page rank to converge
                              [default:20] SSSP-BellmanFord [default:V-1].
 
-  -j, --verbosity=[DEFAULT:0]
-                                                          
+  -j, --verbosity=[DEFAULT:[0:no stats output]
                              For now it controls the output of .perf file and
-                             PageRank .stats (needs --stats enabled) files
-                             PageRank .stat [1:top-k results] [2:top-k results
-                             and top-k ranked vertices listed.
+                             PageRank .stats (needs --stats enabled)
+                             filesPageRank .stat [1:top-k results] [2:top-k
+                             results and top-k ranked vertices listed.
 
-  -k, --remove-duplicate     
-                             Removers duplicate edges and self loops from the
+  -k, --remove-duplicate     Removers duplicate edges and self loops from the
                              graph.
 
-  -l, --light-reorder=[ORDER:0]
-                                                          
-                             Relabels the graph for better cache performance.
-                             [default:0]-no-reordering 
-                             [1]-out-degree
-                             [2]-in-degree 
-                             [3]-(in+out)-degree 
-                             [4]-DBG-out-degree 
-                             [5]-DBG-in-degree  
-                             [6]-HUBSort-out-degree  
-                             [7]-HUBSort-in-degree 
-                             [8]-HUBCluster-out-degree  
-                             [9]-HUBCluster-in-degree 
-                             [10]-(random)-degree  
-                             [11]-LoadFromFile
+  -K, --Kernel-num-threads=[DEFAULT:algo-num-threads]
+                             Number of threads for graph processing kernel
+                             (critical-path) (graph algorithm)
 
-  -n, --num-threads=[DEFAULT:MAX]
-                                                          
-                             Default:max number of threads the system has
-  
-  -o, --sort=[DEFAULT:0]
-                                                          
-                             [0]-radix-src 
-                             [1]-radix-src-dest 
-                             [2]-count-src
+  -l, --light-reorder-l1=[DEFAULT:[0]-no-reordering]
+                             Relabels the graph for better cache performance
+                             (first layer). [0]-no-reordering [1]-out-degree
+                             [2]-in-degree [3]-(in+out)-degree [4]-DBG-out
+                             [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in
+                             [8]-HUBCluster-out [9]-HUBCluster-in
+                             [10]-(random)-degree  [11]-LoadFromFile
+
+  -L, --light-reorder-l2=[DEFAULT:[0]-no-reordering]
+                             Relabels the graph for better cache performance
+                             (second layer). [0]-no-reordering [1]-out-degree
+                             [2]-in-degree [3]-(in+out)-degree [4]-DBG-out
+                             [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in
+                             [8]-HUBCluster-out [9]-HUBCluster-in
+                             [10]-(random)-degree  [11]-LoadFromFile
+
+  -M, --mask-mode=[DEFAULT:[0:disabled]]
+                             Encodes [0:disabled] the last two bits of
+                             [1:out-degree]-Edgelist-labels
+                             [2:in-degree]-Edgelist-labels or
+                             [3:out-degree]-vertex-property-data
+                             [4:in-degree]-vertex-property-data with hot/cold
+                             hints [11:HOT]|[10:WARM]|[01:LUKEWARM]|[00:COLD]
+                             to specialize caching. The algorithm needs to
+                             support value unmask to work.
+
+  -n, --pre-num-threads=[DEFAULT:MAX]
+                             Number of threads for preprocessing (graph
+                             structure) step 
+
+  -N, --algo-num-threads=[DEFAULT:MAX]
+                             Number of threads for graph processing (graph
+                             algorithm)
+
+  -o, --sort=[DEFAULT:[0]-radix-src]
+                             [0]-radix-src [1]-radix-src-dest [2]-count-src
                              [3]-count-src-dst.
 
-  -p, --direction=[DEFAULT:0]
-                                                          
-                             [0]-PULL, 
-                             [1]-PUSH,
-                             [2]-HYBRID. 
-                             NOTE: Please consult the function switch table for each
+  -O, --light-reorder-l3=[DEFAULT:[0]-no-reordering]
+                             Relabels the graph for better cache performance
+                             (third layer). [0]-no-reordering [1]-out-degree
+                             [2]-in-degree [3]-(in+out)-degree [4]-DBG-out
+                             [5]-DBG-in [6]-HUBSort-out [7]-HUBSort-in
+                             [8]-HUBCluster-out [9]-HUBCluster-in
+                             [10]-(random)-degree  [11]-LoadFromFile
+
+  -p, --direction=[DEFAULT:[0]-PULL]
+                             [0]-PULL, [1]-PUSH,[2]-HYBRID. NOTE: Please
+                             consult the function switch table for each
                              algorithm.
 
-  -r, --root=[DEFAULT:0]
-                                                          
-                             BFS, DFS, SSSP root
-  -s, --symmetrize           
-                             Symmetric graph, create a set of incoming edges.
+  -r, --root=[DEFAULT:0]     BFS, DFS, SSSP root
 
-  -S, --stats                
-                             Write algorithm stats to file. same directory as
-                             the graph.
-                             PageRank: Dumps top-k ranks matching using QPR
-                             similarity metrics.
+  -s, --symmetrize           Symmetric graph, create a set of incoming edges.
 
-  -t, --num-trials=[DEFAULT:1]
-                                                          
+  -S, --stats                Write algorithm stats to file. same directory as
+                             the graph.PageRank: Dumps top-k ranks matching
+                             using QPR similarity metrics.
+
+  -t, --num-trials=[DEFAULT:[1 Trial]]
                              Number of trials for whole run (graph algorithm
-                             run) [default:0].
+                             run) [default:1].
 
-  -w, --generate-weights     
-                             Load or Generate weights. Check ->graphConfig.h
+  -w, --generate-weights     Load or Generate weights. Check ->graphConfig.h
                              #define WEIGHTED 1 beforehand then recompile using
                              this option.
 
-  -x, --serialize            
-                             Enable file conversion/serialization use with
+  -x, --serialize            Enable file conversion/serialization use with
                              --convert-format.
 
-  -z, --graph-file-format=[TEXT|BIN|CSR:1]
-                                                          
+  -z, --graph-file-format=[DEFAULT:[1]-binary-edgeList]
                              Specify file format to be read, is it textual edge
                              list, or a binary file edge list. This is
                              specifically useful if you have Graph CSR/Grid
                              structure already saved in a binary file format to
-                             skip the preprocessing step. 
-                             [0]-text-edgeList
-                             [1]-binary-edgeList 
-                             [2]-graphCSR-binary.
+                             skip the preprocessing step. [0]-text edgeList
+                             [1]-binary edgeList [2]-graphCSR binary.
 
   -?, --help                 Give this help list
       --usage                Give a short usage message
   -V, --version              Print program version
+
 
 ```
 
@@ -419,4 +420,4 @@ benchmarking suite for various graph processing algorithms using pure C.
 Report bugs to:
 - <atmughrabi@gmail.com>
 - <atmughra@ncsu.edu>
-[<p align="right"> <img src="./02_slides/fig/logo1.png" width="200" ></p>](#opengraph-Sim-benchmark-suite)
+[<p align="right"> <img src="./02_slides/fig/logo1.png" width="200" ></p>](#OpenGraphSim-benchmark-suite)
