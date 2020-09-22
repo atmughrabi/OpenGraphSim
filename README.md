@@ -67,7 +67,7 @@ open@graph:~OpenGraphSim$ make
 #endif
 ```
 
-###Sniper simulator
+### Sniper simulator
 
 ```C
 #ifdef SNIPER_HARNESS
