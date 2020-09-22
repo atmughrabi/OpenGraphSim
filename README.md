@@ -61,13 +61,42 @@ open@graph:~OpenGraphSim$ make
 
 ### Simple Trace Cache simulator
 
+1. No setup needed cache simulator is included with in the code. And highlighted in the code with:
+
 ```C
 #ifdef CACHE_HARNESS_META
   //Simple Cache function calls
 #endif
 ```
+* OR
+```C
+#ifdef CACHE_HARNESS
+  //Simple Cache function calls
+#endif
+```
 
 ### Sniper simulator
+
+1. Obtain The Sniper Multi-Core Simulator for their website, [(SniperSim)](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator).
+2. Follow the steps for setting up and patching sniper to function with the correct the compiler, and ROI support.
+3. Copy the sniper simulator to `OpenGraphSim/00_graph_bench`
+```console
+open@graph:~OpenGraphSim$ mkdir -p 00_graph_bench/sniper
+open@graph:~OpenGraphSim$ cp ORIGINAL_SNIPERSIM_SOURCE 00_graph_bench/sniper
+```
+4. go to `00_graph_bench/sniper` and build
+
+```console
+open@graph:~OpenGraphSim$ cd 00_graph_bench/sniper
+open@graph:~OpenGraphSim/00_graph_bench/sniper$ make
+```
+5. go to the root directory to `OpenGraphSim` now you can run sniper with OpenGraph benchmarks
+
+```console
+open@graph:~OpenGraphSim/00_graph_bench/sniper$ cd ../..
+open@graph:~OpenGraphSim$ make run-sniper
+```
+6.Sniper ROI is highlighted in the code with:
 
 ```C
 #ifdef SNIPER_HARNESS
@@ -104,14 +133,14 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for trace cache:
 ```console
-open@graph:~OpenGraphSim$ make run-cache
+open@graph:~OpenGraphSim$ make clean; make run-cache
 ```
 
 ## Sniper Multi-Core Simulator
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for sniper:
 ```console
-open@graph:~OpenGraphSim$ make run-sniper
+open@graph:~OpenGraphSim$ make clean; make run-sniper
 ```
 
 ## gem5 Simulator

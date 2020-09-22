@@ -97,7 +97,7 @@ INOUT_STATS     ?= 0
 MASK_MODE       ?= 0
 
 ARGS ?= -w -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA)
-
+SNIPER_ARGS ?= -n $(NUM_THREADS_ALGO) -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results
 
 ##############################################
 #      ACCEL GRAPH COMPILATION VARIABLES     #
@@ -316,7 +316,7 @@ sweep-cache: test-cache
 run-sniper: MODE        = -DSNIPER_HARNESS
 run-sniper: INTEGRATION = openmp
 run-sniper: app-sniper
-	./$(APP_DIR)/$(SNI_DIR)/run-sniper -n $(NUM_THREADS_ALGO) -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
+	./$(APP_DIR)/$(SNI_DIR)/run-sniper $(SNIPER_ARGS) -- ./$(APP_DIR)/$(BIN_DIR)/$(APP)-sniper -f $(FILE_BIN) $(ARGS)
 
 .PHONY: run-openmp
 run-openmp: INTEGRATION = openmp
