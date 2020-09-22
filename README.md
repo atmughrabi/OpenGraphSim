@@ -128,6 +128,27 @@ open@graph:~OpenGraphSim$ make run
 open@graph:~OpenGraphSim$ make run-openmp
 ```
 
+* You can pass parameters modifying Makefile parameters (easiest way) - cross reference with (#OpenGraphSim-options) to pass the correct values.
+
+| PARAMETER  | FUNCTION | 
+| :---: | :---: |
+| FILE_BIN  | graph edge-list location |
+| FILE_LABEL  | graph edge-list reorder list | 
+| :---: | :---: |
+| SORT_TYPE  | graph edge-list sort (count/radix) |
+| DATA_STRUCTURES  | CSR,GRID,LinkedList,ArrayList |
+| REORDER_LAYER1  | Reorder graph for cache optimization |
+| :---: | :---: |
+| ROOT  | source node for BFS, etc |
+| TOLERANCE  | PR tolerance for convergence |
+| NUM_ITERATIONS  | PR iterations or convergence |
+| DELTA  | SSSP delta step |
+| :---: | :---: |
+| NUM_THREADS_PRE  | number of threads for the preprocess step (graph sorting, generation) |
+| NUM_THREADS_ALGO  | number of threads for the algorithm step (BFS,PR, etc) |
+| NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
+| NUM_TRIALS  | number of trials for the same algorithms|
+
 # Running OpenGraphSim Simulation mode
 
 ## Simple trace-driven Cache 
@@ -418,7 +439,7 @@ benchmarking suite for various graph processing algorithms using pure C.
 
 * *`Makefile`* - Global makefile
 
-# Tasks TODO:
+# Tasks TODO CSR Graphs Only:
 
 - [ ] Finish graph algorithms suite Simple Trace Cache
   - [x] BFS   (Breadth First Search)
