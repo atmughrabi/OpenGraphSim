@@ -34,6 +34,8 @@ OpenGraphSim is coded using C giving the researcher full flexibility with modify
 
 ## Dependencies
 
+[<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+
 ### OpenMP
 1. Judy Arrays
 ```console
@@ -179,7 +181,7 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
 ```console
 open@graph:~OpenGraphSim$ make clean; make run-sniper
 ```
-2. Simulation results are output to `0_graph_bench/sniper-results`
+2. Simulation results are output to `OpenGraphSim/00_graph_bench/sniper-results`
 3. To clean simulation stats
 ```console
 open@graph:~OpenGraphSim$ make clean-stats
@@ -189,7 +191,7 @@ open@graph:~OpenGraphSim$ make clean-stats
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
-| SNIPER_ARGS  | arguments passed to sniper |
+| SNIPER_ARGS  | arguments passed to sniper simulator |
 
 ## gem5 Simulator
 1. Coming soon
