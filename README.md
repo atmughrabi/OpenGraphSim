@@ -109,8 +109,10 @@ open@graph:~OpenGraphSim/00_graph_bench/sniper$ make
 open@graph:~OpenGraphSim/00_graph_bench/sniper$ cd ../..
 open@graph:~OpenGraphSim$ make run-sniper
 ```
-
+https://www.gem5.org/
 ### gem5 simulator
+[<img src="./02_slides/fig/gem5_logo.png" height="80" align="right" >](https://www.gem5.org/)
+
 1. Coming soon
 
 
@@ -197,6 +199,8 @@ open@graph:~OpenGraphSim$ make clean-stats
 | SNIPER_ARGS  | arguments passed to sniper simulator |
 
 ## gem5 Simulator
+[<img src="./02_slides/fig/gem5_logo.png" height="80" align="right" >](https://www.gem5.org/)
+
 1. Coming soon
 
 # Graph structure Input (Edge list)
