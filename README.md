@@ -136,6 +136,10 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
+| ARGS  | arguments passed to open-graph |
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
 | *Graph Files Directory* |
 | FILE_BIN  | graph edge-list location |
 | FILE_LABEL  | graph edge-list reorder list | 
