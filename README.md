@@ -131,23 +131,27 @@ open@graph:~OpenGraphSim$ make run-openmp
 * You can pass parameters modifying Makefile parameters (easiest way) - cross reference with (#OpenGraphSim-options) to pass the correct values.
 
 | PARAMETER  | FUNCTION | 
-| :---: | :---: |
+| :---: | :--- |
+| Graph Files Directory |
 | FILE_BIN  | graph edge-list location |
 | FILE_LABEL  | graph edge-list reorder list | 
-| :---: | :---: |
+| Graph Structures PreProcessing|
 | SORT_TYPE  | graph edge-list sort (count/radix) |
 | DATA_STRUCTURES  | CSR,GRID,LinkedList,ArrayList |
 | REORDER_LAYER1  | Reorder graph for cache optimization |
-| :---: | :---: |
+| Algorithms General |
+| ALGORITHMS  | BFS, PR, DFS, etc |
+| PULL_PUSH  | Direction push,pull,hybrid |
+| Algorithms SPECIFIC |
 | ROOT  | source node for BFS, etc |
 | TOLERANCE  | PR tolerance for convergence |
 | NUM_ITERATIONS  | PR iterations or convergence |
 | DELTA  | SSSP delta step |
-| :---: | :---: |
+| General Performance |
 | NUM_THREADS_PRE  | number of threads for the preprocess step (graph sorting, generation) |
 | NUM_THREADS_ALGO  | number of threads for the algorithm step (BFS,PR, etc) |
 | NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
-| NUM_TRIALS  | number of trials for the same algorithms|
+| NUM_TRIALS  | number of trials for the same algorithms | 
 
 # Running OpenGraphSim Simulation mode
 
@@ -156,6 +160,17 @@ open@graph:~OpenGraphSim$ make run-openmp
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for trace cache:
 ```console
 open@graph:~OpenGraphSim$ make clean; make run-cache
+```
+
+2. These arguments are not passed through the Args-list you need to modify from `OpenGraphSim/00_graph_bench/include/cache/cache.h` :
+```C
+//OpenGraphSim/00_graph_bench/src/main/open-graph.c
+#ifdef CACHE_HARNESS_META
+    arguments->l1_size   = L1_SIZE;
+    arguments->l1_assoc  = L1_ASSOC;
+    arguments->blocksize = BLOCKSIZE;
+    arguments->policey   = POLICY;
+#endif
 ```
 
 ## Sniper Multi-Core Simulator
