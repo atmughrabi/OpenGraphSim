@@ -132,22 +132,22 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
-| Graph Files Directory |
+| *Graph Files Directory* |
 | FILE_BIN  | graph edge-list location |
 | FILE_LABEL  | graph edge-list reorder list | 
-| Graph Structures PreProcessing|
+| *Graph Structures PreProcessing* |
 | SORT_TYPE  | graph edge-list sort (count/radix) |
 | DATA_STRUCTURES  | CSR,GRID,LinkedList,ArrayList |
 | REORDER_LAYER1  | Reorder graph for cache optimization |
-| Algorithms General |
+| *Algorithms General* |
 | ALGORITHMS  | BFS, PR, DFS, etc |
 | PULL_PUSH  | Direction push,pull,hybrid |
-| Algorithms SPECIFIC |
+| *Algorithms Specific* |
 | ROOT  | source node for BFS, etc |
 | TOLERANCE  | PR tolerance for convergence |
 | NUM_ITERATIONS  | PR iterations or convergence |
 | DELTA  | SSSP delta step |
-| General Performance |
+| *General Performance* |
 | NUM_THREADS_PRE  | number of threads for the preprocess step (graph sorting, generation) |
 | NUM_THREADS_ALGO  | number of threads for the algorithm step (BFS,PR, etc) |
 | NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
