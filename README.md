@@ -61,7 +61,7 @@ open@graph:~$ cd OpenGraphSim/
 open@graph:~OpenGraphSim$ make
 ```
 
-[<img src="./02_slides/fig/sniper_logo.png" height="45" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+[<img src="./02_slides/fig/sniper_logo.png" height="100" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
 
 ### Simple Trace Cache simulator
 
