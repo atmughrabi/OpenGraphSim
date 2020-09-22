@@ -1752,11 +1752,11 @@ void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr,
             //     Access(accel_graph->warm_cache, victim->addr, 'd', victim->idx);
             // }
         }
-        else if(mask == VERTEX_CACHE_WARM_U32)
-        {
-            Access(accel_graph->cold_cache, addr, op, node, mask);
-            Access(accel_graph->warm_cache, addr, op, node, mask);
-        }
+        // else if(mask == VERTEX_CACHE_WARM_U32)
+        // {
+        //     Access(accel_graph->cold_cache, addr, op, node, mask);
+        //     Access(accel_graph->warm_cache, addr, op, node, mask);
+        // }
         else
         {
             Access(accel_graph->cold_cache, addr, op, node, mask);

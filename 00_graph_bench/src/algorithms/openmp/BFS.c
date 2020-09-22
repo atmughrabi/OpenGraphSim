@@ -752,7 +752,11 @@ uint32_t topDownStepGraphCSR(struct GraphCSR *graph, struct ArrayQueue *sharedFr
     uint32_t mf = 0;
 
 
+#ifdef CACHE_HARNESS
+    #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf) num_threads(1)
+#else
     #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf)
+#endif
     {
         uint32_t t_id = omp_get_thread_num();
         struct ArrayQueue *localFrontierQueue = localFrontierQueues[t_id];
@@ -832,7 +836,11 @@ uint32_t bottomUpStepGraphCSR(struct GraphCSR *graph, struct Bitmap *bitmapCurr,
     sorted_edges_array = graph->sorted_edges_array->edges_array_dest;
 #endif
 
+#ifdef CACHE_HARNESS
+    #pragma omp parallel for default(none) private(j,u,v,out_degree,edge_idx) shared(stats,bitmapCurr,bitmapNext,graph,vertices,sorted_edges_array) reduction(+:nf) schedule(dynamic, 1024) num_threads(1)
+#else
     #pragma omp parallel for default(none) private(j,u,v,out_degree,edge_idx) shared(stats,bitmapCurr,bitmapNext,graph,vertices,sorted_edges_array) reduction(+:nf) schedule(dynamic, 1024)
+#endif
     for(v = 0 ; v < graph->num_vertices ; v++)
     {
         out_degree = vertices->out_degree[v];

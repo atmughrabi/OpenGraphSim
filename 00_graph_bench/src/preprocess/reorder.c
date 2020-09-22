@@ -1154,9 +1154,9 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
     }
     else
     {
-        cache_regions[0] = cache_size; // VERTEX_VALUE_HOT_U32
-        cache_regions[1] = cache_size; // VERTEX_CACHE_WARM_U32
-        cache_regions[2] = cache_size; // VERTEX_VALUE_LUKEWARM_U32
+        cache_regions[0] = cache_size*8; // VERTEX_VALUE_HOT_U32
+        cache_regions[1] = cache_regions[0]*4; // VERTEX_CACHE_WARM_U32
+        cache_regions[2] = cache_regions[1]*4; // VERTEX_VALUE_LUKEWARM_U32
     }
 
     cache_regions[3] = UINT32_MAX; // VERTEX_CACHE_COLD_U32

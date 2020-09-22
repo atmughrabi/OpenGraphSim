@@ -26,10 +26,10 @@
 #define WARM_L1_SIZE   131072
 #define WARM_L1_ASSOC  16
 #define WARM_POLICY    PLRU_POLICY
-#define WARM_BLOCKSIZE 4
+#define WARM_BLOCKSIZE 8
 
 #define HOT_L1_SIZE   131072
-#define HOT_L1_ASSOC  16
+#define HOT_L1_ASSOC  8
 #define HOT_POLICY    PLRU_POLICY
 #define HOT_BLOCKSIZE 4
 
