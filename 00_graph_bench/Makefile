@@ -272,7 +272,8 @@ clean-stats:
 	@rm -f $(BENCHMARKS_DIR)/*/*.perf
 	@rm -f $(BENCHMARKS_DIR)/*/*.stats
 	@rm -fr $(APP_DIR)/sniper-results
-	@rm -fr $(APP_DIR)/cache-results
+	@rm -fr ../$(APP_DIR)/cache-results
+	@rm -fr ../$(APP_DIR)/sniper-results
 
 ##################################################
 ##################################################
