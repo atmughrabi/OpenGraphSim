@@ -85,30 +85,34 @@ open@graph:~OpenGraphSim$ make
 
 ## Initial compilation for the Graph framework with OpenMP
 
-1. (Optional) From the root directory go to the graph benchmark directory:
+1. The default compilation is `openmp` mode:
 ```console
-open@graph:~OpenGraphSim$ cd 00_graph_bench/
+open@graph:~OpenGraphSim$ make
 ```
-2. The default compilation is `openmp` mode:
+2. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for OpenMP:
 ```console
-open@graph:~OpenGraphSim/00_graph_bench$ make
-```
-3. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for OpenMP:
-```console
-open@graph:~OpenGraphSim/00_graph_bench$ make run
+open@graph:~OpenGraphSim$ make run
 ```
 * OR
 ```console
-open@graph:~OpenGraphSim/00_graph_bench$ make run-openmp
+open@graph:~OpenGraphSim$ make run-openmp
 ```
 
 # Running OpenGraphSim Simulation mode
 
 ## Simple trace-driven Cache 
-1. Coming soon
+
+1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for trace cache:
+```console
+open@graph:~OpenGraphSim$ make run-cache
+```
 
 ## Sniper Multi-Core Simulator
-1. Coming soon
+
+1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for sniper:
+```console
+open@graph:~OpenGraphSim$ make run-sniper
+```
 
 ## gem5 Simulator
 1. Coming soon
