@@ -36,7 +36,9 @@ OpenGraphSim is coded using C giving the researcher full flexibility with modify
 
 
 
-### OpenMP [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+### OpenMP
+[<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+
 1. Judy Arrays
 ```console
 open@graph:~$ sudo apt-get install libjudy-dev
@@ -77,7 +79,8 @@ No setup needed, cache simulator is included within the code. And highlighted in
 #endif
 ```
  
-### The Sniper Multi-Core Simulator [<img src="./02_slides/fig/sniper_logo.png" height="100" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+### The Sniper Multi-Core Simulator 
+[<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
 
 Sniper simulator is needed within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
 
@@ -113,7 +116,8 @@ open@graph:~OpenGraphSim$ make run-sniper
 
 # Running OpenGraphSim 
 
-## Initial compilation for the Graph framework with OpenMP [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
+## Initial compilation for the Graph framework with OpenMP
+[<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 
 1. The default compilation is `openmp` mode:
 ```console
@@ -173,7 +177,8 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
 #endif
 ```
 
-## The Sniper Multi-Core Simulator [<img src="./02_slides/fig/sniper_logo.png" height="45" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+## The Sniper Multi-Core Simulator
+[<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for sniper:
 ```console
