@@ -61,11 +61,11 @@ open@graph:~OpenGraphSim$ make
 
 ### Simple Trace Cache simulator
 
-1. No setup needed cache simulator is included with in the code. And highlighted in the code with:
+No setup needed, cache simulator is included within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
 
 ```C
 #ifdef CACHE_HARNESS_META
-  //Simple Cache function calls
+  //Simple Cache structures
 #endif
 ```
 * OR
@@ -76,6 +76,14 @@ open@graph:~OpenGraphSim$ make
 ```
 
 ### Sniper simulator
+
+Sniper simulator is needed within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
+
+```C
+#ifdef SNIPER_HARNESS
+  //Sniper ROI function call
+#endif
+```
 
 1. Obtain The Sniper Multi-Core Simulator for their website, [(SniperSim)](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator).
 2. Follow the steps for setting up and patching sniper to function with the correct the compiler, and ROI support.
@@ -95,13 +103,6 @@ open@graph:~OpenGraphSim/00_graph_bench/sniper$ make
 ```console
 open@graph:~OpenGraphSim/00_graph_bench/sniper$ cd ../..
 open@graph:~OpenGraphSim$ make run-sniper
-```
-6.Sniper ROI is highlighted in the code with:
-
-```C
-#ifdef SNIPER_HARNESS
-  //Sniper ROI function call
-#endif
 ```
 
 ### gem5 simulator
