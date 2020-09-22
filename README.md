@@ -61,6 +61,8 @@ open@graph:~$ cd OpenGraphSim/
 open@graph:~OpenGraphSim$ make
 ```
 
+[<img src="./02_slides/fig/sniper_logo.png" height="45" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
+
 ### Simple Trace Cache simulator
 
 No setup needed, cache simulator is included within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
@@ -174,6 +176,8 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
     arguments->policey   = POLICY;
 #endif
 ```
+
+[<img src="./02_slides/fig/sniper_logo.png" height="45" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
 
 ## Sniper Multi-Core Simulator
 
