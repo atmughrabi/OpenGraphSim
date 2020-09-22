@@ -131,7 +131,7 @@ open@graph:~OpenGraphSim$ make run-openmp
 * You can pass parameters modifying Makefile parameters (easiest way) - cross reference with (#OpenGraphSim-options) to pass the correct values.
 
 | PARAMETER  | FUNCTION | 
-| :---: | :--- |
+| :--- | :--- |
 | Graph Files Directory |
 | FILE_BIN  | graph edge-list location |
 | FILE_LABEL  | graph edge-list reorder list | 
