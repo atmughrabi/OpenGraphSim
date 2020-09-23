@@ -230,14 +230,14 @@ struct AccelGraphCache *newAccelGraphCache(uint32_t l1_size, uint32_t l1_assoc, 
 
     cache->cold_cache = newCache( l1_size / 2, l1_assoc, blocksize, num_vertices, policy, numPropertyRegions);
     cache->warm_cache = newCache( l1_size / 4, WARM_L1_ASSOC, WARM_BLOCKSIZE, num_vertices, WARM_POLICY, numPropertyRegions);
-    cache->hot_cache  = newCache( l1_size / 4, HOT_L1_ASSOC, HOT_BLOCKSIZE, num_vertices, HOT_POLICY, numPropertyRegions);
+    cache->hot_cache  = newCache( l1_size / 2, HOT_L1_ASSOC, HOT_BLOCKSIZE, num_vertices, HOT_POLICY, numPropertyRegions);
 
     return cache;
 }
 
 void initAccelGraphCacheRegion(struct AccelGraphCache *cache, struct PropertyMetaData *propertyMetaData)
 {
-    uint64_t size = cache->cold_cache->size + cache->warm_cache->size + cache->hot_cache->size;
+    uint64_t size = cache->cold_cache->size + cache->hot_cache->size;
     initialzeCachePropertyRegions (cache->cold_cache, propertyMetaData, size);
     initialzeCachePropertyRegions (cache->warm_cache, propertyMetaData, size);
     initialzeCachePropertyRegions (cache->hot_cache, propertyMetaData, size);
@@ -1739,38 +1739,19 @@ void AccessAccelGraphExpress(struct AccelGraphCache *accel_graph, uint64_t addr,
 {
     // struct CacheLine *victim = NULL;
 
-    if(checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
+    if(checkInCache(accel_graph->hot_cache, addr))
     {
         if(mask == VERTEX_VALUE_HOT_U32)
         {
             Access(accel_graph->cold_cache, addr, op, node, mask);
             Access(accel_graph->hot_cache, addr, op, node, mask);
-            // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
-            // if(isValid(victim))
-            // {
-            //     // Prefetch(accel_graph->warm_cache, victim->addr, 'r', victim_node);
-            //     Access(accel_graph->warm_cache, victim->addr, 'd', victim->idx);
-            // }
         }
-        // else if(mask == VERTEX_CACHE_WARM_U32)
-        // {
-        //     Access(accel_graph->cold_cache, addr, op, node, mask);
-        //     Access(accel_graph->warm_cache, addr, op, node, mask);
-        // }
         else
         {
             Access(accel_graph->cold_cache, addr, op, node, mask);
         }
     }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->warm_cache, addr, op, node, mask);
-    }
-    else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->hot_cache, addr, op, node, mask);
-    }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
+    else  if(!checkInCache(accel_graph->hot_cache, addr))
     {
         Access(accel_graph->hot_cache, addr, op, node, mask);
     }
@@ -1780,38 +1761,19 @@ void AccessAccelGraphGRASP(struct AccelGraphCache *accel_graph, uint64_t addr, u
 {
     // struct CacheLine *victim = NULL;
 
-    if(checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
+    if(checkInCache(accel_graph->hot_cache, addr))
     {
         if(inHotRegionAddrGRASP(accel_graph->hot_cache, addr))
         {
             Access(accel_graph->cold_cache, addr, op, node, mask);
             Access(accel_graph->hot_cache, addr, op, node, mask);
-            // victim = peekVictimPolicy(accel_graph->hot_cache, addr);
-            // if(isValid(victim))
-            // {
-            //     // Prefetch(accel_graph->warm_cache, victim->addr, 'r', victim_node);
-            //     Access(accel_graph->warm_cache, victim->addr, 'd', victim->idx);
-            // }
-        }
-        else if(inWarmRegionAddrGRASP(accel_graph->warm_cache, addr))
-        {
-            Access(accel_graph->cold_cache, addr, op, node, mask);
-            Access(accel_graph->warm_cache, addr, op, node, mask);
         }
         else
         {
             Access(accel_graph->cold_cache, addr, op, node, mask);
         }
     }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->warm_cache, addr, op, node, mask);
-    }
-    else  if(checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
-    {
-        Access(accel_graph->hot_cache, addr, op, node, mask);
-    }
-    else  if(!checkInCache(accel_graph->warm_cache, addr) && !checkInCache(accel_graph->hot_cache, addr))
+    else  if(!checkInCache(accel_graph->hot_cache, addr))
     {
         Access(accel_graph->hot_cache, addr, op, node, mask);
     }
@@ -2171,16 +2133,16 @@ void printStatsCacheToFile(struct Cache *cache, char *fname_perf)
 float getCAPIMissRate(struct AccelGraphCache *cache)
 {
     uint64_t readsHits_hot    = getReads(cache->hot_cache)  - getRM(cache->hot_cache);
-    uint64_t readsHits_warm   = getReads(cache->warm_cache) - getRM(cache->warm_cache);
+
 
     uint64_t readsMisses_cold = getRM(cache->cold_cache);
 
     uint64_t writesHits_hot   = getWrites(cache->hot_cache)  - getWM(cache->hot_cache);
-    uint64_t writesHits_warm  = getWrites(cache->warm_cache) - getWM(cache->warm_cache);
+
 
     uint64_t writesMisses_cold = getWM(cache->cold_cache);
 
-    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+    uint64_t ReadWriteHotCold_total = readsHits_hot + writesHits_hot;
 
     uint64_t ReadWrite_total   = getReads(cache->cold_cache) + getWrites(cache->cold_cache) + ReadWriteHotCold_total;
     uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
@@ -2199,24 +2161,24 @@ void printStatsAccelGraphCachetoFile(struct AccelGraphCache *cache, char *fname_
     fptr1 = fopen(fname_perf, "a+");
 
     uint64_t readsHits_hot    = getReads(cache->hot_cache)  - getRM(cache->hot_cache);
-    uint64_t readsHits_warm   = getReads(cache->warm_cache) - getRM(cache->warm_cache);
+
 
     uint64_t readsMisses_cold = getRM(cache->cold_cache);
 
     uint64_t writesHits_hot   = getWrites(cache->hot_cache)  - getWM(cache->hot_cache);
-    uint64_t writesHits_warm  = getWrites(cache->warm_cache) - getWM(cache->warm_cache);
+
 
     uint64_t writesMisses_cold = getWM(cache->cold_cache);
 
-    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+    uint64_t ReadWriteHotCold_total = readsHits_hot + writesHits_hot;
 
     uint64_t ReadWrite_total   = getReads(cache->cold_cache) + getWrites(cache->cold_cache) + ReadWriteHotCold_total;
     uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
 
-    uint64_t Read_total       = getReads(cache->cold_cache) + readsHits_hot + readsHits_warm;
+    uint64_t Read_total       = getReads(cache->cold_cache) + readsHits_hot ;
     uint64_t ReadMisses_total = readsMisses_cold ;
 
-    uint64_t Write_total       = getWrites(cache->cold_cache) + writesHits_hot + writesHits_warm;
+    uint64_t Write_total       = getWrites(cache->cold_cache) + writesHits_hot ;
     uint64_t WriteMisses_total =  writesMisses_cold;
 
 
@@ -2233,15 +2195,12 @@ void printStatsAccelGraphCachetoFile(struct AccelGraphCache *cache, char *fname_
 
     float commCold = (((double)((ReadWrite_total - ReadWriteHotCold_total)) / (double)ReadWrite_total)) * 100;
     commCold       = roundf(commCold * 100) / 100;
-    float commWarm = (((double)((readsHits_warm + writesHits_warm)) / (double)ReadWrite_total)) * 100;
-    commWarm       = roundf(commWarm * 100) / 100;
     float commHot = (((double)((readsHits_hot + writesHits_hot)) / (double)ReadWrite_total)) * 100;
     commHot       = roundf(commHot * 100) / 100;
 
     fprintf(fptr1, "\n====================== cache Stats Accel Graph =======================\n");
     fprintf(fptr1, "| %-21s | %-27.2f | \n", "PSL Comm Improved(%)", commReduction);
     fprintf(fptr1, "| %-21s | %-27.2f | \n", "Cold Comm Cache(%)  ", commCold);
-    fprintf(fptr1, "| %-21s | %-27.2f | \n", "Warm Comm Cache(%)  ", commWarm);
     fprintf(fptr1, "| %-21s | %-27.2f | \n", "Hot Comm Cache(%)   ", commHot);
     fprintf(fptr1, " -----------------------------------------------------\n");
     fprintf(fptr1, " -----------------------------------------------------\n");
@@ -2451,24 +2410,22 @@ void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degre
     //rounding miss rate
 
     uint64_t readsHits_hot    = getReads(cache->hot_cache)  - getRM(cache->hot_cache);
-    uint64_t readsHits_warm   = getReads(cache->warm_cache) - getRM(cache->warm_cache);
 
     uint64_t readsMisses_cold = getRM(cache->cold_cache);
 
     uint64_t writesHits_hot   = getWrites(cache->hot_cache)  - getWM(cache->hot_cache);
-    uint64_t writesHits_warm  = getWrites(cache->warm_cache) - getWM(cache->warm_cache);
 
     uint64_t writesMisses_cold = getWM(cache->cold_cache);
 
-    uint64_t ReadWriteHotCold_total = readsHits_hot + readsHits_warm + writesHits_hot + writesHits_warm;
+    uint64_t ReadWriteHotCold_total = readsHits_hot + writesHits_hot;
 
     uint64_t ReadWrite_total   = getReads(cache->cold_cache) + getWrites(cache->cold_cache) + ReadWriteHotCold_total;
     uint64_t ReadWriteMisses_total = readsMisses_cold + writesMisses_cold;
 
-    uint64_t Read_total       = getReads(cache->cold_cache) + readsHits_hot + readsHits_warm;
+    uint64_t Read_total       = getReads(cache->cold_cache) + readsHits_hot ;
     uint64_t ReadMisses_total = readsMisses_cold ;
 
-    uint64_t Write_total       = getWrites(cache->cold_cache) + writesHits_hot + writesHits_warm;
+    uint64_t Write_total       = getWrites(cache->cold_cache) + writesHits_hot ;
     uint64_t WriteMisses_total =  writesMisses_cold;
 
 
@@ -2485,14 +2442,11 @@ void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degre
 
     float commCold = (((double)((ReadWrite_total - ReadWriteHotCold_total)) / (double)ReadWrite_total)) * 100;
     commCold       = roundf(commCold * 100) / 100;
-    float commWarm = (((double)((readsHits_warm + writesHits_warm)) / (double)ReadWrite_total)) * 100;
-    commWarm       = roundf(commWarm * 100) / 100;
     float commHot = (((double)((readsHits_hot + writesHits_hot)) / (double)ReadWrite_total)) * 100;
     commHot       = roundf(commHot * 100) / 100;
 
     printf("| %-21s | %-27.2f | \n", "PSL Comm Improved(%)", commReduction);
     printf("| %-21s | %-27.2f | \n", "Cold Comm Cache(%)  ", commCold);
-    printf("| %-21s | %-27.2f | \n", "Warm Comm Cache(%)  ", commWarm);
     printf("| %-21s | %-27.2f | \n", "Hot Comm Cache(%)   ", commHot);
     printf(" -----------------------------------------------------\n");
     printf("\n====================== cache Stats Accel Graph =======================\n");
@@ -2518,8 +2472,6 @@ void printStatsAccelGraphCache(struct AccelGraphCache *cache, uint32_t *in_degre
 
     printf("\n================ cache Stats ((PSL) cold_cache Stats) ================\n");
     printStatsGraphCache(cache->cold_cache, in_degree, out_degree);
-    printf("\n===================  cache Stats (warm_cache Stats) ==================\n");
-    printStatsGraphCache(cache->warm_cache, in_degree, out_degree);
     printf("\n===================  cache Stats (hot_cache Stats)  ==================\n");
     printStatsGraphCache(cache->hot_cache, in_degree, out_degree);
 }

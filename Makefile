@@ -5,10 +5,10 @@
 APP                         ?= open-graph
 
 # test name needs to match the file name test/test_accel-graph.c
-export APP_TEST             ?=  test_open-graph-match
+# export APP_TEST           ?=  test_open-graph-match
 # export APP_TEST           ?=  test_grasp-cache-original
 # export APP_TEST           ?=  sweep_unified-cache-graph
-# export APP_TEST           ?=  sweep_capi-cache-graph
+export APP_TEST           ?=  sweep_capi-cache-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -113,12 +113,12 @@ export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_T
 
 #ALGORITHM
 export PULL_PUSH 		?= 0
-export ALGORITHMS 		?= 0
+export ALGORITHMS 		?= 1
 
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		?= 1
-export DATA_STRUCTURES  ?= 0
-export REORDER_LAYER1 	?= 0
+export DATA_STRUCTURES  ?= 11
+export REORDER_LAYER1 	?= 4
 export REORDER_LAYER2   ?= 0
 export REORDER_LAYER3   ?= 0
 

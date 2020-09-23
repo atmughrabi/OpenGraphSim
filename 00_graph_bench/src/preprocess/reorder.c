@@ -1148,7 +1148,7 @@ struct EdgeList *maskGraphProcessGenerateMaskArray(struct EdgeList *edgeList, ui
 
     if(diff < (2 * (int)cache_size))
     {
-        cache_regions[0] = edgeList->num_vertices / 3; // VERTEX_VALUE_HOT_U32
+        cache_regions[0] = edgeList->num_vertices / 2; // VERTEX_VALUE_HOT_U32
         cache_regions[1] = edgeList->num_vertices / 3; // VERTEX_CACHE_WARM_U32
         cache_regions[2] = edgeList->num_vertices / 3; // VERTEX_VALUE_LUKEWARM_U32
     }
