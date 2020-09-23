@@ -134,8 +134,8 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 * You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#OpenGraphSim-options) to pass the correct values.
 
+
 | PARAMETER  | FUNCTION | 
-| *OpenGraph Argument List* |
 | :--- | :--- |
 | ARGS  | arguments passed to open-graph |
 
