@@ -30,9 +30,9 @@ OpenGraphSim is coded using C giving the researcher full flexibility with modify
 <!-- ## Details -->
 <!-- ### OpenGraphSim Supported Algorithms -->
 
-# Installation
+# Installation and Dependencies
 
-## Dependencies
+## CPU Mode
 
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 ### OpenMP
@@ -60,6 +60,8 @@ open@graph:~$ cd OpenGraphSim/
 ```console
 open@graph:~OpenGraphSim$ make
 ```
+
+## Simulation Mode
 
 ### Simple Trace Cache simulator
 
