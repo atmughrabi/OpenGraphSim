@@ -116,6 +116,8 @@ open@graph:~OpenGraphSim$ make run-sniper
 
 # Running OpenGraphSim 
 
+## CPU Mode
+
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
 ### Initial compilation for the Graph framework with OpenMP
 
@@ -174,7 +176,7 @@ open@graph:~OpenGraphSim$ make run-openmp
 | NUM_THREADS_KER  | (Optional) number of threads for the algorithm kernel (BFS,PR, etc) |
 | NUM_TRIALS  | number of trials for the same algorithms | 
 
-# Running OpenGraphSim Simulation mode
+## Simulation Mode
 
 ### Simple trace-driven Cache 
 
