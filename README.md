@@ -268,7 +268,7 @@ open@graph:~OpenGraphSim/00_graph_bench$ make convert-w
 open@graph:~OpenGraphSim/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
-* `Makefile` parameters (weighted graph)
+* `Makefile` parameters
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
