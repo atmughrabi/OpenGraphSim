@@ -54,8 +54,8 @@ void arrayQueueToBitmap(struct ArrayQueue *q, struct Bitmap *b);
 void bitmapToArrayQueue(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues);
 
 //added for dual order graphs where mapping between push/pull is needed.
-void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_t *labels, uint32_t *inv_labels);
-void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues, uint32_t *labels, uint32_t *inv_labels);
+void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_t *labels);
+void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues, uint32_t *labels);
 
 #endif
 

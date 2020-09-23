@@ -291,7 +291,7 @@ void *generateGraphDataStructure(struct Arguments *arguments)
             Stop(timer);
             generateGraphPrintMessageWithtime("GraphAdjArrayList Preprocessing Step Time (Seconds)", Seconds(timer));
             break;
-        case 6: // CSR
+        case 6: // CSR Dual Order
             Start(timer);
             graph = (void *)graphCSRPreProcessingStepDualOrder(arguments);
             Stop(timer);

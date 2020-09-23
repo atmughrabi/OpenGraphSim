@@ -63,7 +63,7 @@ struct BFSStats *newBFSStatsGraphCSR(struct GraphCSR *graph)
     for(vertex_id = 0; vertex_id < graph->num_vertices ; vertex_id++)
     {
         stats->distances[vertex_id] = 0;
-        stats->parents_DualOrder[vertex_id] = 0;
+        // stats->parents_DualOrder[vertex_id] = 0;
         if(graph->vertices->out_degree[vertex_id])
         {
             stats->parents[vertex_id] = graph->vertices->out_degree[vertex_id] * (-1);
@@ -189,39 +189,47 @@ void freeBFSStats(struct BFSStats *stats)
 
 }
 
-void syncDualOrderParentArrays(int *parents, int *parents_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices)
+void syncDualOrderParentArrays(int **parents, int **parents_DualOrder, uint32_t *labels, uint32_t num_vertices)
 {
 
     uint32_t vertex_id;
     uint32_t vertex_v;
-    uint32_t vertex_u;
     int *parents_temp;
-    #pragma omp parallel for default(none) private(vertex_id,vertex_v,vertex_u) shared(parents,parents_DualOrder,labels,inv_labels,num_vertices)
+    #pragma omp parallel for default(none) private(vertex_id,vertex_v) shared(parents,parents_DualOrder,labels,num_vertices)
     for(vertex_id = 0; vertex_id < num_vertices ; vertex_id++)
     {
         vertex_v = labels[vertex_id];
-        vertex_u = inv_labels[vertex_id];
-        parents_DualOrder[vertex_u] = parents[vertex_v];
+        // vertex_u = inv_labels[vertex_id];
+
+        if((*parents)[vertex_id] >= 0)
+        {
+            (*parents_DualOrder)[vertex_v] = labels[(*parents)[vertex_id]];
+        }
+        else
+        {
+            (*parents_DualOrder)[vertex_v] = (*parents)[vertex_id];
+        }
+
     }
 
-    parents_temp = parents;
-    parents = parents_DualOrder;
-    parents_DualOrder = parents_temp;
+    parents_temp = *parents;
+    *parents = *parents_DualOrder;
+    *parents_DualOrder = parents_temp;
 }
 
-void syncDualOrderDistancesArrays(uint32_t *distances, uint32_t *distances_DualOrder, uint32_t *labels, uint32_t *inv_labels, uint32_t num_vertices)
+void syncDualOrderDistancesArrays(uint32_t *distances, uint32_t *distances_DualOrder, uint32_t *labels, uint32_t num_vertices)
 {
 
     uint32_t vertex_id;
     uint32_t vertex_v;
-    uint32_t vertex_u;
+    // uint32_t vertex_u;
     uint32_t *distances_temp;
-    #pragma omp parallel for default(none) private(vertex_id,vertex_v,vertex_u) shared(distances,distances_DualOrder,labels,inv_labels,num_vertices)
+    #pragma omp parallel for default(none) private(vertex_id,vertex_v) shared(distances,distances_DualOrder,labels,num_vertices)
     for(vertex_id = 0; vertex_id < num_vertices ; vertex_id++)
     {
         vertex_v = labels[vertex_id];
-        vertex_u = inv_labels[vertex_id];
-        distances_DualOrder[vertex_u] = distances[vertex_v];
+        // vertex_u = inv_labels[vertex_id];
+        distances_DualOrder[vertex_v] = distances[vertex_id];
     }
 
     distances_temp = distances;
@@ -701,11 +709,12 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(struct Arguments *
 #endif
 
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    // stats->time_total =  Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    // stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1297,11 +1306,12 @@ struct BFSStats *breadthFirstSearchPullGraphCSRDualOrder(struct Arguments *argum
 #endif
 
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    // stats->time_total =  Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    // stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1420,7 +1430,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSRDualOrder(struct Arguments *argum
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    // stats->time_total =  Seconds(timer);
 
 #ifdef SNIPER_HARNESS
     SimRoiEnd();
@@ -1429,6 +1439,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSRDualOrder(struct Arguments *argum
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    // stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1556,8 +1567,8 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
         {
 
             Start(timer_inner);
-            arrayQueueToBitmapDualOrder(sharedFrontierQueue, bitmapCurr, graph->sorted_edges_array->inverse_label_array, graph->inverse_sorted_edges_array->label_array);
-            syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
+            arrayQueueToBitmapDualOrder(sharedFrontierQueue, bitmapCurr, graph->sorted_edges_array->inverse_label_array);
+            syncDualOrderParentArrays(&(stats->parents), &(stats->parents_DualOrder), graph->sorted_edges_array->inverse_label_array, graph->num_vertices);
             // syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->label_array, graph->num_vertices);
             nf = sizeArrayQueue(sharedFrontierQueue);
             Stop(timer_inner);
@@ -1590,9 +1601,9 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
                     ( nf > (n / beta)));
 
             Start(timer_inner);
-            syncDualOrderParentArrays(stats->parents, stats->parents_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
+            syncDualOrderParentArrays(&(stats->parents), &(stats->parents_DualOrder), graph->inverse_sorted_edges_array->inverse_label_array, graph->num_vertices);
             // syncDualOrderDistancesArrays(stats->distances, stats->distances_DualOrder, graph->inverse_sorted_edges_array->label_array, graph->sorted_edges_array->label_array, graph->num_vertices);
-            bitmapToArrayQueueDualOrder(bitmapCurr, sharedFrontierQueue, localFrontierQueues, graph->sorted_edges_array->label_array, graph->inverse_sorted_edges_array->inverse_label_array);
+            bitmapToArrayQueueDualOrder(bitmapCurr, sharedFrontierQueue, localFrontierQueues, graph->inverse_sorted_edges_array->inverse_label_array);
             Stop(timer_inner);
             printf("| C  %-12s | %-15s | %-15f | \n", " ", " ", Seconds(timer_inner));
 
@@ -1631,11 +1642,12 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
 #endif
 
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    // stats->time_total =  Seconds(timer);
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    // stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1768,10 +1780,12 @@ uint32_t bottomUpStepGraphCSRDualOrder(struct GraphCSR *graph, struct Bitmap *bi
         out_degree = vertices->out_degree[v];
         if(stats->parents[v] < 0)  // optmization
         {
+
             edge_idx = vertices->edges_idx[v];
 
             for(j = edge_idx ; j < (edge_idx + out_degree) ; j++)
             {
+
                 u = EXTRACT_VALUE(sorted_edges_array[j]);
 #ifdef CACHE_HARNESS
                 AccessDoubleTaggedCacheUInt32(stats->cache, (uint64_t) & (bitmapCurr->bitarray[word_offset(u)]), 'r', u, EXTRACT_MASK(sorted_edges_array[j]));
