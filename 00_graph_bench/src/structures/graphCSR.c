@@ -347,11 +347,9 @@ void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR)
 #if DIRECTED
     inverse_label_array_iel = graphCSR->inverse_sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->inverse_sorted_edges_array->label_array;
-    vertices = graphCSR->inverse_vertices;
 #else
     inverse_label_array_iel = graphCSR->sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->sorted_edges_array->label_array;
-    vertices = graphCSR->vertices;
 #endif
 
     inverse_label_array_el = graphCSR->sorted_edges_array->inverse_label_array;
