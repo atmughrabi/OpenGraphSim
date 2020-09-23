@@ -117,7 +117,7 @@ open@graph:~OpenGraphSim$ make run-sniper
 # Running OpenGraphSim 
 
 [<img src="./02_slides/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
-## Initial compilation for the Graph framework with OpenMP
+### Initial compilation for the Graph framework with OpenMP
 
 1. The default compilation is `openmp` mode:
 ```console
@@ -176,7 +176,7 @@ open@graph:~OpenGraphSim$ make run-openmp
 
 # Running OpenGraphSim Simulation mode
 
-## Simple trace-driven Cache 
+### Simple trace-driven Cache 
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for trace cache:
 ```console
@@ -195,7 +195,7 @@ open@graph:~OpenGraphSim$ make clean; make run-cache
 ```
 
 [<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
-## The Sniper Multi-Core Simulator
+### The Sniper Multi-Core Simulator
 
 
 1. From the root directory you can modify the Makefile with the [(parameters)](#OpenGraphSim-options) you need for sniper:
@@ -215,7 +215,7 @@ open@graph:~OpenGraphSim$ make clean-stats
 | SNIPER_ARGS  | arguments passed to sniper simulator |
 
 [<img src="./02_slides/fig/gem5_logo.png" height="100" align="right" >](https://www.gem5.org/)
-## gem5 Simulator
+### gem5 Simulator
 
 1. Coming soon
 
