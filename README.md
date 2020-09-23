@@ -255,13 +255,27 @@ open@graph:~OpenGraphSim$ make clean-stats
 * `--graph-file-format` is the type of graph you are reading, `--convert-format` is the type of format you are converting to.
 * NOTE: you can read the file from text format without the convert step. By adding `--graph-file-format 0` to the argument list. The default is `1` assuming it is binary. please check `--help` for better explanation.
 * `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
+* (unweighted graph)
 ```console
 open@graph:~OpenGraphSim/00_graph_bench$ make convert
 ```
-* OR
+* OR (weighted graph)
+```console
+open@graph:~OpenGraphSim/00_graph_bench$ make convert-w
+```
+* OR (weighted graph)
 ```console
 open@graph:~OpenGraphSim/00_graph_bench$ ./bin/open-graph-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
+
+* `Makefile` parameters (weighted graph)
+
+| PARAMETER  | FUNCTION | 
+| :--- | :--- |
+| *File Formats* |
+| FILE_FORMAT  | the type of graph read |
+| CONVERT_FORMAT  | the type of graph converted |
+
 
 * OUTPUT: (weighted binary edge-list)
 *  ../BENCHMARKS_DIR/GRAPH_NAME/graph.wbin
