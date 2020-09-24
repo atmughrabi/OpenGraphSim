@@ -292,3 +292,82 @@ void *runGraphAlgorithmsTest(struct Arguments *arguments, void *graph)
 
     return ref_stats;
 }
+
+
+
+float getGraphAlgorithmsTestTime(void *ref_stats, uint32_t algorithm)
+{
+    
+    float time = 0.0;
+    switch (algorithm)
+    {
+    case 0:  // BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 1: // pagerank
+    {
+        struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 2: // SSSP-Delta
+    {
+        struct SSSPStats *ref_stats_tmp = (struct SSSPStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 3: // SSSP-Bellmanford
+    {
+        struct BellmanFordStats *ref_stats_tmp = (struct BellmanFordStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 4: // DFS
+    {
+        struct DFSStats *ref_stats_tmp = (struct DFSStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 5: // SPMV
+    {
+        struct SPMVStats *ref_stats_tmp = (struct SPMVStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 6: // Connected Components
+    {
+        struct CCStats *ref_stats_tmp = (struct CCStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 7: // Betweenness Centrality
+    {
+        struct BetweennessCentralityStats *ref_stats_tmp = (struct BetweennessCentralityStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 8: // Triangle Count
+    {
+        struct TCStats *ref_stats_tmp = (struct TCStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    case 9: // incremental Aggregation
+    {
+        struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    default:// BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        time = ref_stats_tmp->time_total;
+    }
+    break;
+    }
+
+    return time;
+}

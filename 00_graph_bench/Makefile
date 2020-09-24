@@ -207,6 +207,7 @@ directories :
 .PHONY: directories-openmp
 directories-openmp :
 	@mkdir -p $(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp
+	@mkdir -p $(APP_DIR)/openmp-results
 
 .PHONY: directories-cache
 directories-cache :
@@ -272,8 +273,8 @@ clean-stats:
 	@rm -f $(BENCHMARKS_DIR)/*/*.perf
 	@rm -f $(BENCHMARKS_DIR)/*/*.stats
 	@rm -fr $(APP_DIR)/sniper-results
-	@rm -fr ../$(APP_DIR)/cache-results
-	@rm -fr ../$(APP_DIR)/sniper-results
+	@rm -fr $(APP_DIR)/cache-results
+	@rm -fr $(APP_DIR)/openmp-results
 
 ##################################################
 ##################################################
@@ -392,12 +393,12 @@ run-test: run-test-openmp
 .PHONY: run-test-openmp
 run-test-openmp: INTEGRATION = openmp
 run-test-openmp: test-openmp
-	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp
+	./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp >> $(APP_DIR)/openmp-results/full_results.perf
 
 .PHONY: debug-test-openmp
 debug-test-openmp: INTEGRATION = openmp
 debug-test-openmp: test-openmp
-	gdb ./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp
+	gdb ./$(APP_DIR)/$(BIN_DIR)/$(APP_TEST)-openmp  
 
 .PHONY: debug-memory-test-openmp
 debug-memory-test-openmp: INTEGRATION = openmp

@@ -4,6 +4,7 @@
 00_graph_bench/sniper
 00_graph_bench/sniper-results
 00_graph_bench/cache-results
+00_graph_bench/openmp-results
 sniper-results
 nohup.out
 00_graph_bench/nohup.out
