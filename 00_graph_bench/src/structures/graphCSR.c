@@ -343,16 +343,13 @@ void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR)
     uint32_t *inverse_label_array_iel = NULL;
     uint32_t num_vertices = graphCSR->num_vertices;
     uint32_t v;
-    struct Vertex *vertices = NULL;
 
 #if DIRECTED
     inverse_label_array_iel = graphCSR->inverse_sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->inverse_sorted_edges_array->label_array;
-    vertices = graphCSR->inverse_vertices;
 #else
     inverse_label_array_iel = graphCSR->sorted_edges_array->inverse_label_array;
     label_array_iel = graphCSR->sorted_edges_array->label_array;
-    vertices = graphCSR->vertices;
 #endif
 
     inverse_label_array_el = graphCSR->sorted_edges_array->inverse_label_array;
@@ -375,8 +372,6 @@ void graphCSRVertexLabelRemappingDualOrder (struct GraphCSR *graphCSR)
         uint32_t t = label_array_iel[v];
 
         inverse_label_array_iel[t] = u;
-        // vertices->out_degree[t] = graphCSR->vertices->in_degree[u];
-        // vertices->in_degree[t] = graphCSR->vertices->out_degree[u];
     }
 #endif
 
