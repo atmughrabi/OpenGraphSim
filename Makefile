@@ -7,9 +7,12 @@ APP                         ?= open-graph
 # test name needs to match the file name test/test_accel-graph.c
 # export APP_TEST           ?=  test_open-graph-match
 # export APP_TEST           ?=  test_grasp-cache-original
-export APP_TEST           ?=  sweep_unified-cache-graph
+# export APP_TEST           ?=  sweep_unified-cache-graph
 # export APP_TEST           ?=  sweep_capi-cache-graph
-# export APP_TEST           ?=  sweep_order-performance-graph
+
+export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
+# export APP_TEST           ?=  sweep_order-PR-performance-graph
+# export APP_TEST           ?=  sweep_order-BFS-performance-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -110,14 +113,14 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		?= 0
+export PULL_PUSH 		?= 2
 export ALGORITHMS 		?= 0
 
 #GRAPH DATA_STRUCTURES
 export SORT_TYPE		?= 1
 export DATA_STRUCTURES  ?= 0
 export REORDER_LAYER1 	?= 0
-export REORDER_LAYER2   ?= 0
+export REORDER_LAYER2   ?= 4
 export REORDER_LAYER3   ?= 0
 
 #ALGORITHM SPECIFIC ARGS
@@ -145,7 +148,7 @@ export CONVERT_FORMAT 	?= 1
 #STATS COLLECTION VARIABLES
 export BIN_SIZE 		?= 1000
 export INOUT_STATS 		?= 0
-export MASK_MODE 		?= 1
+export MASK_MODE 		?= 0
 
 ##################################################
 

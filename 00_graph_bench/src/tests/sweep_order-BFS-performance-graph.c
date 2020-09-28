@@ -47,9 +47,7 @@
 #include "graphTest.h"
 #define GRAPH_NUM 4
 
-
-#define THREAD_NUM 64
-#define THREAD_INC 2
+#define THREAD_POINTS 7
 
 #define CACHE_CONFIGS 12
 #define MODE_NUM 3
@@ -67,7 +65,7 @@ main (int argc, char **argv)
     // char express_perf_file[1024];
     // char grasp_perf_file[1024];
 
-    float PLRU_stats[THREAD_NUM/THREAD_INC][GRAPH_NUM][ORDER_CONFIG]  = {0};
+    float PLRU_stats[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]  = {0};
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
     uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0 };
     uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };
@@ -166,10 +164,9 @@ main (int argc, char **argv)
     arguments.dflag = 1;
 
     arguments.iterations = 100;
-    arguments.trials = 100;
     arguments.epsilon = 0.0001;
     arguments.source = 5319;
-    arguments.algorithm = 1;
+    arguments.algorithm = 0; // BFS
     arguments.datastructure = 0;
     arguments.pushpull = 0;
     arguments.sort = 1;
@@ -186,7 +183,7 @@ main (int argc, char **argv)
     arguments.fnamel = "../01_test_graphs/LAW/LAW-enron/graph_Gorder.labels";
     arguments.fnameb_format = 1;
     arguments.convert_format = 1;
-    arguments.trials = 1; // random number of trials
+    arguments.trials = 10; // random number of trials
     initializeMersenneState (&(arguments.mt19937var), 27491095);
 
     arguments.lmode = 0;
@@ -198,6 +195,8 @@ main (int argc, char **argv)
 
     uint32_t i = 0;
     uint32_t j = 0;
+    uint32_t k = 0;
+    uint32_t kk = 0;
     void *ref_data;
 
     sprintf(unified_perf_file, "%s/results_algo%u_time.unified.%s", "./openmp-results", arguments.algorithm, "perf");
@@ -219,39 +218,54 @@ main (int argc, char **argv)
             printf("graph config %5u - %u %u %u - %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, config_labels[j]);
 
             graph = generateGraphDataStructure(&arguments);
-            ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-            PLRU_stats[i][j] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
-            // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
-            freeGraphStatsGeneral(ref_data, arguments.algorithm);
+
+            for(k = 0; k < THREAD_POINTS; k ++)
+            {
+                arguments.algo_numThreads = 1 << k;
+                arguments.ker_numThreads = arguments.algo_numThreads ;
+                initializeMersenneState (&(arguments.mt19937var), 27491095);
+                for(kk = 0 ; kk < arguments.trials; kk++)
+                {
+                    arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
+                    ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                    PLRU_stats[i][j][k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+                    // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+                    freeGraphStatsGeneral(ref_data, arguments.algorithm);
+                }
+            }
+
             freeGraphDataStructure(graph, arguments.datastructure);
         }
     }
     // print out stats to file each graph processed
     FILE *fptr1;
     fptr1 = fopen(unified_perf_file, "a+");
-    fprintf(fptr1, " -----------------------------------------------------\n");
-    fprintf(fptr1, " Performance (Seconds) \n");
-    fprintf(fptr1, " -----------------------------------------------------\n");
 
-    fprintf(fptr1, "%-25s ",  " ");
-    fprintf(fptr1, "%-25s ",  " ");
-    for (j = 0; j < ORDER_CONFIG; ++j)
+    for(k = 0; k < THREAD_POINTS; k ++)
     {
-        fprintf(fptr1, "%-14s ",  config_labels[j]);
-    }
-    fprintf(fptr1, " \n");
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " Performance (Seconds), Num Threads %u \n",  1 << k);
+        fprintf(fptr1, " -----------------------------------------------------\n");
 
-    for ( i = 0; i < GRAPH_NUM; ++i)
-    {
-        fprintf(fptr1, "%-25s ",  benchmarks_graphs[i]);
-        fprintf(fptr1, "%-25s ",  "PLRU");
+        fprintf(fptr1, "NumThreads%-15u, ", 1 << k);
         for (j = 0; j < ORDER_CONFIG; ++j)
         {
-            fprintf(fptr1, "%-14f ",  PLRU_stats[i][j]);
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
         }
         fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  PLRU_stats[i][j][k] / arguments.trials );
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
     }
-    fprintf(fptr1, " -----------------------------------------------------\n");
+
     fclose(fptr1);
 
     exit (0);
