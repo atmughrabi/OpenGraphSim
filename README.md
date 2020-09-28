@@ -65,7 +65,7 @@ open@graph:~OpenGraphSim$ make
 
 ### Simple Trace Cache simulator
 
-No setup needed, cache simulator is included within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
+No setup needed, cache simulator is included within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo-csr-graphs-only)
 
 ```C
 #ifdef CACHE_HARNESS_META
@@ -82,7 +82,7 @@ No setup needed, cache simulator is included within the code. And highlighted in
 [<img src="./02_slides/fig/sniper_logo.png" height="80" align="right" >](https://snipersim.org/w/The_Sniper_Multi-Core_Simulator)
 ### The Sniper Multi-Core Simulator 
 
-Sniper simulator is needed within the code. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo)
+Sniper simulator is needed. And highlighted in the code with:  [(Algorithms Supported)](#tasks-todo-csr-graphs-only)
 
 ```C
 #ifdef SNIPER_HARNESS

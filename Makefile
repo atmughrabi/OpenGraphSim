@@ -14,13 +14,6 @@ export APP_TEST           ?=  sweep_unified-cache-graph
 # dirs Root app
 export APP_DIR              ?= .
 
-
-# export BENCHMARKS_DIR_LOCAL ?= 01_test_graphs
-# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
-export BENCHMARKS_DIR    	?= ../01_test_graphs
-# export BENCHMARKS_DIR    	?= ../$(BENCHMARKS_DIR_LOCAL)
-# export BENCHMARKS_DIR    	?= ../../$(BENCHMARKS_DIR_LOCAL)
-
 #dir root/managed_folders
 export SRC_DIR           	= src
 export OBJ_DIR			  	= obj
@@ -55,6 +48,10 @@ export MAIN_DIR		  	= main
 #########################################################
 #       		 ACCEL RUN GRAPH ARGUMENTS    			#
 #########################################################
+
+# export BENCHMARKS_DIR    	?= ../../01_GraphDatasets
+export BENCHMARKS_DIR    	?= ../01_test_graphs
+
 # export GRAPH_SUIT ?= TEST
 export GRAPH_SUIT ?= LAW
 # export GRAPH_SUIT ?= GAP
@@ -127,16 +124,16 @@ export REORDER_LAYER3   ?= 0
 export ROOT 			?= 46022
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
-export NUM_ITERATIONS	?= 1
+export NUM_ITERATIONS	?= 0
 
 #PERFORMANCE
 # export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
 # export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
 # export NUM_THREADS_KER  ?= 1
 
-export NUM_THREADS_PRE  ?= 1
-export NUM_THREADS_ALGO ?= 1
-export NUM_THREADS_KER  ?= 1
+export NUM_THREADS_PRE  ?= 8
+export NUM_THREADS_ALGO ?= 8
+export NUM_THREADS_KER  ?= 8
 
 #EXPERIMENTS
 export NUM_TRIALS 		?= 1

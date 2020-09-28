@@ -47,6 +47,10 @@
 #include "graphTest.h"
 #define GRAPH_NUM 4
 
+
+#define THREAD_NUM 64
+#define THREAD_INC 2
+
 #define CACHE_CONFIGS 12
 #define MODE_NUM 3
 #define ORDER_CONFIG 6
@@ -63,7 +67,7 @@ main (int argc, char **argv)
     // char express_perf_file[1024];
     // char grasp_perf_file[1024];
 
-    float PLRU_stats[GRAPH_NUM][ORDER_CONFIG]  = {0};
+    float PLRU_stats[THREAD_NUM/THREAD_INC][GRAPH_NUM][ORDER_CONFIG]  = {0};
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
     uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0 };
     uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };

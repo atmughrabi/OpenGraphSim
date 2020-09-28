@@ -379,11 +379,12 @@ struct BFSStats *breadthFirstSearchPullGraphCSR(struct Arguments *arguments, str
 #endif
 
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -502,7 +503,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(struct Arguments *arguments, str
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
 #ifdef SNIPER_HARNESS
     SimRoiEnd();
@@ -511,6 +512,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSR(struct Arguments *arguments, str
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -714,7 +716,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSR(struct Arguments *
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
-    // stats->time_total =  Seconds(timer);
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -961,11 +963,12 @@ struct BFSStats *breadthFirstSearchPushBitmapGraphCSR(struct Arguments *argument
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1101,11 +1104,12 @@ struct BFSStats *breadthFirstSearchPushDirectionOptimizedBitmapGraphCSR(struct A
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1311,7 +1315,7 @@ struct BFSStats *breadthFirstSearchPullGraphCSRDualOrder(struct Arguments *argum
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
-    // stats->time_total =  Seconds(timer);
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1439,7 +1443,7 @@ struct BFSStats *breadthFirstSearchPushGraphCSRDualOrder(struct Arguments *argum
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
-    // stats->time_total =  Seconds(timer);
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1647,7 +1651,7 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphCSRDualOrder(struct Ar
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
-    // stats->time_total =  Seconds(timer);
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -1940,11 +1944,12 @@ struct BFSStats *breadthFirstSearchRowGraphGrid(struct Arguments *arguments, str
         printf("| %-15u | %-15u | %-15f | \n", stats->iteration++, processed_nodes, Seconds(timer_iteration));
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", sharedFrontierQueue->tail_next, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "**", sharedFrontierQueue->tail_next, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2042,11 +2047,12 @@ struct BFSStats *breadthFirstSearchColumnGraphGrid(struct Arguments *arguments, 
         printf("| %-15u | %-15u | %-15f | \n", stats->iteration++, processed_nodes, Seconds(timer_iteration));
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", sharedFrontierQueue->tail_next, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "**", sharedFrontierQueue->tail_next, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2319,11 +2325,12 @@ struct BFSStats *breadthFirstSearchRowGraphGridBitmap(struct Arguments *argument
         printf("| %-15u | %-15u | %-15f | \n", stats->iteration++, processed_nodes, Seconds(timer_iteration));
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", total_processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "**", total_processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2404,11 +2411,12 @@ struct BFSStats *breadthFirstSearchColumnGraphGridBitmap(struct Arguments *argum
         printf("| %-15u | %-15u | %-15f | \n", stats->iteration++, processed_nodes, Seconds(timer_iteration));
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", total_processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "**", total_processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2634,11 +2642,12 @@ struct BFSStats *breadthFirstSearchPullGraphAdjArrayList(struct Arguments *argum
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2730,11 +2739,12 @@ struct BFSStats *breadthFirstSearchPushGraphAdjArrayList(struct Arguments *argum
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -2881,11 +2891,12 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphAdjArrayList(struct Ar
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -3135,11 +3146,12 @@ struct BFSStats *breadthFirstSearchPullGraphAdjLinkedList(struct Arguments *argu
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -3229,11 +3241,12 @@ struct BFSStats *breadthFirstSearchPushGraphAdjLinkedList(struct Arguments *argu
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
@@ -3382,11 +3395,12 @@ struct BFSStats *breadthFirstSearchDirectionOptimizedGraphAdjLinkedList(struct A
 
     } // end while
     Stop(timer);
-    stats->time_total =  Seconds(timer);
+    
 
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "No OverHead", stats->processed_nodes, stats->time_total);
     printf(" -----------------------------------------------------\n");
+    stats->time_total =  Seconds(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-15s | %-15u | %-15f | \n", "total", stats->processed_nodes, Seconds(timer));
     printf(" -----------------------------------------------------\n");
