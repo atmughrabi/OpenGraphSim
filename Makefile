@@ -10,9 +10,9 @@ APP                         ?= open-graph
 # export APP_TEST           ?=  sweep_unified-cache-graph
 # export APP_TEST           ?=  sweep_capi-cache-graph
 
-# export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
+export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
 # export APP_TEST           ?=  sweep_order-PR-performance-graph
-export APP_TEST           ?=  sweep_order-BFS-performance-graph
+# export APP_TEST           ?=  sweep_order-BFS-performance-graph
 
 # dirs Root app
 export APP_DIR              ?= .
