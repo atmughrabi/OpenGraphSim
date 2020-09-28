@@ -168,7 +168,7 @@ main (int argc, char **argv)
     arguments.source = 5319;
     arguments.algorithm = 0; // BFS
     arguments.datastructure = 0;
-    arguments.pushpull = 0;
+    arguments.pushpull = 2;
     arguments.sort = 1;
 
     arguments.symmetric = 0;

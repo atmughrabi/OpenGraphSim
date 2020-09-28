@@ -10,9 +10,9 @@ APP                         ?= open-graph
 # export APP_TEST           ?=  sweep_unified-cache-graph
 # export APP_TEST           ?=  sweep_capi-cache-graph
 
-export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
+# export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
 # export APP_TEST           ?=  sweep_order-PR-performance-graph
-# export APP_TEST           ?=  sweep_order-BFS-performance-graph
+export APP_TEST           ?=  sweep_order-BFS-performance-graph
 
 # dirs Root app
 export APP_DIR              ?= .
@@ -86,11 +86,11 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
 # LAW # https://sparse.tamu.edu/MM/LAW/
-# export GRAPH_NAME ?= LAW-amazon-2008
+export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -113,7 +113,7 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		?= 2
+export PULL_PUSH 		?= 1
 export ALGORITHMS 		?= 0
 
 #GRAPH DATA_STRUCTURES

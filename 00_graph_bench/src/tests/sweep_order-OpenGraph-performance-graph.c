@@ -222,7 +222,7 @@ main (int argc, char **argv)
 
             graph = generateGraphDataStructure(&arguments);
 
-            arguments.pushpull = 2; // dynamic
+            arguments.pushpull = 1; // dynamic
             sweepBFS(arguments, graph, &(PLRU_stats_BFS[i][j][0]));
 
             arguments.pushpull = 0; // dynamic

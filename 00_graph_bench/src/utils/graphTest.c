@@ -228,7 +228,13 @@ uint32_t cmpGraphAlgorithmsTestStats(void *ref_stats, void *cmp_stats, uint32_t 
 
 void *runGraphAlgorithmsTest(struct Arguments *arguments, void *graph)
 {
-
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-35s %-15d | \n", "Number of Threads Algorithm :", arguments->algo_numThreads);
+    printf(" -----------------------------------------------------\n");
+    printf("*-----------------------------------------------------*\n");
+    printf("| %-35s %-15d | \n", "Number of Threads Kernel    :", arguments->ker_numThreads);
+    printf(" -----------------------------------------------------\n");
+    omp_set_num_threads(arguments->algo_numThreads);
     void *ref_stats = NULL;
 
     switch (arguments->algorithm)
@@ -297,7 +303,7 @@ void *runGraphAlgorithmsTest(struct Arguments *arguments, void *graph)
 
 float getGraphAlgorithmsTestTime(void *ref_stats, uint32_t algorithm)
 {
-    
+
     float time = 0.0;
     switch (algorithm)
     {

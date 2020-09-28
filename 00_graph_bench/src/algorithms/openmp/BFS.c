@@ -766,7 +766,7 @@ uint32_t topDownStepGraphCSR(struct GraphCSR *graph, struct ArrayQueue *sharedFr
 #ifdef CACHE_HARNESS
     #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf) num_threads(1)
 #else
-    #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf)
+    #pragma omp parallel default (none) private(u,v,j,i,edge_idx) shared(stats,localFrontierQueues,graph,sharedFrontierQueue,mf) 
 #endif
     {
         uint32_t t_id = omp_get_thread_num();
