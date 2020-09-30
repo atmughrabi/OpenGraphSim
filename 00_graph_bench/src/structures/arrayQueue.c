@@ -342,8 +342,9 @@ void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_
     uint32_t v;
     uint32_t i;
     uint32_t inv_u;
+    uint32_t num_threads_max = omp_get_max_threads();
 
-    #pragma omp parallel for default(none) shared(q,b,labels) private(v,i,inv_u)
+    #pragma omp parallel for default(none) shared(q,b,labels) private(v,i,inv_u) num_threads(num_threads_max)
     for(i = q->head ; i < q->tail; i++)
     {
         v = q->queue[i];
@@ -362,6 +363,7 @@ void arrayQueueToBitmapDualOrder(struct ArrayQueue *q, struct Bitmap *b, uint32_
 void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct ArrayQueue **localFrontierQueues, uint32_t *labels)
 {
 
+   
     #pragma omp parallel default(none) shared(b,localFrontierQueues,q,labels)
     {
         uint32_t i;
@@ -375,7 +377,10 @@ void bitmapToArrayQueueDualOrder(struct Bitmap *b, struct ArrayQueue *q, struct 
             if(getBit(b, i))
             {
                 inv_v = labels[i];
+                // uint32_t shared_q_tail_next = __sync_fetch_and_add(&localFrontierQueue->tail, 1);
                 localFrontierQueue->queue[localFrontierQueue->tail] = inv_v;
+
+                // #pragma omp atomic
                 localFrontierQueue->tail++;
             }
 

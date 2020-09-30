@@ -299,7 +299,8 @@ main (int argc, char **argv)
     arguments->fnameb_format = 1;
     arguments->convert_format = 1;
     initializeMersenneState (&(arguments->mt19937var), 27491095);
-
+    omp_set_nested(1);
+    
 #ifdef CACHE_HARNESS_META
     arguments->l1_size   = L1_SIZE;
     arguments->l1_assoc  = L1_ASSOC;

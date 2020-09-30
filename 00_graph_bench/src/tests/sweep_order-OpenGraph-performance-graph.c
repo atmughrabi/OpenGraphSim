@@ -188,7 +188,8 @@ main (int argc, char **argv)
     arguments.convert_format = 1;
     arguments.trials = 10; // random number of trials
     initializeMersenneState (&(arguments.mt19937var), 27491095);
-
+    omp_set_nested(1);
+    
     arguments.lmode = 0;
     arguments.lmode_l2 = 0;
     arguments.lmode_l3 = 0;
