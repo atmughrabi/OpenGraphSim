@@ -7,10 +7,10 @@ APP                         ?= open-graph
 # test name needs to match the file name test/test_accel-graph.c
 # export APP_TEST           ?=  test_open-graph-match
 # export APP_TEST           ?=  test_grasp-cache-original
-export APP_TEST           ?=  sweep_unified-cache-graph
+# export APP_TEST           ?=  sweep_unified-cache-graph
 # export APP_TEST           ?=  sweep_capi-cache-graph
 
-# export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
+export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
 # export APP_TEST           ?=  sweep_order-PR-performance-graph
 # export APP_TEST           ?=  sweep_order-BFS-performance-graph
 
@@ -113,11 +113,11 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		?= 2
+export PULL_PUSH 		?= 1
 export ALGORITHMS 		?= 0
 
 #GRAPH DATA_STRUCTURES
-export SORT_TYPE		?= 1
+export SORT_TYPE		?= 0
 export DATA_STRUCTURES  ?= 0
 export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0
@@ -127,16 +127,16 @@ export REORDER_LAYER3   ?= 0
 export ROOT 			?= 46050
 export TOLERANCE 		?= 1e-8
 export DELTA			?= 800
-export NUM_ITERATIONS	?= 1
+export NUM_ITERATIONS	?= 100
 
 #PERFORMANCE
 # export NUM_THREADS_PRE  ?= $(shell grep -c ^processor /proc/cpuinfo)
 # export NUM_THREADS_ALGO ?= $(shell grep -c ^processor /proc/cpuinfo)
 # export NUM_THREADS_KER  ?= 1
 
-export NUM_THREADS_PRE  ?= 8
-export NUM_THREADS_ALGO ?= 8
-export NUM_THREADS_KER  ?= 8
+export NUM_THREADS_PRE  ?= 1
+export NUM_THREADS_ALGO ?= 1
+export NUM_THREADS_KER  ?= 1
 
 #EXPERIMENTS
 export NUM_TRIALS 		?= 1
@@ -162,7 +162,7 @@ MAKE_ARGS               = -w -C $(APP_DIR)/$(MAKE_DIR) -j$(MAKE_NUM_THREADS)
 #                RUN  ARGUMENTS                         #
 #########################################################
 export ARGS ?= -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA)
-export SNIPER_ARGS ?= -n $(NUM_THREADS_ALGO) -c gainestown -s markers:verbose:markers:stats --roi --no-cache-warming -d $(APP_DIR)/sniper-results
+export SNIPER_ARGS ?= -n $(NUM_THREADS_ALGO) -c gainestown -s markers:verbose:markers:stats --roi --profile --no-cache-warming -d $(APP_DIR)/sniper-results
 
 ##################################################
 ##################################################
