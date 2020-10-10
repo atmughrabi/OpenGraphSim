@@ -250,19 +250,19 @@ struct BFSStats *breadthFirstSearchGraphCSR(struct Arguments *arguments, struct 
 
     struct BFSStats *stats = NULL;
 
-#ifdef SNIPER_HARNESS
-    SimSetGraphARGS((uint64_t)graph);
+// #ifdef SNIPER_HARNESS
+//     SimSetGraphARGS((uint64_t)graph);
 
-    printf("Set GraphCSR Base Address           : %p\n", graph);
-    printf("GraphCSR num_edges                  : %u\n", graph->num_edges);
-    printf("GraphCSR num_vertices               : %u\n", graph->num_vertices);
-    printf("GraphCSR avg_degree                 : %u\n", graph->avg_degree);
-    printf("GraphCSR vertices                   : %p\n", graph->vertices);
-    printf("GraphCSR sorted_edges_array         : %p\n", graph->sorted_edges_array);
-    printf("GraphCSR inverse_vertices           : %p\n", graph->inverse_vertices);
-    printf("GraphCSR inverse_sorted_edges_array : %p\n\n", graph->inverse_sorted_edges_array);
+//     printf("Set GraphCSR Base Address           : %p\n", graph);
+//     printf("GraphCSR num_edges                  : %u\n", graph->num_edges);
+//     printf("GraphCSR num_vertices               : %u\n", graph->num_vertices);
+//     printf("GraphCSR avg_degree                 : %u\n", graph->avg_degree);
+//     printf("GraphCSR vertices                   : %p\n", graph->vertices);
+//     printf("GraphCSR sorted_edges_array         : %p\n", graph->sorted_edges_array);
+//     printf("GraphCSR inverse_vertices           : %p\n", graph->inverse_vertices);
+//     printf("GraphCSR inverse_sorted_edges_array : %p\n\n", graph->inverse_sorted_edges_array);
 
-#endif
+// #endif
 
     switch (arguments->pushpull)
     {
