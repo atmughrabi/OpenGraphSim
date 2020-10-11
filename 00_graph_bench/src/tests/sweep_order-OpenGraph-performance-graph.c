@@ -47,8 +47,8 @@
 #include "graphTest.h"
 #define GRAPH_NUM 4
 
-#define THREAD_POINTS 7
-#define THREAD_SHIFT  2
+#define THREAD_POINTS 4
+#define THREAD_SHIFT  1
 
 #define CACHE_CONFIGS 12
 #define MODE_NUM 3
@@ -233,22 +233,22 @@ main (int argc, char **argv)
 
             graph = generateGraphDataStructure(&arguments);
 
-            arguments.pushpull = 2; // 
+            arguments.pushpull = 2; //
             sweepBFS(arguments, graph, &(PLRU_stats_BFS[i][j][0]));
 
-            arguments.pushpull = 0; // 
+            arguments.pushpull = 0; //
             sweepPR(arguments, graph, &(PLRU_stats_PR[i][j][0]));
 
-            arguments.pushpull = 0; // 
+            arguments.pushpull = 0; //
             sweepSPMV(arguments, graph, &(PLRU_stats_SPMV[i][j][0]));
 
-            arguments.pushpull = 3; // 
+            arguments.pushpull = 3; //
             sweepTC(arguments, graph, &(PLRU_stats_TC[i][j][0]));
 
-            arguments.pushpull = 0; // 
+            arguments.pushpull = 1; //
             sweepCC(arguments, graph, &(PLRU_stats_CC[i][j][0]));
 
-            arguments.pushpull = 0; // 
+            arguments.pushpull = 0; //
             sweepSSSP(arguments, graph, &(PLRU_stats_SSSP[i][j][0]));
 
             freeGraphDataStructure(graph, arguments.datastructure);
@@ -308,6 +308,108 @@ main (int argc, char **argv)
         fprintf(fptr1, " -----------------------------------------------------\n");
     }
 
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " Performance (Seconds) CC, Num Threads %u \n",  1 << k);
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "NumThreads%-15u, ", 1 << k);
+        for (j = 0; j < ORDER_CONFIG; ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  PLRU_stats_CC[i][j][k]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+    }
+
+
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " Performance (Seconds) TC, Num Threads %u \n",  1 << k);
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "NumThreads%-15u, ", 1 << k);
+        for (j = 0; j < ORDER_CONFIG; ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  PLRU_stats_TC[i][j][k]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+    }
+
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " Performance (Seconds) SPMV, Num Threads %u \n",  1 << k);
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "NumThreads%-15u, ", 1 << k);
+        for (j = 0; j < ORDER_CONFIG; ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  PLRU_stats_SPMV[i][j][k]);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+    }
+
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        fprintf(fptr1, " -----------------------------------------------------\n");
+        fprintf(fptr1, " Performance (Seconds) SSSP, Num Threads %u \n",  1 << k);
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "NumThreads%-15u, ", 1 << k);
+        for (j = 0; j < ORDER_CONFIG; ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < ORDER_CONFIG; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  PLRU_stats_SSSP[i][j][k] / arguments.trials);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+    }
+
+
     fclose(fptr1);
 
     exit (0);
@@ -341,7 +443,7 @@ void sweepSSSP(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_
     uint32_t k = 0;
     uint32_t kk = 0;
     void *ref_data;
-    arguments.algorithm = 3; // BFS
+    arguments.algorithm = 3; // SSSP
     for(k = 0; k < THREAD_POINTS; k ++)
     {
         arguments.algo_numThreads = THREAD_SHIFT << k;
@@ -368,7 +470,7 @@ void sweepPR(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_PO
         arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        PLRU_stats[k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
         // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
         freeGraphStatsGeneral(ref_data, arguments.algorithm);
     }
@@ -382,13 +484,13 @@ void sweepTC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_PO
     //    break;}
     uint32_t k = 0;
     void *ref_data;
-    arguments.algorithm = 8; // PR
+    arguments.algorithm = 8; // TC
     for(k = 0; k < THREAD_POINTS; k ++)
     {
         arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        PLRU_stats[k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
         // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
         freeGraphStatsGeneral(ref_data, arguments.algorithm);
     }
@@ -400,13 +502,13 @@ void sweepSPMV(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_
 {
     uint32_t k = 0;
     void *ref_data;
-    arguments.algorithm = 5; // PR
+    arguments.algorithm = 5; // SPMV
     for(k = 0; k < THREAD_POINTS; k ++)
     {
         arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        PLRU_stats[k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
         // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
         freeGraphStatsGeneral(ref_data, arguments.algorithm);
     }
@@ -417,13 +519,13 @@ void sweepCC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_PO
 {
     uint32_t k = 0;
     void *ref_data;
-    arguments.algorithm = 6; // PR
+    arguments.algorithm = 6; // CC
     for(k = 0; k < THREAD_POINTS; k ++)
     {
         arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        PLRU_stats[k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
         // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
         freeGraphStatsGeneral(ref_data, arguments.algorithm);
     }
