@@ -8,10 +8,10 @@ APP                         ?= open-graph
 # export APP_TEST           ?=  test_open-graph-match
 # export APP_TEST           ?=  test_grasp-cache-original
 
-export APP_TEST           ?=  sweep_unified-cache-graph
+# export APP_TEST           ?=  sweep_unified-cache-graph
 # export APP_TEST           ?=  sweep_capi-cache-graph
 
-# export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
+export APP_TEST           ?=  sweep_order-OpenGraph-performance-graph
 # export APP_TEST           ?=  sweep_order-PR-performance-graph
 # export APP_TEST           ?=  sweep_order-BFS-performance-graph
 
@@ -179,6 +179,10 @@ help:
 .PHONY: run
 run:
 	$(MAKE) run $(MAKE_ARGS)
+
+.PHONY: sweep-run
+sweep-run:
+	$(MAKE) run-test $(MAKE_ARGS)
 
 .PHONY: run-cache
 run-cache:

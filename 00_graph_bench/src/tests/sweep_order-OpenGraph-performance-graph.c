@@ -48,12 +48,17 @@
 #define GRAPH_NUM 4
 
 #define THREAD_POINTS 7
+#define THREAD_SHIFT  2
 
 #define CACHE_CONFIGS 12
 #define MODE_NUM 3
 #define ORDER_CONFIG 6
 #define TOTAL_CONFIG (MODE_NUM+MODE_NUM+ORDER_CONFIG)
 
+void sweepSPMV(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
+void sweepCC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
+void sweepTC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
+void sweepSSSP(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
 void sweepBFS(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
 void sweepPR(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS]);
 
@@ -66,8 +71,13 @@ main (int argc, char **argv)
     // char express_perf_file[1024];
     // char grasp_perf_file[1024];
 
-    float PLRU_stats_BFS[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]  = {0};
-    float PLRU_stats_PR[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]  = {0};
+    float PLRU_stats_BFS[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]   = {0};
+    float PLRU_stats_PR[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]    = {0};
+    float PLRU_stats_SPMV[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]  = {0};
+    float PLRU_stats_TC[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]    = {0};
+    float PLRU_stats_CC[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]    = {0};
+    float PLRU_stats_SSSP[GRAPH_NUM][ORDER_CONFIG][THREAD_POINTS]  = {0};
+
 
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
     uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0 };
@@ -189,7 +199,7 @@ main (int argc, char **argv)
     arguments.trials = 10; // random number of trials
     initializeMersenneState (&(arguments.mt19937var), 27491095);
     omp_set_nested(1);
-    
+
     arguments.lmode = 0;
     arguments.lmode_l2 = 0;
     arguments.lmode_l3 = 0;
@@ -223,11 +233,23 @@ main (int argc, char **argv)
 
             graph = generateGraphDataStructure(&arguments);
 
-            arguments.pushpull = 2; // dynamic
+            arguments.pushpull = 2; // 
             sweepBFS(arguments, graph, &(PLRU_stats_BFS[i][j][0]));
 
-            arguments.pushpull = 0; // dynamic
+            arguments.pushpull = 0; // 
             sweepPR(arguments, graph, &(PLRU_stats_PR[i][j][0]));
+
+            arguments.pushpull = 0; // 
+            sweepSPMV(arguments, graph, &(PLRU_stats_SPMV[i][j][0]));
+
+            arguments.pushpull = 3; // 
+            sweepTC(arguments, graph, &(PLRU_stats_TC[i][j][0]));
+
+            arguments.pushpull = 0; // 
+            sweepCC(arguments, graph, &(PLRU_stats_CC[i][j][0]));
+
+            arguments.pushpull = 0; // 
+            sweepSSSP(arguments, graph, &(PLRU_stats_SSSP[i][j][0]));
 
             freeGraphDataStructure(graph, arguments.datastructure);
         }
@@ -300,7 +322,29 @@ void sweepBFS(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_P
     arguments.algorithm = 0; // BFS
     for(k = 0; k < THREAD_POINTS; k ++)
     {
-        arguments.algo_numThreads = 1 << k;
+        arguments.algo_numThreads = THREAD_SHIFT << k;
+        arguments.ker_numThreads = arguments.algo_numThreads ;
+        initializeMersenneState (&(arguments.mt19937var), 27491095);
+        for(kk = 0 ; kk < arguments.trials; kk++)
+        {
+            arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
+            ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+            PLRU_stats[k] += getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+            // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+            freeGraphStatsGeneral(ref_data, arguments.algorithm);
+        }
+    }
+}
+
+void sweepSSSP(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS])
+{
+    uint32_t k = 0;
+    uint32_t kk = 0;
+    void *ref_data;
+    arguments.algorithm = 3; // BFS
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         initializeMersenneState (&(arguments.mt19937var), 27491095);
         for(kk = 0 ; kk < arguments.trials; kk++)
@@ -321,7 +365,62 @@ void sweepPR(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_PO
     arguments.algorithm = 1; // PR
     for(k = 0; k < THREAD_POINTS; k ++)
     {
-        arguments.algo_numThreads = 1 << k;
+        arguments.algo_numThreads = THREAD_SHIFT << k;
+        arguments.ker_numThreads = arguments.algo_numThreads ;
+        ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+        freeGraphStatsGeneral(ref_data, arguments.algorithm);
+    }
+
+}
+
+void sweepTC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS])
+{
+    // case 3: // With binary intersection
+    //    stats = triangleCountBinaryIntersectionGraphCSR(graph);
+    //    break;}
+    uint32_t k = 0;
+    void *ref_data;
+    arguments.algorithm = 8; // PR
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        arguments.algo_numThreads = THREAD_SHIFT << k;
+        arguments.ker_numThreads = arguments.algo_numThreads ;
+        ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+        freeGraphStatsGeneral(ref_data, arguments.algorithm);
+    }
+
+}
+
+
+void sweepSPMV(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS])
+{
+    uint32_t k = 0;
+    void *ref_data;
+    arguments.algorithm = 5; // PR
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        arguments.algo_numThreads = THREAD_SHIFT << k;
+        arguments.ker_numThreads = arguments.algo_numThreads ;
+        ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+        PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
+        // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+        freeGraphStatsGeneral(ref_data, arguments.algorithm);
+    }
+
+}
+
+void sweepCC(struct Arguments arguments, void *graph, float PLRU_stats[THREAD_POINTS])
+{
+    uint32_t k = 0;
+    void *ref_data;
+    arguments.algorithm = 6; // PR
+    for(k = 0; k < THREAD_POINTS; k ++)
+    {
+        arguments.algo_numThreads = THREAD_SHIFT << k;
         arguments.ker_numThreads = arguments.algo_numThreads ;
         ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
         PLRU_stats[k] = getGraphAlgorithmsTestTime(ref_data, arguments.algorithm);
