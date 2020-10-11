@@ -24,6 +24,12 @@ struct DFSStats
     uint32_t  processed_nodes;
     uint32_t  num_vertices;
     double time_total;
+
+#ifdef CACHE_HARNESS_META
+    uint32_t numPropertyRegions;
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
 };
 
 struct DFSStats *newDFSStatsGraphCSR(struct GraphCSR *graph);

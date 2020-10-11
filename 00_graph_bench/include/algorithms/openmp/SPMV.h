@@ -19,7 +19,7 @@
 struct SPMVStats
 {
 
-	uint32_t iterations;
+    uint32_t iterations;
     struct Arguments *arguments;
     uint32_t num_vertices;
     float *vector_output;

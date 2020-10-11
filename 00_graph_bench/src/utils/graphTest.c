@@ -446,8 +446,8 @@ float getGraphAlgorithmsTestMissRateRef(void *ref_stats, uint32_t algorithm)
     case 9: // incremental Aggregation
     {
         struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
-        // missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
-        missRate = 0;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+        // missRate = 0;
     }
     break;
     default:// BFS
@@ -524,8 +524,8 @@ float getGraphAlgorithmsTestMissRateCAPI(void *ref_stats, uint32_t algorithm)
     case 9: // incremental Aggregation
     {
         struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
-        // missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
-        missRate = 0;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+        // missRate = 0;
     }
     break;
     default:// BFS

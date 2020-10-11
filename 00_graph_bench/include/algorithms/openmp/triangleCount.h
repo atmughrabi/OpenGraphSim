@@ -19,6 +19,12 @@ struct TCStats
     uint64_t *counts;
     uint64_t total_counts;
     double time_total;
+
+#ifdef CACHE_HARNESS_META
+    uint32_t numPropertyRegions;
+    struct PropertyMetaData *propertyMetaData;
+    struct DoubleTaggedCache *cache;
+#endif
 };
 
 struct TCStats *newTCStatsGraphCSR(struct GraphCSR *graph);
