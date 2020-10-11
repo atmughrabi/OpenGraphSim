@@ -47,10 +47,10 @@
 #include "cache.h"
 
 #include "graphTest.h"
-#define GRAPH_NUM 14
+#define GRAPH_NUM 4
 
 #define CACHE_CONFIGS 5
-#define CACHE_POLICY 4
+#define CACHE_POLICY 6
 #define MODE_NUM 3
 #define ORDER_CONFIG 6
 #define TOTAL_CONFIG (MODE_NUM+MODE_NUM+ORDER_CONFIG)
@@ -70,14 +70,16 @@ main (int argc, char **argv)
     // uint32_t Associativity[CACHE_CONFIGS] = {4,  4, 4, 8,  8,  16, 16, 16, 16, 32, 32, 32};
     // uint32_t Block_size[CACHE_CONFIGS] = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
 
-    uint32_t cache_size[CACHE_CONFIGS] = {262144, 524288,  1048576, 2097152, 4194304};
+    uint32_t cache_size[CACHE_CONFIGS]    = {262144, 524288,  1048576, 2097152, 4194304};
     uint32_t Associativity[CACHE_CONFIGS] = {8,  8,  16, 16, 16};
-    uint32_t Block_size[CACHE_CONFIGS] = {128, 128, 128, 128, 128};
-    uint32_t policy[CACHE_POLICY] = {PLRU_POLICY, SRRIP_POLICY, GRASP_POLICY, MASK_POLICY};
-    float PLRU_stats[GRAPH_NUM][ORDER_CONFIG]  = {0};
-    float SSRIP_stats[GRAPH_NUM][ORDER_CONFIG] = {0};
-    float GRASP_stats[GRAPH_NUM][MODE_NUM]     = {0};
-    float EXPRESS_stats[GRAPH_NUM][MODE_NUM]   = {0};
+    uint32_t Block_size[CACHE_CONFIGS]    = {128, 128, 128, 128, 128};
+    uint32_t policy[CACHE_POLICY]         = {PLRU_POLICY, SRRIP_POLICY, GRASP_POLICY, MASK_POLICY, GRASP_CAPI_POLICY, MASK_CAPI_POLICY};
+    float PLRU_stats[GRAPH_NUM][ORDER_CONFIG]       = {0};
+    float SSRIP_stats[GRAPH_NUM][ORDER_CONFIG]      = {0};
+    float GRASP_stats[GRAPH_NUM][MODE_NUM]          = {0};
+    float EXPRESS_stats[GRAPH_NUM][MODE_NUM]        = {0};
+    float GRASP_stats_capi[GRAPH_NUM][MODE_NUM]     = {0};
+    float EXPRESS_stats_capi[GRAPH_NUM][MODE_NUM]   = {0};
     uint32_t lmode_l2[TOTAL_CONFIG] = {0, 4, 11, 11, 11, 11, 0, 11, 11, 0, 11, 11};
     uint32_t lmode_l3[TOTAL_CONFIG] = {0, 0, 0, 4, 0, 4, 4, 4, 4, 0, 0, 0 };
     uint32_t mmode[TOTAL_CONFIG]    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 };
@@ -115,57 +117,57 @@ main (int argc, char **argv)
     };
 
 
-    // char *benchmarks_graphs[GRAPH_NUM] =
-    // {
-    //     "LAW-amazon-2008",
-    //     "LAW-cnr-2000",
-    //     "LAW-dblp-2010",
-    //     "LAW-enron"
-    // };
-
-    // char *benchmarks_dir[GRAPH_NUM] =
-    // {
-    //     "../01_test_graphs/LAW/LAW-amazon-2008",
-    //     "../01_test_graphs/LAW/LAW-cnr-2000",
-    //     "../01_test_graphs/LAW/LAW-dblp-2010",
-    //     "../01_test_graphs/LAW/LAW-enron"
-    // };
-
     char *benchmarks_graphs[GRAPH_NUM] =
     {
-        "GAP-road",
-        "GAP-twitter",
-        "GONG-gplus",
-        "KONECT-wikipedia_link_en",
-        "LAW-in-2004",
-        "LAW-it-2004",
-        "LAW-uk-2002",
-        "LAW-uk-2005",
-        "LAW-webbase-2001",
-        "SNAP-cit-Patents",
-        "SNAP-com-Orkut",
-        "SNAP-soc-LiveJournal1",
-        "SNAP-soc-Pokec",
-        "SNAP-web-Google"
+        "LAW-amazon-2008",
+        "LAW-cnr-2000",
+        "LAW-dblp-2010",
+        "LAW-enron"
     };
 
     char *benchmarks_dir[GRAPH_NUM] =
     {
-        "../../01_GraphDatasets/GAP/GAP-road",
-        "../../01_GraphDatasets/GAP/GAP-twitter",
-        "../../01_GraphDatasets/GONG/GONG-gplus",
-        "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
-        "../../01_GraphDatasets/LAW/LAW-in-2004",
-        "../../01_GraphDatasets/LAW/LAW-it-2004",
-        "../../01_GraphDatasets/LAW/LAW-uk-2002",
-        "../../01_GraphDatasets/LAW/LAW-uk-2005",
-        "../../01_GraphDatasets/LAW/LAW-webbase-2001",
-        "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
-        "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
-        "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
-        "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
-        "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+        "../01_test_graphs/LAW/LAW-amazon-2008",
+        "../01_test_graphs/LAW/LAW-cnr-2000",
+        "../01_test_graphs/LAW/LAW-dblp-2010",
+        "../01_test_graphs/LAW/LAW-enron"
     };
+
+    // char *benchmarks_graphs[GRAPH_NUM] =
+    // {
+    //     "GAP-road",
+    //     "GAP-twitter",
+    //     "GONG-gplus",
+    //     "KONECT-wikipedia_link_en",
+    //     "LAW-in-2004",
+    //     "LAW-it-2004",
+    //     "LAW-uk-2002",
+    //     "LAW-uk-2005",
+    //     "LAW-webbase-2001",
+    //     "SNAP-cit-Patents",
+    //     "SNAP-com-Orkut",
+    //     "SNAP-soc-LiveJournal1",
+    //     "SNAP-soc-Pokec",
+    //     "SNAP-web-Google"
+    // };
+
+    // char *benchmarks_dir[GRAPH_NUM] =
+    // {
+    //     "../../01_GraphDatasets/GAP/GAP-road",
+    //     "../../01_GraphDatasets/GAP/GAP-twitter",
+    //     "../../01_GraphDatasets/GONG/GONG-gplus",
+    //     "../../01_GraphDatasets/KONECT/KONECT-wikipedia_link_en",
+    //     "../../01_GraphDatasets/LAW/LAW-in-2004",
+    //     "../../01_GraphDatasets/LAW/LAW-it-2004",
+    //     "../../01_GraphDatasets/LAW/LAW-uk-2002",
+    //     "../../01_GraphDatasets/LAW/LAW-uk-2005",
+    //     "../../01_GraphDatasets/LAW/LAW-webbase-2001",
+    //     "../../01_GraphDatasets/SNAP/SNAP-cit-Patents",
+    //     "../../01_GraphDatasets/SNAP/SNAP-com-Orkut",
+    //     "../../01_GraphDatasets/SNAP/SNAP-soc-LiveJournal1",
+    //     "../../01_GraphDatasets/SNAP/SNAP-soc-Pokec",
+    //     "../../01_GraphDatasets/SNAP/SNAP-web-Google"
+    // };
 
     struct Arguments arguments;
     /* Default values. */
@@ -353,6 +355,65 @@ main (int argc, char **argv)
                 freeGraphDataStructure(graph, arguments.datastructure);
             }
 
+            arguments.policey   = policy[4];
+            for (kk = 0, j = ORDER_CONFIG; j < ORDER_CONFIG + MODE_NUM; ++j, ++kk)
+            {
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
+                sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+                arguments.lmode = 0; // base is random order
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
+
+                graph = generateGraphDataStructure(&arguments);
+
+                initializeMersenneState (&(arguments.mt19937var), 27491095);
+                for(jj = 0 ; jj < arguments.trials; jj++)
+                {
+                    arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
+                    ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+                    GRASP_stats_capi[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+                    freeGraphStatsGeneral(ref_data, arguments.algorithm);
+                }
+
+                freeGraphDataStructure(graph, arguments.datastructure);
+            }
+
+            arguments.policey   = policy[5];
+            for (kk = 0, j = (ORDER_CONFIG + MODE_NUM); j < (ORDER_CONFIG + MODE_NUM + MODE_NUM); ++j, ++kk)
+            {
+                sprintf (graph_dir, "%s/%s", benchmarks_dir[i], "graph.rand.bin");
+                sprintf (label_dir, "%s/%s", benchmarks_dir[i], reorder_labels[j]);
+                arguments.lmode = 0; // base is random order
+                arguments.lmode_l2 =  lmode_l2[j];
+                arguments.lmode_l3 = lmode_l3[j];
+                arguments.mmode = mmode[j];
+                arguments.fnameb = graph_dir;
+                arguments.fnamel = label_dir;
+                printf("graph config %5u - %u %u %u - %u %s\n", j, arguments.lmode_l2, arguments.lmode_l3, arguments.mmode, arguments.l1_size / 1024, config_labels[j]);
+
+                graph = generateGraphDataStructure(&arguments);
+
+                initializeMersenneState (&(arguments.mt19937var), 27491095);
+                for(jj = 0 ; jj < arguments.trials; jj++)
+                {
+                    arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
+                    ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
+                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
+                    EXPRESS_stats_capi[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
+                    freeGraphStatsGeneral(ref_data, arguments.algorithm);
+                }
+
+                freeGraphDataStructure(graph, arguments.datastructure);
+            }
+
+
 
         }
         // print out stats to file each graph processed
@@ -420,6 +481,42 @@ main (int argc, char **argv)
             for (j = 0; j < MODE_NUM; ++j)
             {
                 fprintf(fptr1, "%-14f, ",  EXPRESS_stats[i][j] / arguments.trials);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "%-25s, ",  "GRASP_CAPI");
+        for (j = (ORDER_CONFIG); j < (ORDER_CONFIG + MODE_NUM); ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < MODE_NUM; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  GRASP_stats_capi[i][j] / arguments.trials);
+            }
+            fprintf(fptr1, " \n");
+        }
+        fprintf(fptr1, " -----------------------------------------------------\n");
+
+        fprintf(fptr1, "%-25s, ",  "EXPRESS_CAPI");
+        for (j = (ORDER_CONFIG + MODE_NUM); j < (ORDER_CONFIG + MODE_NUM + MODE_NUM); ++j)
+        {
+            fprintf(fptr1, "%-14s, ",  config_labels[j]);
+        }
+        fprintf(fptr1, " \n");
+
+        for ( i = 0; i < GRAPH_NUM; ++i)
+        {
+            fprintf(fptr1, "%-25s, ",  benchmarks_graphs[i]);
+            for (j = 0; j < MODE_NUM; ++j)
+            {
+                fprintf(fptr1, "%-14f, ",  EXPRESS_stats_capi[i][j] / arguments.trials);
             }
             fprintf(fptr1, " \n");
         }
