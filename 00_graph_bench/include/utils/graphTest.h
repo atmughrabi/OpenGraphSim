@@ -14,4 +14,9 @@ uint32_t equalFloat(float a, float b, double epsilon);
 uint32_t compareFloatArrays(float *arr1, float *arr2, uint32_t arr1_size, uint32_t arr2_size);
 float getGraphAlgorithmsTestTime(void *ref_stats, uint32_t algorithm);
 
+#ifdef CACHE_HARNESS
+float getGraphAlgorithmsTestMissRateRef(void *ref_stats, uint32_t algorithm);
+float getGraphAlgorithmsTestMissRateCAPI(void *ref_stats, uint32_t algorithm);
+#endif
+
 #endif

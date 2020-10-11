@@ -45,6 +45,10 @@
 #include "connectedComponents.h"
 #include "triangleCount.h"
 
+#ifdef CACHE_HARNESS
+#include "cache.h"
+#endif
+
 #include "graphStats.h"
 #include "graphRun.h"
 #include "graphTest.h"
@@ -377,3 +381,162 @@ float getGraphAlgorithmsTestTime(void *ref_stats, uint32_t algorithm)
 
     return time;
 }
+
+#ifdef CACHE_HARNESS
+float getGraphAlgorithmsTestMissRateRef(void *ref_stats, uint32_t algorithm)
+{
+
+    float missRate = 0.0;
+    switch (algorithm)
+    {
+    case 0:  // BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 1: // pagerank
+    {
+        struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 2: // SSSP-Delta
+    {
+        struct SSSPStats *ref_stats_tmp = (struct SSSPStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 3: // SSSP-Bellmanford
+    {
+        struct BellmanFordStats *ref_stats_tmp = (struct BellmanFordStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 4: // DFS
+    {
+        struct DFSStats *ref_stats_tmp = (struct DFSStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 5: // SPMV
+    {
+        struct SPMVStats *ref_stats_tmp = (struct SPMVStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 6: // Connected Components
+    {
+        struct CCStats *ref_stats_tmp = (struct CCStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 7: // Betweenness Centrality
+    {
+        struct BetweennessCentralityStats *ref_stats_tmp = (struct BetweennessCentralityStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 8: // Triangle Count
+    {
+        struct TCStats *ref_stats_tmp = (struct TCStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    case 9: // incremental Aggregation
+    {
+        struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
+        // missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+        missRate = 0;
+    }
+    break;
+    default:// BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        missRate = getMissRate(ref_stats_tmp->cache->ref_cache);
+    }
+    break;
+    }
+
+    return missRate;
+}
+
+float getGraphAlgorithmsTestMissRateCAPI(void *ref_stats, uint32_t algorithm)
+{
+
+    float missRate = 0.0;
+    switch (algorithm)
+    {
+    case 0:  // BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 1: // pagerank
+    {
+        struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 2: // SSSP-Delta
+    {
+        struct SSSPStats *ref_stats_tmp = (struct SSSPStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 3: // SSSP-Bellmanford
+    {
+        struct BellmanFordStats *ref_stats_tmp = (struct BellmanFordStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 4: // DFS
+    {
+        struct DFSStats *ref_stats_tmp = (struct DFSStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 5: // SPMV
+    {
+        struct SPMVStats *ref_stats_tmp = (struct SPMVStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 6: // Connected Components
+    {
+        struct CCStats *ref_stats_tmp = (struct CCStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 7: // Betweenness Centrality
+    {
+        struct BetweennessCentralityStats *ref_stats_tmp = (struct BetweennessCentralityStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 8: // Triangle Count
+    {
+        struct TCStats *ref_stats_tmp = (struct TCStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    case 9: // incremental Aggregation
+    {
+        struct IncrementalAggregationStats *ref_stats_tmp = (struct IncrementalAggregationStats * )ref_stats;
+        // missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+        missRate = 0;
+    }
+    break;
+    default:// BFS
+    {
+        struct BFSStats *ref_stats_tmp = (struct BFSStats * )ref_stats;
+        missRate = getCAPIMissRate(ref_stats_tmp->cache->capi_cache);
+    }
+    break;
+    }
+
+    return missRate;
+}
+
+#endif

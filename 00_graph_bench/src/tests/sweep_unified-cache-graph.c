@@ -259,8 +259,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    PLRU_stats[i][j] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    PLRU_stats[i][j] += getGraphAlgorithmsTestMissRateRef(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
@@ -288,8 +287,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    SSRIP_stats[i][j] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    SSRIP_stats[i][j] += getGraphAlgorithmsTestMissRateRef(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
@@ -317,8 +315,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    GRASP_stats[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    GRASP_stats[i][kk] += getGraphAlgorithmsTestMissRateRef(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
@@ -346,8 +343,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    EXPRESS_stats[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    EXPRESS_stats[i][kk] += getGraphAlgorithmsTestMissRateRef(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
@@ -375,8 +371,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    GRASP_stats_capi[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    GRASP_stats_capi[i][kk] += getGraphAlgorithmsTestMissRateCAPI(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
@@ -404,8 +399,7 @@ main (int argc, char **argv)
                 {
                     arguments.source = generateRandomRootGeneral(&arguments, graph); // random root each trial
                     ref_data = runGraphAlgorithmsTest(&arguments, graph); // ref stats should mach oother algo
-                    struct PageRankStats *ref_stats_tmp = (struct PageRankStats * )ref_data;
-                    EXPRESS_stats_capi[i][kk] += getMissRate(ref_stats_tmp->cache->ref_cache);
+                    EXPRESS_stats_capi[i][kk] += getGraphAlgorithmsTestMissRateCAPI(ref_data, arguments.algorithm);
                     // printStatsDoubleTaggedCacheToFile(ref_stats_tmp->cache, unified_perf_file);
                     freeGraphStatsGeneral(ref_data, arguments.algorithm);
                 }
