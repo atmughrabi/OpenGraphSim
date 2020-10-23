@@ -233,22 +233,22 @@ main (int argc, char **argv)
 
             graph = generateGraphDataStructure(&arguments);
 
-            arguments.pushpull = 2; //
+            arguments.pushpull = 0; //
             sweepBFS(arguments, graph, &(PLRU_stats_BFS[i][j][0]));
 
-            arguments.pushpull = 0; //
+            arguments.pushpull = 7; //
             sweepPR(arguments, graph, &(PLRU_stats_PR[i][j][0]));
 
-            arguments.pushpull = 0; //
+            arguments.pushpull = 1; //
             sweepSPMV(arguments, graph, &(PLRU_stats_SPMV[i][j][0]));
 
-            arguments.pushpull = 3; //
+            arguments.pushpull = 0; //
             sweepTC(arguments, graph, &(PLRU_stats_TC[i][j][0]));
 
-            arguments.pushpull = 1; //
+            arguments.pushpull = 0; //
             sweepCC(arguments, graph, &(PLRU_stats_CC[i][j][0]));
 
-            arguments.pushpull = 0; //
+            arguments.pushpull = 1; //
             sweepSSSP(arguments, graph, &(PLRU_stats_SSSP[i][j][0]));
 
             freeGraphDataStructure(graph, arguments.datastructure);
