@@ -87,11 +87,11 @@ export GRAPH_SUIT ?= LAW
 # export GRAPH_NAME ?= KONECT-wikipedia_link_en
 
 # LAW # https://sparse.tamu.edu/MM/LAW/
-# export GRAPH_NAME ?= LAW-amazon-2008
+export GRAPH_NAME ?= LAW-amazon-2008
 # export GRAPH_NAME ?= LAW-arabic-2005
 # export GRAPH_NAME ?= LAW-cnr-2000
 # export GRAPH_NAME ?= LAW-dblp-2010
-export GRAPH_NAME ?= LAW-enron
+# export GRAPH_NAME ?= LAW-enron
 # export GRAPH_NAME ?= LAW-eu-2005
 # export GRAPH_NAME ?= LAW-hollywood-2009
 # export GRAPH_NAME ?= LAW-in-2004
@@ -114,11 +114,11 @@ export FILE_BIN = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_BIN_TYPE)
 export FILE_LABEL = $(BENCHMARKS_DIR)/$(GRAPH_SUIT)/$(GRAPH_NAME)/$(FILE_LABEL_TYPE)
 
 #ALGORITHM
-export PULL_PUSH 		?= 1
+export PULL_PUSH 		?= 0
 export ALGORITHMS 		?= 0
 
 #GRAPH DATA_STRUCTURES
-export SORT_TYPE		?= 0
+export SORT_TYPE		?= 1
 export DATA_STRUCTURES  ?= 0
 export REORDER_LAYER1 	?= 0
 export REORDER_LAYER2   ?= 0

@@ -29,7 +29,6 @@ struct CCStats
     uint32_t *labels;
     double time_total;
 
-
 #ifdef CACHE_HARNESS_META
     uint32_t numPropertyRegions;
     struct PropertyMetaData *propertyMetaData;

@@ -194,7 +194,7 @@ void printCCStats(struct CCStats *stats)
     JLF(PValue, JArray, Index);
     while (PValue != NULL)
     {
-        // printf("%lu %lu\n", Index, *PValue);
+        // printf("--> %lu %lu\n", Index, *PValue);
         stats->counts[Index] = *PValue;
         * PValue = 0;
         JLN(PValue, JArray, Index);
@@ -218,6 +218,8 @@ void printCCStats(struct CCStats *stats)
         printf("| %-21u | %-27u | \n", stats->labels[i], stats->counts[i] );
 
     }
+
+
     printf(" -----------------------------------------------------\n");
     printf("| %-21s | %-27u | \n", "Num Components", numComp);
     printf(" -----------------------------------------------------\n");
@@ -296,7 +298,6 @@ void addSample(uint32_t id)
 
     JLI(PValue, JArray, id);
     *PValue += 1;
-
 }
 
 uint32_t sampleFrequentNode(mt19937state *mt19937var, uint32_t num_vertices, uint32_t num_samples, uint32_t *components)
@@ -350,7 +351,6 @@ struct CCStats *connectedComponentsGraphCSR(struct Arguments *arguments, struct 
 
     switch (arguments->pushpull)
     {
-
     case 0: // Shiloach Vishkin
         stats = connectedComponentsShiloachVishkinGraphCSR( arguments, graph);
         break;
@@ -377,6 +377,7 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( struct Arguments *ar
     uint32_t edge_idx;
     uint32_t componentsCount = 0;
     uint32_t change = 0;
+    Word_t    Bytes;
 
     struct CCStats *stats = newCCStatsGraphCSR(graph);
     struct Timer *timer = (struct Timer *) my_malloc(sizeof(struct Timer));
@@ -497,6 +498,8 @@ struct CCStats *connectedComponentsShiloachVishkinGraphCSR( struct Arguments *ar
 #ifdef CACHE_HARNESS
     printStatsDoubleTaggedCache(stats->cache, graph->vertices->in_degree, graph->vertices->out_degree);
 #endif
+
+    JSLFA(Bytes, JArray);
     return stats;
 
 }

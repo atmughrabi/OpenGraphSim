@@ -403,7 +403,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
         break;
         case 5: // SPMV
         {
-            struct SPMVStats *stats = runSPMVAlgorithm(graph,  arguments);
+            struct SPMVStats *stats = runSPMVAlgorithm(arguments,  graph);
             if(stats)
             {
                 time_total += stats->time_total;
@@ -413,7 +413,7 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
         break;
         case 6: // Connected Components
         {
-            struct CCStats *stats = runConnectedComponentsAlgorithm(graph,  arguments);
+            struct CCStats *stats = runConnectedComponentsAlgorithm(arguments,  graph);
             if(stats)
             {
                 time_total += stats->time_total;
