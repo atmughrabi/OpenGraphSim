@@ -242,7 +242,7 @@ main (int argc, char **argv)
             arguments.pushpull = 1; //
             sweepSPMV(arguments, graph, &(PLRU_stats_SPMV[i][j][0]));
 
-            arguments.pushpull = 0; //
+            arguments.pushpull = 1; //
             sweepTC(arguments, graph, &(PLRU_stats_TC[i][j][0]));
 
             arguments.pushpull = 0; //
