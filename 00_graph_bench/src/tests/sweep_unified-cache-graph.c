@@ -201,7 +201,7 @@ main (int argc, char **argv)
 
     arguments.algorithm = 0;
     arguments.iterations = 1;
-    arguments.trials = 5; // random number of trials
+    arguments.trials = 1; // random number of trials
 
     initializeMersenneState (&(arguments.mt19937var), 27491095);
 
