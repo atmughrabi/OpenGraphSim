@@ -25,7 +25,7 @@ export INC_DIR			  	= include
 export BIN_DIR			  	= bin
 export RES_DIR			  	= results
 export SNI_DIR			    = sniper
-
+export CONFIG_DIR			= config
 
 #if you want to compile from cmake you need this directory
 #cd build
@@ -39,6 +39,7 @@ export ALGO_DIR		  		= algorithms
 export UTIL_DIR		  		= utils
 export CAPI_UTIL_DIR		= capi_utils
 export CACHE_DIR		  	= cache
+export CONFIG_DIR			= config
 
 #contains the tests use make run-test to compile what in this directory
 export TEST_DIR		  	= tests

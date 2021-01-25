@@ -289,6 +289,7 @@ struct TCStats *triangleCountBasicGraphCSR(struct GraphCSR *graph)
                     node_iter = EXTRACT_VALUE(graph->sorted_edges_array->edges_array_dest[iter]);
 
                     if(node_iter == node_w)
+                        // #pragma omp atomic update
                         stats->counts[u]++;
                 }
             }

@@ -33,6 +33,8 @@ PREPRO_DIR          ?= preprocess
 ALGO_DIR            ?= algorithms
 UTIL_DIR            ?= utils
 CACHE_DIR           ?= cache
+CONFIG_DIR			?= config
+
 
 # Folders needed when using CAPI
 
@@ -118,8 +120,9 @@ INC_FILES_UTIL      =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)/*.h)
 INC_FILES_PREPRO    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)/*.h)
 INC_FILES_STRUCT    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)/*.h)
 INC_FILES_CACHE     =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)/*.h)
+INC_FILES_CONFIG    =   $(wildcard $(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)/*.h)
 
-ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CACHE)
+ALL_HEADER_FILES    =   $(INC_FILES_ALGO_OPENMP) $(INC_FILES_UTIL) $(INC_FILES_PREPRO) $(INC_FILES_STRUCT) $(INC_FILES_CACHE) $(INC_FILES_CONFIG)
 
 #create object file rules for the final binary target
 OBJ_FILES_ALGO_OPENMP       = $(patsubst $(APP_DIR)/$(SRC_DIR)/$(ALGO_DIR)/openmp/%.c,$(APP_DIR)/$(OBJ_DIR)/$(ALGO_DIR)/openmp/%.o,$(SRC_FILES_ALGO_OPENMP))
@@ -141,7 +144,8 @@ OPENMP_INC =    -I$(APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(ALGO_DIR)/$(INTEGRATION)  \
 				-I$(APP_DIR)/$(INC_DIR)/$(PREPRO_DIR)               \
 				-I$(APP_DIR)/$(INC_DIR)/$(UTIL_DIR)                 \
-				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)
+				-I$(APP_DIR)/$(INC_DIR)/$(CACHE_DIR)                \
+				-I$(APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)  
 
 SNIPER_INC     = -I$(APP_DIR)/$(SNI_DIR)/$(INC_DIR)
 SNIPER_CFLAGS  = -mno-sse4 -mno-sse4.1 -mno-sse4.2 -mno-sse4a -mno-avx -mno-avx2 -I$(APP_DIR)/$(SNI_DIR)/include 
