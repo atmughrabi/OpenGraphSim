@@ -49,7 +49,7 @@
 #include "graphTest.h"
 #define GRAPH_NUM 4
 
-#define CACHE_CONFIGS 5
+#define CACHE_CONFIGS 1
 #define CACHE_POLICY 6
 #define MODE_NUM 3
 #define ORDER_CONFIG 6
@@ -70,9 +70,14 @@ main (int argc, char **argv)
     // uint32_t Associativity[CACHE_CONFIGS] = {4,  4, 4, 8,  8,  16, 16, 16, 16, 32, 32, 32};
     // uint32_t Block_size[CACHE_CONFIGS] = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
 
-    uint32_t cache_size[CACHE_CONFIGS]    = {262144, 524288,  1048576, 2097152, 4194304};
-    uint32_t Associativity[CACHE_CONFIGS] = {8,  8,  16, 16, 16};
-    uint32_t Block_size[CACHE_CONFIGS]    = {128, 128, 128, 128, 128};
+    // uint32_t cache_size[CACHE_CONFIGS]    = {262144, 524288,  1048576, 2097152, 4194304};
+    // uint32_t Associativity[CACHE_CONFIGS] = {8,  8,  16, 16, 16};
+    // uint32_t Block_size[CACHE_CONFIGS]    = {128, 128, 128, 128, 128};
+
+    uint32_t cache_size[CACHE_CONFIGS]    = {524288};
+    uint32_t Associativity[CACHE_CONFIGS] = {8};
+    uint32_t Block_size[CACHE_CONFIGS]    = {128};
+
     uint32_t policy[CACHE_POLICY]         = {PLRU_POLICY, SRRIP_POLICY, GRASP_POLICY, MASK_POLICY, GRASP_CAPI_POLICY, MASK_CAPI_POLICY};
     float PLRU_stats[GRAPH_NUM][ORDER_CONFIG]       = {0};
     float SSRIP_stats[GRAPH_NUM][ORDER_CONFIG]      = {0};

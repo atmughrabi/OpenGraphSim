@@ -170,6 +170,7 @@ struct Cache
     uint64_t *vertices_total_reuse_region;
     uint64_t *vertices_accesses_region;
     uint64_t *threshold_accesses_region;
+    uint32_t *degrees_pointer;
 
     uint32_t  numVertices;
 
