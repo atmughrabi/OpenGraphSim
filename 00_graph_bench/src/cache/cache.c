@@ -270,17 +270,23 @@ struct Cache *newCache(uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, 
     cache->numPropertyRegions  = numPropertyRegions;
     cache->propertyRegions     = (struct PropertyRegion *)my_malloc(sizeof(struct PropertyRegion) * numPropertyRegions);
 
-    cache->thresholds              = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
-    cache->thresholds_count        = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
-    cache->thresholds_totalDegrees = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
-    cache->thresholds_avgDegrees   = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
+    cache->thresholds              = (uint64_t  *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
+    cache->thresholds_count        = (uint64_t  *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
+    cache->thresholds_totalDegrees = (uint64_t  *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
+    cache->thresholds_avgDegrees   = (uint64_t  *)my_malloc(sizeof(uint64_t) * cache->num_buckets );
     cache->regions_avgDegrees      = (uint64_t **)my_malloc(sizeof(uint64_t *) * numPropertyRegions);
 
     cache->verticesMiss = NULL;
     cache->verticesHit  = NULL;
+
     cache->vertices_base_reuse  = NULL;
     cache->vertices_total_reuse = NULL;
     cache->vertices_accesses    = NULL;
+
+    cache->vertices_base_reuse_region  = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets);
+    cache->vertices_total_reuse_region = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets);
+    cache->vertices_accesses_region    = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets);
+    cache->threshold_accesses_region   = (uint64_t *)my_malloc(sizeof(uint64_t) * cache->num_buckets);
 
     for(i = 0; i < cache->numPropertyRegions; i++)
     {
@@ -297,6 +303,10 @@ struct Cache *newCache(uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, 
         cache->thresholds_count[i]         = 0;
         cache->thresholds_totalDegrees[i]  = 0;
         cache->thresholds_avgDegrees[i]    = 0;
+
+        cache->vertices_base_reuse_region[i]  = 0;
+        cache->vertices_total_reuse_region[i] = 0;
+        cache->vertices_accesses_region[i]    = 0;
     }
 
     for(i = 0; i < numPropertyRegions; i++)
@@ -317,6 +327,8 @@ struct Cache *newCache(uint32_t l1_size, uint32_t l1_assoc, uint32_t blocksize, 
         cache->vertices_total_reuse = (uint64_t *)my_malloc(sizeof(uint64_t) * num_vertices);
         cache->vertices_accesses    = (uint64_t *)my_malloc(sizeof(uint64_t) * num_vertices);
     }
+
+
 
     for(i = 0; i < num_vertices; i++)
     {
@@ -352,6 +364,12 @@ void freeCache(struct Cache *cache)
             free(cache->thresholds);
         if(cache->thresholds_count)
             free(cache->thresholds_count);
+        if(cache->vertices_base_reuse_region)
+            free(cache->vertices_base_reuse_region);
+        if(cache->vertices_total_reuse_region)
+            free(cache->vertices_total_reuse_region);
+        if(cache->vertices_accesses_region)
+            free(cache->vertices_accesses_region);
         if(cache->thresholds_totalDegrees)
             free(cache->thresholds_totalDegrees);
         if(cache->thresholds_avgDegrees)
@@ -453,7 +471,7 @@ void online_cache_graph_stats(struct Cache *cache, uint32_t node)
 
     cache->vertices_base_reuse[node]   = cache->access_counter;
     v = node;
-    for (i = 0; i < 32; ++i)
+    for (i = 0; i < (cache->lineSize / 4); ++i)
     {
         cache->vertices_base_reuse[(node / (cache->lineSize / 4)) + i]   = cache->access_counter;
         v++;

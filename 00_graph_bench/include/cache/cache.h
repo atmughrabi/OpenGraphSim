@@ -46,7 +46,7 @@
 // #define POLICY PLRU_POLICY
 // #define POLICY GRASPXP_POLICY
 // #define POLICY MASK_POLICY
-#define POLICY MASK_CAPI_POLICYz
+#define POLICY MASK_CAPI_POLICY
 // #define POLICY GRASP_CAPI_POLICY
 
 #define BLOCKSIZE   64
@@ -165,6 +165,12 @@ struct Cache
     uint64_t *vertices_base_reuse;
     uint64_t *vertices_total_reuse;
     uint64_t *vertices_accesses;
+
+    uint64_t *vertices_base_reuse_region;
+    uint64_t *vertices_total_reuse_region;
+    uint64_t *vertices_accesses_region;
+    uint64_t *threshold_accesses_region;
+
     uint32_t  numVertices;
 
     uint32_t  num_buckets;
