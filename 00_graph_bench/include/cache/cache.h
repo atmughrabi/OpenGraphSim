@@ -14,6 +14,8 @@
 #define MASK_POLICY    7
 #define MASK_CAPI_POLICY     8
 #define GRASP_CAPI_POLICY    9
+#define GRASP_CAPI_POLICY    9
+#define CACHE_MORPH_POLICY   10
 
 //CAPI PSL CACHE default CONFIGS
 
